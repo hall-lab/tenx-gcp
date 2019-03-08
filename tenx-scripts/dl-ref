@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+#SBATCH --job-name=DL_REF
+#SBATCH --output=%J.out
+
+set -e
+
+[ -z "${1}" ] && echo "No refernce given!" && exit 1
+export TENX_REFNAME="${1}"
+source /apps/tenx-scripts/tenxrc
+
+echo "Fetching ${TENX_REFNAME} reference from the object store..."
+echo "Checking reference remote URL: ${TENX_REF_URL}"
+gsutil ls "${TENX_REF_URL}"
+echo "Entering ${TENX_REFS_PATH}"
+cd "${TENX_REFS_PATH}"
+gsutil -m rsync -r "${TENX_REF_URL}" .
+echo "Untarring ${TENX_REF_TGZ} ..."
+tar -xvvfz "${TENX_REF_TGZ}"
+rm -f "${TENX_REF_TGZ}"
+echo "Fetching reference from the object store...OK"

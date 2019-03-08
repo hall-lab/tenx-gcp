@@ -1,0 +1,138 @@
+{
+    "name": "ID.TWAP-WGS-0622-AB58800511.PHASER_SVCALLER_CS.PHASER_SVCALLER._SNPINDEL_PHASER.ATTACH_PHASING.fork0.chnk005",
+    "pid": 15874,
+    "host": "longranger2-compute1",
+    "type": "slurm",
+    "cwd": "/mnt/disks/data/alignments/TWAP-WGS-0622-AB58800511/PHASER_SVCALLER_CS/PHASER_SVCALLER/_SNPINDEL_PHASER/ATTACH_PHASING/fork0/chnk005-u02d4563d8f/files",
+    "python": {
+        "binpath": "/apps/longranger/anaconda-cs/2.2.0-anaconda-cs-c8/bin/python",
+        "version": "2.7.9 |Anaconda 2.2.0 (64-bit)| (default, Mar  9 2015, 16:20:48) \n[GCC 4.4.7 20120313 (Red Hat 4.4.7-1)]"
+    },
+    "rusage": {
+        "self": {
+            "ru_maxrss": 3292,
+            "ru_ixrss": 0,
+            "ru_idrss": 0,
+            "ru_minflt": 1046,
+            "ru_majflt": 0,
+            "ru_nswap": 0,
+            "ru_utime": 0.01124,
+            "ru_stime": 0.0281,
+            "ru_inblock": 16,
+            "ru_oublock": 104,
+            "ru_msgsnd": 0,
+            "ru_msgrcv": 0,
+            "ru_nsignals": 0
+        },
+        "children": {
+            "ru_maxrss": 868604,
+            "ru_ixrss": 0,
+            "ru_idrss": 0,
+            "ru_minflt": 2484281,
+            "ru_majflt": 1,
+            "ru_nswap": 0,
+            "ru_utime": 880.326179,
+            "ru_stime": 28.941548,
+            "ru_inblock": 280,
+            "ru_oublock": 1590400,
+            "ru_msgsnd": 0,
+            "ru_msgrcv": 0,
+            "ru_nsignals": 0
+        }
+    },
+    "used_bytes": {
+        "rss": 854712320,
+        "shared": 16588800,
+        "vmem": 1195290624,
+        "text": 24576,
+        "stack": 842997760,
+        "proc_count": 1
+    },
+    "wallclock": {
+        "start": "2019-02-03 01:02:09",
+        "end": "2019-02-03 01:17:37",
+        "duration_seconds": 928.008067976
+    },
+    "threads": 1,
+    "memGB": 4,
+    "profile_mode": "disable",
+    "stackvars_flag": "disable",
+    "monitor_flag": "disable",
+    "invocation": {
+        "call": "PHASER_SVCALLER_CS",
+        "args": {
+            "downsample": null,
+            "fastq_mode": "ILMN_BCL2FASTQ",
+            "is_germline": true,
+            "noloupe": false,
+            "reference_path": "/mnt/disks/data/references/refdata-GRCh38-2.1.0/",
+            "restrict_locus": null,
+            "sample_def": [
+                {
+                    "bc_in_read": 1,
+                    "bc_length": 16,
+                    "gem_group": null,
+                    "lanes": null,
+                    "library": "LibraryNotSpecified",
+                    "read_path": "/mnt/disks/data/reads/TWAP-WGS-0622-AB58800511",
+                    "sample_indices": [
+                        "any"
+                    ],
+                    "sample_names": [
+                        "TWAP-WGS-0622-AB58800511"
+                    ]
+                }
+            ],
+            "sample_desc": "",
+            "sample_id": "TWAP-WGS-0622-AB58800511",
+            "sex": null,
+            "vc_ground_truth": null,
+            "vc_mode": "freebayes",
+            "vc_precalled": null
+        },
+        "sweepargs": [],
+        "incpaths": [
+            "phaser_svcaller_cs.mro"
+        ]
+    },
+    "version": {
+        "martian": "'2.2.2-2.3.2'",
+        "pipelines": "2.2.2"
+    },
+    "sge": {
+        "SLURM_CHECKPOINT_IMAGE_DIR": "/var/slurm/checkpoint",
+        "SLURM_CLUSTER_NAME": "longranger2",
+        "SLURM_CPUS_ON_NODE": "2",
+        "SLURM_GTIDS": "0",
+        "SLURM_JOBID": "1260",
+        "SLURM_JOB_ACCOUNT": "default",
+        "SLURM_JOB_CPUS_PER_NODE": "2",
+        "SLURM_JOB_GID": "467214103",
+        "SLURM_JOB_ID": "1260",
+        "SLURM_JOB_NAME": "ID.TWAP-WGS-0622-AB58800511.PHASER_SVCALLER_CS.PHASER_SVCALLER._SNPINDEL_PHASER.ATTACH_PHASING.fork0.chnk005.main",
+        "SLURM_JOB_NODELIST": "longranger2-compute1",
+        "SLURM_JOB_NUM_NODES": "1",
+        "SLURM_JOB_PARTITION": "debug",
+        "SLURM_JOB_QOS": "normal",
+        "SLURM_JOB_UID": "467214103",
+        "SLURM_JOB_USER": "ebelter_wustl_edu",
+        "SLURM_LOCALID": "0",
+        "SLURM_MEM_PER_NODE": "4096",
+        "SLURM_NNODES": "1",
+        "SLURM_NODEID": "0",
+        "SLURM_NODELIST": "longranger2-compute1",
+        "SLURM_NODE_ALIASES": "(null)",
+        "SLURM_NPROCS": "1",
+        "SLURM_NTASKS": "1",
+        "SLURM_NTASKS_PER_NODE": "1",
+        "SLURM_PRIO_PROCESS": "0",
+        "SLURM_PROCID": "0",
+        "SLURM_SUBMIT_DIR": "/mnt/disks/data/alignments/TWAP-WGS-0622-AB58800511/PHASER_SVCALLER_CS/PHASER_SVCALLER/_SNPINDEL_PHASER/ATTACH_PHASING/fork0/chnk005-u02d4563d8f/files",
+        "SLURM_SUBMIT_HOST": "longranger2-controller",
+        "SLURM_TASKS_PER_NODE": "1",
+        "SLURM_TASK_PID": "15839",
+        "SLURM_TOPOLOGY_ADDR": "longranger2-compute1",
+        "SLURM_TOPOLOGY_ADDR_PATTERN": "node",
+        "SLURM_WORKING_CLUSTER": "longranger2:longranger2-controller:6817:8192"
+    }
+}

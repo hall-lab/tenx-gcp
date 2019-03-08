@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+#SBATCH --job-name=UL_ALIGN
+#SBATCH --output=%j.out
+
+set -e
+
+[ -z "${1}" ] && echo "No sample given!" && exit 1
+export TENX_SAMPLE="${1}"
+source /apps/tenx-scripts/tenxrc
+
+echo "Uploading ${TENX_SAMPLE} alignment to the object store..."
+echo "Entering: ${TENX_ALN_PATH}"
+cd "${TENX_ALN_PATH}"
+echo "Removing logging directory ALIGNER_CS or PHASER_SVCALLER_CS prior to upload"
+rm -rf ALIGNER_CS PHASER_SVCALLER_CS
+echo "Uploading to: ${TENX_ALN_URL}"
+gsutil -m rsync -r . "${TENX_ALN_URL}"
+echo "Uploading alignment to the object store...OK"
