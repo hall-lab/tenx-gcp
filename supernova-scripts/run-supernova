@@ -1,0 +1,118 @@
+#!/bin/bash
+
+set -o errexit
+
+function sn_init() {
+    SUPERNOVA_SAMPLE="${1}"
+    if [ -z "${SUPERNOVA_SAMPLE}" ]; then
+        echo "ERROR: No sample given!"
+        exit 1
+    fi
+
+    SUPERNOVA_READS_PATH=@DATA_DIR@/reads
+    SUPERNOVA_SAMPLE_READS_PATH="${SUPERNOVA_READS_PATH}/${SUPERNOVA_SAMPLE}"
+    SUPERNOVA_ASSEMBLY_PATH=@DATA_DIR@/assembly
+    SUPERNOVA_SAMPLE_ASSEMBLY_PATH="${SUPERNOVA_ASSEMBLY_PATH}/${SUPERNOVA_SAMPLE}"
+
+    SUPERNOVA_SOURCEME_PATH="/apps/supernova/sourceme.bash" # TODO configure
+
+}
+
+function sn_fetch_fastqs() {
+    echo "Fetching ${SUPERNOVA_SAMPLE} fastqs from the object store..."
+    mkdir -p "${SUPERNOVA_SAMPLE_READS_PATH}"
+    cd "${SUPERNOVA_SAMPLE_READS_PATH}"
+    gsutil ls "@REMOTE_DATA_URL@/reads/${SUPERNOVA_SAMPLE}/"
+    gsutil -m rsync -r "@REMOTE_DATA_URL@/reads/${SUPERNOVA_SAMPLE}/" .
+    echo "Fetching fastqs from the object store...OK"
+
+}
+
+function sn_assemble() {
+    echo "Running supernova..."
+    mkdir -p "${SUPERNOVA_ASSEMBLY_PATH}"
+    cd "${SUPERNOVA_ASSEMBLY_PATH}"
+    supernova run --id="${SUPERNOVA_SAMPLE}" --fastqs="${SUPERNOVA_SAMPLE_READS_PATH}" --uiport=18080 --nodebugmem --localcores=50 --localmem=400
+    echo "Running supernova...OK"
+
+}
+
+function sn_mkoutput() {
+    echo "Running mkoutput..."
+    SUPERNOVA_MKOUTPUT_PATH="${SUPERNOVA_SAMPLE_ASSEMBLY_PATH}/mkoutput";
+    mkdir -p "${SUPERNOVA_MKOUTPUT_PATH}"
+    cd "${SUPERNOVA_MKOUTPUT_PATH}"
+    supernova mkoutput --asmdir="${SUPERNOVA_SAMPLE_ASSEMBLY_PATH}/outs/assembly" --outprefix="${SUPERNOVA_SAMPLE}.raw" --style="raw"
+    supernova mkoutput --asmdir="${SUPERNOVA_SAMPLE_ASSEMBLY_PATH}/outs/assembly" --outprefix="${SUPERNOVA_SAMPLE}.megabubbles" --style="megabubbles"
+    supernova mkoutput --asmdir="${SUPERNOVA_SAMPLE_ASSEMBLY_PATH}/outs/assembly" --outprefix="${SUPERNOVA_SAMPLE}.pseudohap2" --style="pseudohap2"
+    echo "Running mkoutput...OK"
+
+}
+
+function sn_put_assembly() {
+    echo "Uploading assembly to object store..."
+    echo "Checking if the assembly completed..."
+    cd "${SUPERNOVA_SAMPLE_ASSEMBLY_PATH}"
+    grep -q "Pipestance completed successfully" _log
+    echo "Removing the ASSEMBLER_CS log sub directory..."
+    rm -rf ASSEMBLER_CS/
+    cd "${SUPERNOVA_ASSEMBLY_PATH}"
+    gsutil -m rsync -r "${SUPERNOVA_SAMPLE}" "@REMOTE_DATA_URL@/assembly/${SUPERNOVA_SAMPLE}/"
+    echo "Uploading assembly to object store...OK"
+}
+
+## __MAIN__ ##
+SUPERNOVA_USAGE='
+USAGE:
+  run-supernova FUNCTION SAMPLE
+
+FUNCTIONS:
+  pipeline     run all functions
+  dl-fastqs    download fastqs
+  assemble     run the supernova assembler
+  mkoutput     create the mkoutputs for the assembly
+  ul-assembly  upload the assembly to cloud storage
+
+DATA LOCATION:
+  /data/supernova
+'
+
+case "${1}" in
+    help)
+        echo "${SUPERNOVA_USAGE}"
+        ;;
+    dl-fastqs)
+        sn_init "${2}"
+        sn_fetch_fastqs
+        ;;
+    assemble)
+        sn_init "${2}"
+        source "${SUPERNOVA_SOURCEME_PATH}"
+        sn_assemble
+        ;;
+    mkoutput)
+        sn_init "${2}"
+        source "${SUPERNOVA_SOURCEME_PATH}"
+        sn_mkoutput
+        ;;
+    ul-assembly)
+        sn_init "${2}"
+        sn_put_assembly
+        ;;
+    pipeline)
+        sn_init "${2}"
+        source "${SUPERNOVA_SOURCEME_PATH}"
+        sn_fetch_fastqs
+        sn_assemble
+        sn_mkoutput
+        sn_put_assembly
+        ;;
+     *)
+        if [ -z "${1}" ]; then
+            echo "ERROR: No function given!"
+        else
+            echo "ERROR: Unknown function: ${1}"
+        fi
+        echo "${SUPERNOVA_USAGE}"
+        exit 1
+esac

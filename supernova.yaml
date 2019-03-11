@@ -1,0 +1,23 @@
+# [START supernova_yaml]
+imports:
+- path: supernova.jinja
+
+resources:
+- name: supernova-cluster
+  type: supernova.jinja
+  properties:
+    # PROJECT
+    service_account         : <SERVICE_ACCOUNT>
+    region                  : us-central1
+    zone                    : us-central1-c
+
+    # CLUSTER
+    cluster_name            : supernova1
+    machine_type            : n1-highmem-64
+    disk_size               : 2000
+
+    # DIRS/URLS
+    data_dir                : <DATA_DIR>
+    remote_data_url         : <REMOVE_DATA_URL>
+    supernova_version       : <SUPERNOVA_VERSION>
+#  [END supernova_yaml]

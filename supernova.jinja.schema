@@ -1,0 +1,73 @@
+# Copyright 2015 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+info:
+  title: A template for creating a 10X Genomics Supernova cluster.
+  author: Eddie Belter
+  description: |
+    Create a 10X Genomics Supernova cluster on GCP.
+
+imports:
+- path: scripts/startup-script.bash
+- path: scripts/run-supernova
+
+required:
+- cluster_name
+- data_dir
+- disk_size_gb
+- machine_type
+- region
+- remote_data_url
+- service_account
+- zone
+
+properties:
+  cluster_name:
+    type        : string
+    description : Name of the cluster.
+
+  data_dir:
+    type        : string
+    default     : /mnt/disks/data
+    description : Local data directory to store reads and assemblies.
+
+  disk_size_gb:
+    type        : integer
+    default     : 2000
+    minimum     : 10
+    maximum     : 64000
+    description : Size of disk for compute nodes.
+
+  machine_type:
+    type        : string
+    description : |
+      Machine type to use for compute node instances, eg. n1-highmem-64.
+
+  region:
+    type        : string
+    description : Region to run the instances in.
+
+  remote_data_url:
+    type        : string
+    description : Remote data URL (gs://) where pull read fastqs and software, and to push finished assemblies. There should be a software subdir with supernova TGZ. There also needs to be individual sample directory with a reads and assembly sub-buckets.
+
+  service_account:
+    type        : string
+    default     : default
+    description : Service account for compute instances to use.
+
+  zone:
+    type        : string
+    description : Zone to run the instances in based on region.
+
