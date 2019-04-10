@@ -46,7 +46,7 @@ GPU_COUNT         = @GPU_COUNT@
 NFS_APPS_SERVER   = '@NFS_APPS_SERVER@'
 NFS_HOME_SERVER   = '@NFS_HOME_SERVER@'
 CONTROLLER_SECONDARY_DISK = @CONTROLLER_SECONDARY_DISK@
-SEC_DISK_DIR      = '/mnt/disks/data'
+DATA_DIR      = '@DATA_DIR@'
 REMOTE_DATA_URL   = '@REMOTE_DATA_URL@'
 CONTROL_MACHINE = CLUSTER_NAME + '-controller'
 
@@ -286,7 +286,7 @@ def setup_nfs_exports():
     if CONTROLLER_SECONDARY_DISK:
         f.write("""
 %s  *(rw,sync,no_subtree_check,no_root_squash)
-""" % SEC_DISK_DIR)
+""" % DATA_DIR)
     f.close()
 
     subprocess.call(shlex.split("exportfs -a"))
@@ -846,8 +846,8 @@ def install_gatk():
 def create_data_directory_structure():
     print "Create data directory structure..."
 
-    os.mkdir(SEC_DISK_DIR + '/references')
-    os.chmod(SEC_DISK_DIR + '/references', 0o777)
+    os.mkdir(DATA_DIR + '/references')
+    os.chmod(DATA_DIR + '/references', 0o777)
 
     print "Create data directory structure...OK"
 
@@ -946,7 +946,7 @@ def setup_nfs_sec_vols():
         if ((INSTANCE_TYPE != "controller")):
             f.write("""
 {1}:{0}    {0}     nfs      rw,sync,hard,intr  0     0
-""".format(SEC_DISK_DIR, CONTROL_MACHINE))
+""".format(DATA_DIR, CONTROL_MACHINE))
     f.close()
 
 #END setup_nfs_sec_vols()
@@ -958,7 +958,7 @@ def setup_secondary_disks():
 
     f.write("""
 /dev/sdb    {0}  ext4    discard,defaults,nofail  0  2
-""".format(SEC_DISK_DIR))
+""".format(DATA_DIR))
     f.close()
 
 #END setup_secondary_disks()
@@ -989,9 +989,9 @@ def setup_slurmd_cronjob():
 
 def format_disk():
     subprocess.call(shlex.split("sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb"))
-    #subprocess.call(shlex.split("sudo mkdir -p " + SEC_DISK_DIR))
-    subprocess.call(shlex.split("sudo mount -o discard,defaults /dev/sdb " + SEC_DISK_DIR))
-    subprocess.call(shlex.split("sudo chmod a+w " + SEC_DISK_DIR))
+    #subprocess.call(shlex.split("sudo mkdir -p " + DATA_DIR))
+    subprocess.call(shlex.split("sudo mount -o discard,defaults /dev/sdb " + DATA_DIR))
+    subprocess.call(shlex.split("sudo chmod a+w " + DATA_DIR))
 
 # END format_disk()
 
@@ -1008,8 +1008,8 @@ def main():
         print "ww Created Slurm Folders"
 
     if CONTROLLER_SECONDARY_DISK:
-        if not os.path.exists(SEC_DISK_DIR):
-            os.makedirs(SEC_DISK_DIR)
+        if not os.path.exists(DATA_DIR):
+            os.makedirs(DATA_DIR)
 
     start_motd()
 
