@@ -2,7 +2,9 @@
 
 set -o errexit
 
-TENX_LR_USAGE='
+source /apps/tenx-scripts/tenxrc
+
+TENX_LR_USAGE="
 USAGE:
   run-lr <SAMPLE> <REFERENCE> [VCMODE]
 
@@ -10,9 +12,9 @@ SCRIPTS LOCATION:
   /apps/tenx-scripts/
 
 DATA LOCATION:
-  @DATA_PATH@
+  ${DATA_PATH}
   
-'
+"
 
 [ -z "${1}" ] && echo "No sample given!${TENX_LR_USAGE}" && exit 1
 [ -z "${2}" ] && echo "No reference given!${TENX_LR_USAGE}" && exit 1
