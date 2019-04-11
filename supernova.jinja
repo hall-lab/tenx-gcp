@@ -79,7 +79,7 @@ resources:
       items:
         - key: startup-script
           value: |
-            {{ imports["scripts/startup-script.bash"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_VERSION@",properties["remote_data_url"]) }}
-        - key: run-supernova
+            {{ imports["scripts/startup-script.py"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_VERSION@",properties["remote_data_url"]) }}
+        - key: tenxrc
           value: |
-            {{ imports["scripts/run-supernova"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
+            {{ imports["tenx-scripts/tenxrc"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
