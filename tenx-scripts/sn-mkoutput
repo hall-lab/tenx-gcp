@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+[ -z "${1}" ] && echo "No sample given!" && exit 1
+export TENX_SAMPLE="${1}"
+
+source /apps/tenx-scripts/tenxrc
+source /apps/supernova/sourceme.bash
+
+echo "Running mkoutput..."
+echo "Entering ${TENX_ASM_PATH}/mkoutput"
+mkdir -p "${TENX_ASM_PATH}/mkoutput"
+cd "${TENX_ASM_PATH}/mkoutput"
+echo "Running mkoutput raw..."
+supernova mkoutput --asmdir="${TENX_ASM_PATH}/outs/assembly" --outprefix="${TENX_SAMPLE}.raw" --style="raw"
+echo "Running mkoutput megabubbles..."
+supernova mkoutput --asmdir="${TENX_ASM_PATH}/outs/assembly" --outprefix="${TENX_SAMPLE}.megabubbles" --style="megabubbles"
+echo "Running mkoutput pseudohap2..."
+supernova mkoutput --asmdir="${TENX_ASM_PATH}/outs/assembly" --outprefix="${TENX_SAMPLE}.pseudohap2" --style="pseudohap2"
+echo "Running mkoutput...OK"

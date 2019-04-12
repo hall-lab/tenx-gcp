@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+[ -z "${1}" ] && echo "No sample given!" && exit 1
+export TENX_SAMPLE="${1}"
+
+source /apps/tenx-scripts/tenxrc
+echo "Uploading ${TENX_SAMPLE} assembly to the object store..."
+echo "Entering: ${TENX_ASM_PATH}"
+cd "${TENX_ASM_PATH}"
+echo "Removing logging directory ASSEMBLER_CS prior to upload"
+rm -rf ASSEMBLER_CS
+echo "Uploading to: ${TENX_ASM_URL}"
+gsutil -m rsync -r . "${TENX_ASM_URL}"
+echo "Uploading assembly to the object store...OK"
