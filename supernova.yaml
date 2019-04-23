@@ -10,6 +10,7 @@ resources:
     service_account         : <SERVICE_ACCOUNT>
     region                  : us-central1
     zone                    : us-central1-c
+    project_name            : <PROJECT>
 
     # CLUSTER
     cluster_name            : supernova1
