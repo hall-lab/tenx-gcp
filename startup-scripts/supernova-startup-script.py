@@ -93,6 +93,8 @@ def install_tenx_scripts():
        '-o', 'tenx-scripts/tenxrc']):
         print "Failed curl tenxrc! Trying again in 5 seconds..."
         time.sleep (5)
+    for f in glob/glob( os.path.join(APPS_DIR, 'tenx-scripts', '*.bats'):
+        os.remove(f)
     shutil.move('tenx-scripts', APPS_DIR)
 
     os.chdir('/tmp')
