@@ -54,8 +54,8 @@ def install_supernova():
     if os.path.exists(APPS_DIR + "/supernova"): return
 
     print "Install supernova..."
-    os.makedirs(APPS_DIR + "/supernova")
-    os.chdir(APPS_DIR + "/supernova")
+    os.makedirs(APPS_DIR)
+    os.chdir(APPS_DIR)
     supernova_bn = 'supernova-2.0.1'
     supernova_tgz = '.'.join([supernova_bn, "tgz"])
     supernova_url = os.path.join(REMOTE_DATA_URL, "software", supernova_tgz)
