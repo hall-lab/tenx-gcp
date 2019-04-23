@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, shutil, subprocess
+import os, shutil, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR = '@DATA_DIR@'
@@ -19,6 +19,7 @@ def install_packages():
 	'openssl',
 	'openssl-devel',
         'python-devel',
+        'python-pip',
         'python-setuptool',
         'redhat-rpm-config',
 	'sssd-client',
@@ -35,7 +36,7 @@ def install_packages():
     while subprocess.call(['pip', 'install', '--upgrade', 'google-api-python-client']):
         print "Failed to install google python api client. Trying again 5 seconds."
 
-    subprocess.call(['pip', 'uninstall', 'crcmod']) # ignore rv
+    subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
     while subprocess.call(['pip', 'install', '-U', 'crcmod']):
         print "Failed to install crcmod. Trying again 5 seconds."
         time.sleep(5)
@@ -53,13 +54,14 @@ def install_supernova():
     if os.path.exists(APPS_DIR + "/supernova"): return
 
     print "Install supernova..."
-    os.chdir(APPS_DIR)
-    os.mkdir('supernova')
-    supernova_bn = 'supernova-@SUPERNOVA_VERSION@'
+    os.makedirs(APPS_DIR + "/supernova")
+    os.chdir(APPS_DIR + "/supernova")
+    supernova_bn = 'supernova-2.0.1'
     supernova_tgz = '.'.join([supernova_bn, "tgz"])
     supernova_url = os.path.join(REMOTE_DATA_URL, "software", supernova_tgz)
 
     print "Download supernova from " + supernova_url
+    subprocess.call(['gsutil', 'ls', '-l', supernova_url]) # check if exists
     while subprocess.call(['gsutil', '-m', 'cp', supernova_url, '.']):
         print "Failed to download supernova! Trying again in 5 seconds..."
         time.sleep (5)
@@ -83,27 +85,26 @@ def install_tenx_scripts():
     print "Installing tenx-scripts..."
 
     os.chdir('/tmp')
-    while subprocess.call(['git', 'clone', 'git@github.com:hall-lab/tenx-gcp.git']):
-        print "Failed git clone tenx-gcp repo! Trying again in 5 seconds..."
-        time.sleep (5)
-
-    shutil.remove('tenx-scripts/tenxrc')    
+    subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+    os.chdir('tenx-gcp')
+    os.remove('tenx-scripts/tenxrc')
     while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
        'http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenxrc',
        '-o', 'tenx-scripts/tenxrc']):
         print "Failed curl tenxrc! Trying again in 5 seconds..."
         time.sleep (5)
+    shutil.move('tenx-scripts', APPS_DIR)
 
-    shutil.move('tenx-gcp/tenx-scripts', APPS_DIR)
-    shutil.rmtree('tenx-gcp/tenx-scripts')
+    os.chdir('/tmp')
+    shutil.rmtree('tenx-gcp')
     print "Installing tenx-scripts...OK"
 
 #-- install_tenx_scripts
 
 def create_data_directory_structure():
-    mkdir -p DATA_DIR
-    chgrp -R adm DATA_DIR
-    chmod -R 775 DATA_DIR
+    if os.path.exists(DATA_DIR): return
+    os.makedirs(DATA_DIR)
+    os.chmod(DATA_DIR, 0777)
 
 #-- create_data_structure
 
