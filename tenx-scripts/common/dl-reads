@@ -10,6 +10,7 @@ export TENX_SAMPLE="${1}"
 source /apps/tenx-scripts/tenxrc
 echo "Fetching ${TENX_SAMPLE} fastqs from the object store..."
 mkdir -p "${TENX_RDS_PATH}"
+echo Entering "${TENX_RDS_PATH}"
 cd "${TENX_RDS_PATH}"
 echo "Checking for sample reads remote URL..."
 gsutil ls "${TENX_RDS_URL}"
