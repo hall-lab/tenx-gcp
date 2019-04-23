@@ -3,13 +3,12 @@
 @test "copy-and-sed" {
 
   export TESTDIR="${BATS_TMPDIR}/bats"
-  export SCRIPT_PATH="${TESTDIR}/ul-asm"
-
   run mkdir -p "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  run cp -f tenxrc "${TESTDIR}"
-  run cp -f ul-asm "${TESTDIR}"
-  [ "${status}" -eq 0 ]
+
+  # test script
+  export SCRIPT_PATH="${TESTDIR}/ul-asm"
+  run cp -f ul-asm "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
   chmod 755 "${SCRIPT_PATH}"
 
@@ -22,9 +21,13 @@
   run sed -i 's#/apps/tenx-scripts#/tmp/bats#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
 
+  # tenxrc
+  run cp -f ../tenxrc "${TESTDIR}"
+  [ "${status}" -eq 0 ]
+
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
   
 }

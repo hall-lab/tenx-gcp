@@ -85,4 +85,4 @@ resources:
             {{ imports["scripts/startup/supernova.py"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_VERSION@",properties["supernova_version"]) }}
         - key: tenxrc
           value: |
-            {{ imports["tenx-scripts/tenxrc"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
+            {{ imports["scripts/tenxrc"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}

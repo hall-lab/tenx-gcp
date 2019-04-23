@@ -12,7 +12,7 @@
 
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${SCRIPT_PATH}"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
   
 }

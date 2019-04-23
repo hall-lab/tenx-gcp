@@ -3,15 +3,15 @@
 @test "copy-and-sed" {
 
   export TESTDIR="${BATS_TMPDIR}/bats"
-  export SCRIPT_PATH="${TESTDIR}/dl-ref"
-
   run mkdir -p "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  run cp -f tenxrc "${TESTDIR}"
-  run cp -f dl-ref "${TESTDIR}"
-  [ "${status}" -eq 0 ]
+
+  # test script
+  export SCRIPT_PATH="${TESTDIR}/dl-ref"
+  run cp -f dl-ref "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
   chmod 755 "${SCRIPT_PATH}"
+  [ "${status}" -eq 0 ]
 
   run sed -i 's#cd#echo cd#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
@@ -21,12 +21,14 @@
   [ "${status}" -eq 0 ]
   run sed -i 's#tar #echo tar #' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
-
   run sed -i 's#/apps/tenx-scripts#/tmp/bats#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
+
+  # tenxrc
+  run cp -f ../tenxrc "${TESTDIR}"
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
   
 }

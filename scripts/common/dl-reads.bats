@@ -22,7 +22,6 @@
   run sed -i 's#/apps/tenx-scripts#/tmp/bats#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
 
-
   # tenxrc
   run cp -f ../tenxrc "${TESTDIR}"
   [ "${status}" -eq 0 ]

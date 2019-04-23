@@ -3,17 +3,16 @@
 @test "copy-and-sed" {
 
   export TESTDIR="${BATS_TMPDIR}/bats"
-  export SCRIPT_NAME="lr-aln"
-  export SCRIPT_PATH="${TESTDIR}/${SCRIPT_NAME}"
-  export TENXRC_PATH="${TESTDIR}/tenxrc"
-
   run mkdir -p "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  run cp -f tenxrc "${TESTDIR}"
+
+  # test script
+  export SCRIPT_NAME="lr-aln"
+  export SCRIPT_PATH="${TESTDIR}/${SCRIPT_NAME}"
   run cp -f "${SCRIPT_NAME}" "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  [ "${status}" -eq 0 ]
   chmod 755 "${SCRIPT_PATH}"
+  [ "${status}" -eq 0 ]
 
   run sed -i 's#mkdir#echo mkdir#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
@@ -27,9 +26,15 @@
   [ "${status}" -eq 0 ]
   run sed -i 's#longranger#echo longranger#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
+
+  #tenxrc
+  export TENXRC_PATH="${TESTDIR}/tenxrc"
+  run cp -f ../tenxrc "${TENXRC_PATH}"
+  [ "${status}" -eq 0 ]
+
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${TENXRC_PATH}"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${TENXRC_PATH}"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${TENXRC_PATH}"
   [ "${status}" -eq 0 ]
   
 }
@@ -53,6 +58,7 @@
   [ "${lines[1]}" == "cd /mnt/disks/data/TEST/alignment" ]
   [ "${lines[2]}" == "source /apps/echo longranger/sourceme.bash" ]
   [ "${lines[3]}" == "longranger align --id=TEST --sample=TEST --fastqs=/mnt/disks/data/TEST/reads --reference=/mnt/disks/data/references/REF --jobmode=slurm --uiport=18080 --localmem=6 --localcores=1" ]
+  [ "${lines[4]}" == "" ]
 
 }
 
@@ -65,6 +71,7 @@
   [ "${lines[1]}" == "cd /mnt/disks/data/TEST/alignment" ]
   [ "${lines[2]}" == "source /apps/echo longranger/sourceme.bash" ]
   [ "${lines[3]}" == "longranger wgs --id=TEST --sample=TEST --fastqs=/mnt/disks/data/TEST/reads --reference=/mnt/disks/data/references/REF --jobmode=slurm --uiport=18080 --localmem=6 --localcores=1 --vcmode=freebayes" ]
+  [ "${lines[4]}" == "" ]
 
 }
 
@@ -74,4 +81,3 @@
   [ "${status}" -eq 2 ]
 
 }
-

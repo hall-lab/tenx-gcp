@@ -3,15 +3,15 @@
 @test "copy-and-sed" {
 
   export TESTDIR="${BATS_TMPDIR}/bats"
-  export SCRIPT_PATH="${TESTDIR}/sn-mkoutput"
-
   run mkdir -p "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  run cp -f sn-mkoutput "${TESTDIR}"
-  [ "${status}" -eq 0 ]
-  run cp -f tenxrc "${TESTDIR}"
+
+  # test script
+  export SCRIPT_PATH="${TESTDIR}/sn-mkoutput"
+  run cp -f sn-mkoutput "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
   chmod 755 "${SCRIPT_PATH}"
+  [ "${status}" -eq 0 ]
 
   run sed -i 's#source /apps/sup#echo source /apps/sup#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
@@ -24,13 +24,16 @@
   run sed -i 's#^supernova#echo supernova#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
 
+  # tenxrc
+  run cp -f ../tenxrc "${TESTDIR}"
+  [ "${status}" -eq 0 ]
+
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
 
 }
-
 
 @test "mkoutput" {
 

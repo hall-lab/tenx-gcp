@@ -3,15 +3,15 @@
 @test "copy-and-sed" {
 
   export TESTDIR="${BATS_TMPDIR}/bats"
-  export SCRIPT_PATH="${TESTDIR}/ul-aln"
-
   run mkdir -p "${TESTDIR}"
   [ "${status}" -eq 0 ]
-  run cp -f tenxrc "${TESTDIR}"
-  run cp -f ul-aln "${TESTDIR}"
-  [ "${status}" -eq 0 ]
+
+  # test script
+  export SCRIPT_PATH="${TESTDIR}/ul-aln"
+  run cp -f ul-aln "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
   chmod 755 "${SCRIPT_PATH}"
+  [ "${status}" -eq 0 ]
 
   run sed -i 's#mkdir#echo mkdir#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
@@ -23,9 +23,14 @@
   [ "${status}" -eq 0 ]
   run sed -i 's#/apps/tenx-scripts#/tmp/bats#' "${SCRIPT_PATH}"
   [ "${status}" -eq 0 ]
+
+  # tenxrc
+  run cp -f ../tenxrc "${TESTDIR}"
+  [ "${status}" -eq 0 ]
+
   run sed -i 's#\@REMOTE_DATA_URL\@#gs://data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
-  run sed -i 's#\@DATA_PATH\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
+  run sed -i 's#\@DATA_DIR\@#/mnt/disks/data#' "${TESTDIR}/tenxrc"
   [ "${status}" -eq 0 ]
   
 }
@@ -46,6 +51,7 @@
   [ "${lines[5]}" == "Uploading to: gs://data/TEST/alignment" ]
   [ "${lines[6]}" == "gsutil -m rsync -r . gs://data/TEST/alignment" ]
   [ "${lines[7]}" == "Uploading alignment to the object store...OK" ]
+  [ "${lines[8]}" == "" ]
 
 }
 
@@ -55,4 +61,3 @@
   [ "${status}" -eq 2 ]
 
 }
-
