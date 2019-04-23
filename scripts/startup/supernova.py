@@ -90,9 +90,9 @@ def install_tenx_scripts():
     os.chdir('tenx-gcp')
 
     for subdir in ( 'common', 'supernova' ):
-        for fn in glob.glob( os.path.join('tenx-scripts', subdir, "*") ):
+        for fn in glob.glob( os.path.join('scripts', subdir, "*") ):
             if os.path.basename(fn).endswith("bats"): continue
-            os.copy(fn, os.path.join(APPS_DIR, 'tenx-srcipts') )
+            os.copy(fn, os.path.join(APPS_DIR, 'tenx-scripts') )
 
     while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
        'http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenxrc',

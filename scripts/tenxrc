@@ -2,7 +2,7 @@
 
 set -o errexit
 
-TENX_DATA_PATH=@DATA_PATH@
+TENX_DATA_PATH=@DATA_DIR@
 TENX_REMOTE_DATA_URL=@REMOTE_DATA_URL@
 if [ ! -z "${TENX_SAMPLE}" ]; then
     # Local PATHs

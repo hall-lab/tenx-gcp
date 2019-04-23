@@ -19,8 +19,8 @@ info:
     Create a 10X Genomics Supernova cluster on GCP.
 
 imports:
-- path: tenx-scripts/supernova-startup-script.py
-- path: tenx-scripts/tenxrc
+- path: scripts/startup/supernova.py
+- path: scripts/tenxrc
 
 required:
 - cluster_name
