@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, shutil, subprocess, time
+import glob, os, shutil, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR = '@DATA_DIR@'
@@ -84,18 +84,21 @@ def install_tenx_scripts():
     if os.path.exists(APPS_DIR + "/tenx-scripts"): return
     print "Installing tenx-scripts..."
 
+    os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
     os.chdir('/tmp')
     subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
     os.chdir('tenx-gcp')
-    os.remove('tenx-scripts/tenxrc')
+
+    for subdir in ( 'common', 'supernova' ):
+        for fn in glob.glob( os.path.join('tenx-scripts', subdir, "*") ):
+            if os.path.basename(fn).endswith("bats"): continue
+            os.copy(fn, os.path.join(APPS_DIR, 'tenx-srcipts') )
+
     while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
        'http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenxrc',
-       '-o', 'tenx-scripts/tenxrc']):
+       '-o', os.path.join(APPS_DIR, 'tenx-scripts', 'tenxrc')]):
         print "Failed curl tenxrc! Trying again in 5 seconds..."
         time.sleep (5)
-    for f in glob/glob( os.path.join(APPS_DIR, 'tenx-scripts', '*.bats'):
-        os.remove(f)
-    shutil.move('tenx-scripts', APPS_DIR)
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
