@@ -58,13 +58,14 @@ def create_data_directory_structures():
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
         os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
 
-#-- create_data_structure
+#-- create_data_directory_structures
 
 def install_supernova():
-    if os.path.exists( os.path.join(APPS_DIR, "supernova") ): return
+    if os.path.exists( os.path.join(APPS_DIR, "supernova") ):
+        print "Already installed supernova...SKIPPING"
+        return
 
     print "Install supernova..."
-    os.makedirs(APPS_DIR)
     os.chdir(APPS_DIR)
     supernova_bn = 'supernova-2.0.1'
     supernova_tgz = '.'.join([supernova_bn, "tgz"])
@@ -91,7 +92,9 @@ def install_supernova():
 #-- install_supernova
 
 def install_tenx_scripts():
-    if os.path.exists( os.path.join(APPS_DIR, "tenx-scripts", "tenxrc") ): return
+    if os.path.exists( os.path.join(APPS_DIR, "tenx-scripts", "tenxrc") ):
+        print "Already installed tenx-scripts...SKIPPING"
+        return
     print "Installing tenx-scripts..."
 
     os.chdir('/tmp')
@@ -101,8 +104,8 @@ def install_tenx_scripts():
     for subdir in ( 'common', 'supernova' ):
         for fn in glob.glob( os.path.join('scripts', subdir, "*") ):
             if os.path.basename(fn).endswith("bats"): continue
-            dest_fn = os.path.join(APPS_DIR, 'tenx-scripts', fn)
-            os.copy(fn, dest_fn)
+            dest_fn = os.path.join(APPS_DIR, 'tenx-scripts', os.path.basename(fn))
+            shutil.copy(fn, dest_fn)
             os.chmod(dest_fn, 0777)
 
     while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
@@ -118,12 +121,15 @@ def install_tenx_scripts():
 #-- install_tenx_scripts
 
 def add_supernova_profile():
-    if True: return
+    fn = "/etc/profile.d/supernova.sh"
+    if os.path.exists(fn):
+        print "Already installed supernova profile.d config...SKIPPING"
+        return
 
-    with open("/etc/profile.d/supernova.sh", "w") as f:
-        f.print('PATH=/apps/tenxrc:${PATH}')
-        f.print('source /apps/supernova/sourceme.bash')
-
+    print "Installing supernova profile.d script..."
+    with open(fn, "w") as f:
+        f.write('PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
+        f.write("source /apps/supernova/sourceme.bash\n")
 
 #-- install_tenx_scripts
 
@@ -132,5 +138,6 @@ if __name__ == '__main__':
     create_data_directory_structures()
     install_supernova()
     install_tenx_scripts()
-
+    add_supernova_profile()
+    print "Startup script...DONE"
 #-- __main__
