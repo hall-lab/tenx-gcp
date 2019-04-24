@@ -30,6 +30,7 @@ required:
 - region
 - remote_data_url
 - service_account
+- ssh_source_ranges
 - zone
 
 properties:
@@ -66,6 +67,10 @@ properties:
     type        : string
     default     : default
     description : Service account for compute instances to use.
+
+  ssh_source_ranges:
+    type        : array
+    description : Restrict supernova compute instance access to a whitelist of IP addresses.
 
   zone:
     type        : string

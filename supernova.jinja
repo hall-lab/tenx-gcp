@@ -23,12 +23,12 @@ resources:
     network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
     ipCidrRange: 10.10.0.0/16
     region: {{ properties["region"] }}
-- name: {{properties["cluster_name"]}}-tenx-mgi-only-ssh
+- name: {{properties["cluster_name"]}}-tenx-ssh-restricted
   type: compute.v1.firewall
   properties:
     network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
-    sourceRanges: ["128.252.0.0/16"]
-    targetTags: ["tenx-mgi-only-ssh"]
+    sourceRanges: {{ properties['ssh_source_ranges'] }}
+    targetTags: ["tenx-ssh-restricted"]
     priority: 1000
     allowed:
     - IPProtocol: TCP
@@ -77,7 +77,7 @@ resources:
     tags:
       items:
         - tenx-web-ui
-        - tenx-mgi-only-ssh
+        - tenx-ssh-restricted
     metadata:
       items:
         - key: startup-script
