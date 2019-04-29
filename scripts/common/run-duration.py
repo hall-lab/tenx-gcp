@@ -1,11 +1,12 @@
-#!/usr/binenv python
+#!/usr/bin/env python
 
 from datetime import datetime, timedelta
 import json
-import os
+import os, sys
 
-def main():
+def main(run_dir):
     #ASSEMBLER_CS ALIGNER_CS BASIC_CS PHASER_SVCALLER_CS
+    os.chdir(run_dir)
     paths = filter(lambda f:"_CS" in f, os.listdir("."))
     assert len(paths) == 1, "Failed to find log path ending in '_CS'."
     assert os.path.isdir(paths[0]), "Found path ending in _CS, but it is not a directory!"
@@ -41,4 +42,5 @@ Core Hours: {}""".format( round((log['duration'].total_seconds()/3600), 0), log[
 
 
 if __name__ == '__main__':
-    main()
+    if not len(sys.argv) > 1: raise Exception("No run directory given!")
+    main(run_dir=sys.argv[1])

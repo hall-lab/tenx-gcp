@@ -22,5 +22,5 @@ DATA LOCATION:
 "${TENX_SCRIPTS_PATH}/dl-reads" ${1}
 "${TENX_SCRIPTS_PATH}/sn-asm" "${1}"
 "${TENX_SCRIPTS_PATH}/sn-mkoutput" "${1}"
-"${TENX_SCRIPTS_PATH}/run-duration.py" "${1}"
+"${TENX_SCRIPTS_PATH}/run-duration.py" "${TENX_ASM_PATH}"
 "${TENX_SCRIPTS_PATH}/ul-asm" "${1}"
