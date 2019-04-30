@@ -54,6 +54,11 @@ properties:
     description : |
       Machine type to use for compute node instances, eg. n1-highmem-64.
 
+  project_name:
+    type        : string
+    default     : adhoc
+    description : Project name to use in label on instances.
+
   region:
     type        : string
     description : Region to run the instances in.
