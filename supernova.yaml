@@ -9,11 +9,11 @@ resources:
     #-- Commented out properties are optional, or have defaults. See supernova.jinja.schema for documentation --#
     # PROJECT
     service_account         : <SERVICE_ACCOUNT>
-    region                  : us-central1
-    zone                    : us-central1-c
+    region                  : <REGION>
+    zone                    : <ZONE>
     #project_name            : <PROJECT>
 
-    # CLUSTER
+    # CLUSTER [recommended]
     cluster_name            : supernova1
     machine_type            : n1-highmem-64
     disk_size               : 2000
