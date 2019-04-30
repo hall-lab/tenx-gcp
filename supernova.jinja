@@ -23,17 +23,6 @@ resources:
     network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
     ipCidrRange: 10.10.0.0/16
     region: {{ properties["region"] }}
-- name: {{properties["cluster_name"]}}-tenx-ssh-restricted
-  type: compute.v1.firewall
-  properties:
-    network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
-    sourceRanges: {{ properties['ssh_source_ranges'] }}
-    targetTags: ["tenx-ssh-restricted"]
-    priority: 1000
-    allowed:
-    - IPProtocol: TCP
-      ports: ["22"]
-    - IPProtocol: ICMP
 - name: {{properties["cluster_name"]}}-tenx-web-ui
   type: compute.v1.firewall
   properties:
@@ -45,6 +34,20 @@ resources:
     - IPProtocol: TCP
       ports: ["18080"]
     - IPProtocol: ICMP
+
+{% if properties['ssh_source_ranges'] %}
+- name: {{properties["cluster_name"]}}-tenx-ssh-restricted
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
+    sourceRanges: {{ properties['ssh_source_ranges'] }}
+    targetTags: ["tenx-ssh-restricted"]
+    priority: 1000
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+    - IPProtocol: ICMP
+{% endif %}
 
 - name: {{ properties["cluster_name"] }}
   type: compute.v1.instance

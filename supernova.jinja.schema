@@ -30,7 +30,6 @@ required:
 - region
 - remote_data_url
 - service_account
-- ssh_source_ranges
 - zone
 
 properties:
@@ -70,7 +69,7 @@ properties:
 
   ssh_source_ranges:
     type        : array
-    description : Restrict supernova compute instance access to a whitelist of IP addresses.
+    description : Restrict supernova compute instance access to a whitelist of IP addresses via a firewall. No firewall is created if no IPs given.
 
   zone:
     type        : string
