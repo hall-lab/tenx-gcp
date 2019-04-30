@@ -2,7 +2,10 @@
 
 Config, scripts and resources for running 10X Genomics pipelines in GCP
 
-# Supernova
+##### Pipelines
+[Supernova](#supernova)  
+
+# Supernova <a name="supernova"/>
 
 The 10X de novo assembler.
 
