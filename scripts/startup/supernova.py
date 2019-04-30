@@ -67,7 +67,7 @@ def install_supernova():
 
     print "Install supernova..."
     os.chdir(APPS_DIR)
-    supernova_bn = 'supernova-2.0.1'
+    supernova_bn = '-'.join(['supernova', SUPERNOVA_VERSION])
     supernova_tgz = '.'.join([supernova_bn, "tgz"])
     supernova_url = os.path.join(REMOTE_DATA_URL, "software", supernova_tgz)
 
