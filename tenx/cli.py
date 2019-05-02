@@ -20,7 +20,7 @@ def cli():
 @click.group()
 def assembly():
     """
-    Commands, Pipeline, and Helpers for Supernova Assemblies 
+    Commands, Pipeline, and Helpers for Assemblies
     """
     pass
 
@@ -45,3 +45,21 @@ assembly.add_command(run)
 def upload():
     click.echo("UPLOAD")
 assembly.add_command(upload)
+#-- ASSEMBLY
+
+# READS
+# - download (fetch reads from the cloud)
+@click.group(name="reads")
+def reads_cli():
+    """
+    Commands and Helpers for 10X Reads
+    """
+    pass
+
+cli.add_command(reads_cli)
+
+@click.command()
+def reads_download():
+    click.echo("DL")
+reads_cli.add_command(reads_download, name="download")
+#-- READS
