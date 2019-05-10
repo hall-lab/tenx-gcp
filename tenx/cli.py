@@ -61,8 +61,10 @@ def reads_cli():
 
 cli.add_command(reads_cli)
 
-@click.command()
-def reads_download():
-    click.echo("DL")
+@click.command(short_help="Download reads from the cloud!")
+@click.argument('sample-name', type=click.STRING)
+def reads_download(sample_name):
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    reads.download(reads.TenxReads(sample_name=sample_name))
 reads_cli.add_command(reads_download, name="download")
 #-- READS
