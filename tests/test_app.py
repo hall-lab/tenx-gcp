@@ -1,25 +1,26 @@
 import os, sys, unittest
 
 from .context import tenx
-import tenx.app as app
+from tenx.app import TenxApp
 
 class TenxAppTest(unittest.TestCase):
 
-    def test_init(self):
-        # init w/ config
-        theapp = app.TenxApp("tests/test_app/tenx.yaml")
-        self.assertIsNotNone(theapp)
-        self.assertIsNotNone(theapp.config)
-        self.assertEqual(theapp.config['environment'], 'test')
-
-        # init w/o config
-        theapp = app.TenxApp()
-        self.assertIsNone(theapp.config)
-
-    def test_init_fails(self):
+    def test1_init_fails(self):
         with self.assertRaises(IOError) as cm:
-            app.TenxApp("/tenx.yaml")
+            TenxApp("/tenx.yaml")
         self.assertTrue("No such file or directory" in cm.exception)
+
+    def test2_init(self):
+        # init w/o config
+        tenxapp = TenxApp()
+        self.assertIsNotNone(TenxApp.config)
+
+        # init w/ config
+        TenxApp.config = None
+        tenxapp = TenxApp("tests/test_app/tenx.yaml")
+        self.assertIsNotNone(tenxapp)
+        self.assertIsNotNone(tenxapp.config)
+        self.assertEqual(tenxapp.config['environment'], 'test')
 
 # -- TenxAppTest
 
