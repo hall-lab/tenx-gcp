@@ -1,6 +1,7 @@
-import click
+import click, os
 
 from tenx.version import __version__
+from tenx import app, reads
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -9,6 +10,8 @@ def cli():
     """
     10X CLI
     """
+    app.TenxApp(os.environ.get('TENX_CONFIG', None))
+    pass
 
 # ASSEMBLY
 # - asm (run supernova only command)
