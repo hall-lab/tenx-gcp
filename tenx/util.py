@@ -15,7 +15,8 @@ def run_duration(run_dir):
     finally:
         if len(paths) == 0: os.chdir(pwd)
 
-    log = {
+    run = {
+        "directory": run_dir,
         "core_hours": 0,
         "duration": timedelta(0),
         "jobs": 0,
@@ -28,13 +29,14 @@ def run_duration(run_dir):
                 with open( os.path.join(root, fname) ) as f:
                     data = json.load(f)
 
-                log['jobs'] += 1
-                log['duration'] += timedelta(seconds=data['wallclock']['duration_seconds'])
-                log['mem'] += data['memGB']
-                log['threads'] += data['threads']
-                log['core_hours'] += (data['wallclock']['duration_seconds']/3600) * data['threads']
+                run['jobs'] += 1
+                run['duration'] += timedelta(seconds=data['wallclock']['duration_seconds'])
+                run['mem'] += data['memGB']
+                run['threads'] += data['threads']
+                run['core_hours'] += (data['wallclock']['duration_seconds']/3600) * data['threads']
 
-    log['core_hours'] = round(log['core_hours'], 0)
-    return log
+    run['core_hours'] = round(run['core_hours'], 0)
+    os.chdir(pwd)
+    return run
 
 #-- run_duration

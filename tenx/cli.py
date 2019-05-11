@@ -1,7 +1,7 @@
 import click, os
 
 from tenx.version import __version__
-from tenx import app, reads, util
+from tenx import app, reads, report, util
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -82,6 +82,6 @@ cli.add_command(tenx_util_cmd, name='util')
 @click.command()
 @click.argument('directory', type=click.Path(exists=True))
 def tenx_util_runduration(directory):
-    print(util.run_duration(directory))
+    print( report.run_duration_basic(util.run_duration(directory)) )
 tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
 #-- UTIL
