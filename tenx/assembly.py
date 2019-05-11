@@ -13,3 +13,23 @@ class TenxAssembly():
         return os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], self.sample_name, 'assembly')
 
 #-- TenxAssembly
+
+def mkoutput_script(asm):
+    return """source /apps/supernova/sourceme.bash
+echo Running mkoutput...
+echo Entering {TENX_ASM_PATH}/mkoutput
+mkdir -p {TENX_ASM_PATH}/mkoutput
+cd {TENX_ASM_PATH}/mkoutput
+echo Running mkoutput raw...
+supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.raw --style=raw
+echo Running mkoutput megabubbles...
+supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.megabubbles --style=megabubbles
+echo Running mkoutput pseudohap2...
+supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.pseudohap2 --style=pseudohap2
+echo Running mkoutput...OK
+""".format(TENX_ASM_PATH=asm.local_directory(), TENX_SAMPLE=asm.sample_name)
+
+def run_mkoutput(asm):
+   script = mkoutput_script_for_assembly(asm)
+
+#-- mkoutput

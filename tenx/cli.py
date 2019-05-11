@@ -36,7 +36,8 @@ assembly.add_command(asm)
 
 @click.command()
 def mkoutput():
-    click.echo("MKOUTPUT")
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assembly.mkoutput(assembly.TenxAssembly(sample_name=sample_name))
 assembly.add_command(mkoutput)
 
 @click.command()
