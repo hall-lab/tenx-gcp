@@ -1,7 +1,7 @@
 import click, os
 
 from tenx.version import __version__
-from tenx import app, reads
+from tenx import app, reads, util
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -68,3 +68,20 @@ def reads_download(sample_name):
     reads.download(reads.TenxReads(sample_name=sample_name))
 reads_cli.add_command(reads_download, name="download")
 #-- READS
+
+# UTIL
+@click.group()
+def tenx_util_cmd():
+    """
+    Utilities and Helpers
+    """
+    pass
+
+cli.add_command(tenx_util_cmd, name='util')
+
+@click.command()
+@click.argument('directory', type=click.Path(exists=True))
+def tenx_util_runduration(directory):
+    print(util.run_duration(directory))
+tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
+#-- UTIL

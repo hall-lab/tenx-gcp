@@ -22,6 +22,16 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'reads', 'download'])
         self.assertEqual(rv, 2)
 
+    def test4_tenx_util(self):
+        rv = subprocess.call(['tenx', 'util'])
+        self.assertEqual(rv, 0)
+
+    def test4_tenx_reads_download(self):
+        rv = subprocess.call(['tenx', 'util', 'run-duration', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'util', 'run-duration'])
+        self.assertEqual(rv, 2)
+
 # -- TenxCliTest
 
 if __name__ == '__main__':
