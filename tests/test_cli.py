@@ -12,6 +12,12 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'assembly'])
         self.assertEqual(rv, 0)
 
+    def test2_tenx_assembly_mkoutput(self):
+        rv = subprocess.call(['tenx', 'assembly', 'mkoutput', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'assembly', 'mkoutput'])
+        self.assertEqual(rv, 2)
+
     def test3_tenx_reads(self):
         rv = subprocess.call(['tenx', 'reads'])
         self.assertEqual(rv, 0)
