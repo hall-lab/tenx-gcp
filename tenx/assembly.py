@@ -9,8 +9,14 @@ class TenxAssembly():
     def remote_url(self):
         return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample_name, 'assembly')
 
+    def sample_directory(self):
+        return os.path.join(TenxApp.config['TENX_DATA_PATH'], self.sample_name)
+
     def local_directory(self):
-        return os.path.join(TenxApp.config['TENX_DATA_PATH'], self.sample_name, 'assembly')
+        return os.path.join(self.sample_directory(), 'assembly')
+
+    def reads_directory(self):
+        return os.path.join(self.sample_directory(), 'reads')
 
     def mkoutput_directory(self):
         return os.path.join(self.local_directory(), 'mkoutput')

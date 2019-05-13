@@ -13,7 +13,9 @@ class TenxAppTest(unittest.TestCase):
         TenxApp.config['TENX_DATA_PATH'] = '/tmp'
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
         asm = assembly.TenxAssembly(sample_name='TESTER')
+        self.assertEqual(asm.sample_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
         self.assertEqual(asm.local_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly'))
+        self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
 
     def test2_mkoutput_script(self):
