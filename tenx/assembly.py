@@ -15,6 +15,9 @@ class TenxAssembly():
     def local_directory(self):
         return os.path.join(self.sample_directory(), 'assembly')
 
+    def outs_assembly_directory(self):
+        return os.path.join(self.local_directory(), 'outs', 'assembly')
+
     def reads_directory(self):
         return os.path.join(self.sample_directory(), 'reads')
 
