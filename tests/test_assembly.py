@@ -18,15 +18,22 @@ class TenxAppTest(unittest.TestCase):
         self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
 
-    def test2_mkoutput_script(self):
+    def test2_assemble_script(self):
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with open(os.path.join('tests', 'test_assembly', 'mkoutput', 'mkoutput.sh'), 'r') as f:
+        with open(os.path.join('tests', 'test_assembly', 'scripts', 'assemble.sh'), 'r') as f:
+            expected_script = f.read()
+        script = assembly.assemble_script(asm)
+        self.assertEqual(script, expected_script)
+
+    def test3_mkoutput_script(self):
+        asm = assembly.TenxAssembly(sample_name='TESTER')
+        with open(os.path.join('tests', 'test_assembly', 'scripts', 'mkoutput.sh'), 'r') as f:
             expected_script = f.read()
         script = assembly.mkoutput_script(asm)
         self.assertEqual(script, expected_script)
 
     @patch('subprocess.call')
-    def test2_run_mkoutput(self, test_patch):
+    def test3_run_mkoutput(self, test_patch):
         test_patch.return_value = '0'
         TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
         asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')

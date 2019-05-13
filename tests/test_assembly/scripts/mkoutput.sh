@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 source /apps/supernova/sourceme.bash
 echo Running mkoutput...
 echo Entering /tmp/TESTER/assembly/mkoutput

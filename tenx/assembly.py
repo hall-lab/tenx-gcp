@@ -23,8 +23,21 @@ class TenxAssembly():
 
 #-- TenxAssembly
 
+def assemble_script(asm):
+    return """#!/bin/bash
+set -e
+source /apps/supernova/sourceme.bash
+mkdir -p {TENX_SAMPLE_DIRECTORY}
+cd {TENX_SAMPLE_DIRECTORY}
+supernova run --id=assembly --fastqs={TENX_RDS_DIRECTORY} --uiport=18080 --nodebugmem --localcores=50 --localmem=400
+""".format(TENX_SAMPLE_DIRECTORY=asm.sample_directory(), TENX_RDS_DIRECTORY=asm.reads_directory())
+
+#-- assemble
+
 def mkoutput_script(asm):
-    return """source /apps/supernova/sourceme.bash
+    return """#!/bin/bash
+set -e
+source /apps/supernova/sourceme.bash
 echo Running mkoutput...
 echo Entering {TENX_ASM_MKOUTPUT_PATH}
 mkdir -p {TENX_ASM_MKOUTPUT_PATH}
