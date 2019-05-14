@@ -12,17 +12,17 @@ class TenxAssembly():
     def sample_directory(self):
         return os.path.join(TenxApp.config['TENX_DATA_PATH'], self.sample_name)
 
-    def local_directory(self):
+    def directory(self):
         return os.path.join(self.sample_directory(), 'assembly')
 
     def outs_assembly_directory(self):
-        return os.path.join(self.local_directory(), 'outs', 'assembly')
+        return os.path.join(self.directory(), 'outs', 'assembly')
 
     def reads_directory(self):
         return os.path.join(self.sample_directory(), 'reads')
 
     def mkoutput_directory(self):
-        return os.path.join(self.local_directory(), 'mkoutput')
+        return os.path.join(self.directory(), 'mkoutput')
 
     def is_successful(self): # TODO make more robust
         return os.path.exists(self.outs_assembly_directory())
@@ -63,7 +63,7 @@ supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX
 echo Running mkoutput pseudohap2...
 supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.pseudohap2 --style=pseudohap2
 echo Running mkoutput...OK
-""".format(TENX_ASM_PATH=asm.local_directory(), TENX_SAMPLE=asm.sample_name, TENX_ASM_MKOUTPUT_PATH=asm.mkoutput_directory(), TENX_ASM_OUTS_ASSEMBLY_DIRECTORY=asm.outs_assembly_directory())
+""".format(TENX_ASM_PATH=asm.directory(), TENX_SAMPLE=asm.sample_name, TENX_ASM_MKOUTPUT_PATH=asm.mkoutput_directory(), TENX_ASM_OUTS_ASSEMBLY_DIRECTORY=asm.outs_assembly_directory())
 
 def run_mkoutput(asm):
    script = mkoutput_script(asm)
@@ -81,8 +81,8 @@ def run_upload(asm):
 
     if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
 
-    sys.stderr.write("Entering {} ...".format(asm.local_directory))
-    os.chdir(asm.local_directory())
+    sys.stderr.write("Entering {} ...".format(asm.directory))
+    os.chdir(asm.directory())
     if os.path.exists("ASSEMBLER_CS"):
         sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
         os.rmtree("ASSEMBLER_CS")
