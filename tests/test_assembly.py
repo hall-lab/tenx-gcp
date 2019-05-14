@@ -7,7 +7,7 @@ from tenx import assembly
 
 class TenxAppTest(unittest.TestCase):
 
-    def test1_assembly(self):
+    def test10_assembly(self):
         TenxApp()
         self.assertIsNotNone(TenxApp.config)
         TenxApp.config['TENX_DATA_PATH'] = '/tmp'
@@ -18,6 +18,13 @@ class TenxAppTest(unittest.TestCase):
         self.assertEqual(asm.outs_assembly_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
+
+    def test11_is_successful(self):
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
+        self.assertTrue(asm.is_successful())
+        asm = assembly.TenxAssembly(sample_name='TEST_FAIL')
+        self.assertFalse(asm.is_successful())
 
     def test2_assemble_script(self):
         TenxApp.config['TENX_DATA_PATH'] = '/tmp'
@@ -56,6 +63,18 @@ class TenxAppTest(unittest.TestCase):
         asm = assembly.TenxAssembly(sample_name='TEST_FAIL')
         with self.assertRaisesRegexp(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_directory() + " after running mkoutput, but only found 3"):
             assembly.run_mkoutput(asm)
+
+    @patch('subprocess.call')
+    def test4_run_upload(self, test_patch):
+        # TODO test ASSEMBLER_CS dir is removed?
+        test_patch.return_value = '0'
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
+        assembly.run_upload(asm)
+
+        asm = assembly.TenxAssembly(sample_name='TEST_FAIL')
+        with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful assembly"):
+            assembly.run_upload(asm)
 
 # -- TenxAppTest
 

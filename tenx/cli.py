@@ -29,14 +29,14 @@ def assembly():
 
 cli.add_command(assembly)
 
-@click.command(short_help="Run mkoutput on an assembly!")
+@click.command(short_help="create an assembly with supernova")
 @click.argument('sample-name', type=click.STRING)
 def asm_assemble(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
 assembly.add_command(asm_assemble, name="assemble")
 
-@click.command(short_help="Run mkoutput on an assembly!")
+@click.command(short_help="run mkoutput on an assembly")
 @click.argument('sample-name', type=click.STRING)
 def asm_mkoutput(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
@@ -48,10 +48,12 @@ def run():
     click.echo("RUN")
 assembly.add_command(run)
 
-@click.command()
-def upload():
-    click.echo("UPLOAD")
-assembly.add_command(upload)
+@click.command(short_help="Send the assembly to the cloud")
+@click.argument('sample-name', type=click.STRING)
+def asm_upload(sample_name):
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
+assembly.add_command(asm_upload, name="upload")
 #-- ASSEMBLY
 
 # READS

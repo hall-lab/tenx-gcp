@@ -1,4 +1,4 @@
-import glob, os, subprocess, tempfile
+import glob, os, subprocess, sys, tempfile
 from app import TenxApp
 
 class TenxAssembly():
@@ -23,6 +23,9 @@ class TenxAssembly():
 
     def mkoutput_directory(self):
         return os.path.join(self.local_directory(), 'mkoutput')
+
+    def is_successful(self): # TODO make more robust
+        return os.path.exists(self.outs_assembly_directory())
 
 #-- TenxAssembly
 
@@ -72,3 +75,23 @@ def run_mkoutput(asm):
    if len(fastas) != 4: raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but only found {}.".format(asm.mkoutput_directory(), len(fastas)))
 
 #-- mkoutput
+
+def run_upload(asm):
+    sys.stderr.write("Upload {} assembly...".format(asm.sample_name))
+
+    if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
+
+    sys.stderr.write("Entering {} ...".format(asm.local_directory))
+    os.chdir(asm.local_directory())
+    if os.path.exists("ASSEMBLER_CS"):
+        sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
+        os.rmtree("ASSEMBLER_CS")
+
+    sys.stderr.write("Uploading to: {}".format(asm.remote_url()))
+    subprocess.call(["gsutil", "-m", "rsync", "-r", ".", asm.remote_url()])
+
+    # TODO verify
+
+    sys.stderr.write("Upload assembly...OK")
+
+#-- run_upload
