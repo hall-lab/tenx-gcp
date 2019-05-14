@@ -15,6 +15,7 @@ class TenxUtilTest(unittest.TestCase):
 
         run = util.run_duration(os.path.join('tests', 'test_util_runduration'))
         expected_run = {
+            'directory': 'tests/test_util_runduration',
             'jobs':       34,
             'mem':        276,
             'threads':    38,
