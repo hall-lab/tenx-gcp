@@ -20,7 +20,7 @@ class TenxAppTest(unittest.TestCase):
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
 
     def test11_is_successful(self):
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly')
         asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
         self.assertTrue(asm.is_successful())
         asm = assembly.TenxAssembly(sample_name='TEST_FAIL')
@@ -37,7 +37,7 @@ class TenxAppTest(unittest.TestCase):
     @patch('subprocess.call')
     def test2_run_assemble(self, test_patch):
         test_patch.return_value = '0'
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly')
         asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
         assembly.run_assemble(asm)
 
@@ -56,7 +56,7 @@ class TenxAppTest(unittest.TestCase):
     @patch('subprocess.call')
     def test3_run_mkoutput(self, test_patch):
         test_patch.return_value = '0'
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly')
         asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
         assembly.run_mkoutput(asm)
 
@@ -68,7 +68,7 @@ class TenxAppTest(unittest.TestCase):
     def test4_run_upload(self, test_patch):
         # TODO test ASSEMBLER_CS dir is removed?
         test_patch.return_value = '0'
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly')
         asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
         assembly.run_upload(asm)
 
