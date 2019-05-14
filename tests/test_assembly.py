@@ -20,13 +20,26 @@ class TenxAppTest(unittest.TestCase):
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
 
     def test2_assemble_script(self):
+        TenxApp.config['TENX_DATA_PATH'] = '/tmp'
         asm = assembly.TenxAssembly(sample_name='TESTER')
         with open(os.path.join('tests', 'test_assembly', 'scripts', 'assemble.sh'), 'r') as f:
             expected_script = f.read()
         script = assembly.assemble_script(asm)
         self.assertEqual(script, expected_script)
 
+    @patch('subprocess.call')
+    def test2_run_assemble(self, test_patch):
+        test_patch.return_value = '0'
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_assembly', 'mkoutput')
+        asm = assembly.TenxAssembly(sample_name='TEST_SUCCESS')
+        assembly.run_assemble(asm)
+
+        asm = assembly.TenxAssembly(sample_name='TEST_FAIL')
+        with self.assertRaisesRegexp(Exception, "Ran supernova script, but " + asm.outs_assembly_directory() + " was not found"):
+            assembly.run_assemble(asm)
+
     def test3_mkoutput_script(self):
+        TenxApp.config['TENX_DATA_PATH'] = '/tmp'
         asm = assembly.TenxAssembly(sample_name='TESTER')
         with open(os.path.join('tests', 'test_assembly', 'scripts', 'mkoutput.sh'), 'r') as f:
             expected_script = f.read()

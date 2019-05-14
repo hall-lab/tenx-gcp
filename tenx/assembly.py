@@ -35,6 +35,14 @@ cd {TENX_SAMPLE_DIRECTORY}
 supernova run --id=assembly --fastqs={TENX_RDS_DIRECTORY} --uiport=18080 --nodebugmem --localcores=50 --localmem=400
 """.format(TENX_SAMPLE_DIRECTORY=asm.sample_directory(), TENX_RDS_DIRECTORY=asm.reads_directory())
 
+def run_assemble(asm):
+   script = assemble_script(asm)
+   script_f = tempfile.NamedTemporaryFile()
+   script_f.write(script)
+   script_f.flush()
+   subprocess.call(['bash', script_f.name])
+   if not os.path.exists(asm.outs_assembly_directory()): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
+
 #-- assemble
 
 def mkoutput_script(asm):
@@ -46,13 +54,13 @@ echo Entering {TENX_ASM_MKOUTPUT_PATH}
 mkdir -p {TENX_ASM_MKOUTPUT_PATH}
 cd {TENX_ASM_MKOUTPUT_PATH}
 echo Running mkoutput raw...
-supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.raw --style=raw
+supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.raw --style=raw
 echo Running mkoutput megabubbles...
-supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.megabubbles --style=megabubbles
+supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.megabubbles --style=megabubbles
 echo Running mkoutput pseudohap2...
-supernova mkoutput --asmdir={TENX_ASM_PATH}/outs/assembly --outprefix={TENX_SAMPLE}.pseudohap2 --style=pseudohap2
+supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.pseudohap2 --style=pseudohap2
 echo Running mkoutput...OK
-""".format(TENX_ASM_PATH=asm.local_directory(), TENX_SAMPLE=asm.sample_name, TENX_ASM_MKOUTPUT_PATH=asm.mkoutput_directory())
+""".format(TENX_ASM_PATH=asm.local_directory(), TENX_SAMPLE=asm.sample_name, TENX_ASM_MKOUTPUT_PATH=asm.mkoutput_directory(), TENX_ASM_OUTS_ASSEMBLY_DIRECTORY=asm.outs_assembly_directory())
 
 def run_mkoutput(asm):
    script = mkoutput_script(asm)

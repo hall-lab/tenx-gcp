@@ -29,10 +29,12 @@ def assembly():
 
 cli.add_command(assembly)
 
-@click.command()
-def asm():
-    click.echo("ASM")
-assembly.add_command(asm)
+@click.command(short_help="Run mkoutput on an assembly!")
+@click.argument('sample-name', type=click.STRING)
+def asm_assemble(sample_name):
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
+assembly.add_command(asm_assemble, name="assemble")
 
 @click.command(short_help="Run mkoutput on an assembly!")
 @click.argument('sample-name', type=click.STRING)
