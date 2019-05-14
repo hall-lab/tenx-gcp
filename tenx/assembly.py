@@ -44,7 +44,7 @@ def run_assemble(asm):
    script_f.write(script)
    script_f.flush()
    subprocess.call(['bash', script_f.name])
-   if not os.path.exists(asm.outs_assembly_directory()): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
+   if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
 
 #-- assemble
 

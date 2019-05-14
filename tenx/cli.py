@@ -16,7 +16,7 @@ def cli():
 # ASSEMBLY
 # - asm (run supernova only command)
 # - mkoutput (runs mkputput on an assembly
-# - run (run-supernova - full pipeline)
+# - pipeline (run-supernova - full pipeline)
 # - upload (sends assembly to object store)
 # FUTURE download, list, view
 
@@ -43,10 +43,17 @@ def asm_mkoutput(sample_name):
     assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
 assembly.add_command(asm_mkoutput, name="mkoutput")
 
-@click.command()
-def run():
-    click.echo("RUN")
-assembly.add_command(run)
+@click.command(short_help="run the full supernova assembly pipeline")
+@click.argument('sample-name', type=click.STRING)
+def asm_pipeline(sample_name):
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    reads.download(reads.TenxReads(sample_name=sample_name))
+    asm = assembly.TenxAssembly(sample_name=sample_name)
+    assembly.run_assemble(asm)
+    assembly.run_mkoutput(asm)
+    print( report.run_duration_basic(util.run_duration(asm.directory)) )
+    assembly.run_upload(asm)
+assembly.add_command(asm_pipeline, name="pipeline")
 
 @click.command(short_help="Send the assembly to the cloud")
 @click.argument('sample-name', type=click.STRING)
