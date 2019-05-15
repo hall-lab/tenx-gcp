@@ -19,13 +19,13 @@ resources:
   type: compute.v1.network
   properties:
     autoCreateSubnetworks: false
-- name: {{ env["deployment"] }}-subnet
+- name: {{ networkName }}-subnet
   type: compute.v1.subnetwork
   properties:
     network: $(ref.{{ networkName }}.selfLink)
     ipCidrRange: 10.10.0.0/16
     region: {{ properties["region"] }}
-- name: {{ env["deployment"] }}-tenx-web-ui
+- name: {{ networkName }}-tenx-web-ui
   type: compute.v1.firewall
   properties:
     network: $(ref.{{ networkName }}.selfLink)
@@ -38,7 +38,7 @@ resources:
     - IPProtocol: ICMP
 
 {% if properties['ssh_source_ranges'] %}
-- name: {{ env["deployment"] }}-tenx-ssh-restricted
+- name: {{ networkName }}-tenx-ssh-restricted
   type: compute.v1.firewall
   properties:
     network: $(ref.{{ networkName }}.selfLink)
@@ -67,7 +67,7 @@ resources:
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
         diskSizeGb: {{ properties["disk_size"] }}
     networkInterfaces:
-    - subnetwork: $(ref.{{ properties["cluster_name"] }}-subnet.selfLink)
+    - subnetwork: $(ref.{{ networkName }}-subnet.selfLink)
       accessConfigs:
       - name: External NAT
         type: ONE_TO_ONE_NAT
