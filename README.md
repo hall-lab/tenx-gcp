@@ -1,10 +1,10 @@
-# 10X Genomics for GCP
+# 10X Genomics Deployments and CLI
 
-Config, scripts and resources for running 10X Genomics pipelines in GCP
+CLI, config, and resources for running 10X Genomics pipelines
 
 # Pipelines
-[supernova](#supernova)  
-[longranger](#longranger)  
+[supernova](#supernova)
+[longranger](#longranger)
 
 <a name="supernova"/>
 
@@ -22,17 +22,16 @@ The 10X de novo assembler.
 
 GCP Machine recommended: n1-highmem-64
 
-## Configuring the Supernova Deployment
+## Configuring the Supernova Deployment for Google Cloud
 
-### Edit the supernova.yaml
+### Edit the Supernova YAML Configuration File
 
-Update these properties need to be set in the YAML (*supernova.yaml*) configuration. Check _supernova.jinja.schema_ for supernova properties documentation.
+Update these properties need to be set in the YAML (*resources/google/supernova.yaml*) configuration. Check _supernova.jinja.schema_ for supernova properties documentation.
 
 #### Required Supernova Properties
 
 | Property | Notes |
 | --- | --- |
-| cluster_name      | the prefix to all assests for the cluster (also deployment name) | 
 | service_account   | service account email to have authorized on the supernova VM |
 | region/zone       | area to run instances, should match data location region/zone |
 | remote_data_url   | bucket location of reads, software, and assemblies |
@@ -48,29 +47,25 @@ Update these properties need to be set in the YAML (*supernova.yaml*) configurat
 
 ### Create the Deployment
 
-In an authenticated GCP session, create the deployment _supernova1_. For consistency, match the deployment name on the commandline with the cluster_name in the configuration YAML.
+In an authenticated GCP session, enter the _resources/google_ directory. Run the command below to create the deployment named _supernova1_. The deployemnt name will be prepended to all assoiciated assets.
 ```
-$ gcloud deploymewnt manager deployments  create supernova1 --config supernova.yaml
+$ gcloud deploymewnt manager deployments create supernova1 --config supernova.yaml
 ```
 
 ### Start Supernova Pipeline
 
-SSH into the supernova1 VM, and run the supernova pipeline.
+SSH into the supernova1 VM.
 ```
 $ gcloud ssh supernova1
 ```
-Then, run the supernova pipeline, providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
+Then, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
 ```
-[you@soupernova1 ~]$ run-supernova ${SAMPLE_NAME} &> log &
+[you@soupernova1 ~]$ tenx assembly pipeline ${SAMPLE_NAME} &> log &
 ```
-Make sure to logout out of the session, and not let itexit happen because of timeout.
+Make sure to logout out of the session, and not let it exit happen because of timeout. Logout, exit or <CNTRL-D> your SSH session.
 ```
 [you@soupernova1 ~]$ logout
 ```
-
-### Run Supernova and/or the Pipeline Components Separately
-
-The supernova command itself plus the pipeline components can be run separately. Supernova is installed in /app/supernova and the pipeline scripts live in /apps/tenx-scripts.
 
 <a name="longranger"/>
 
