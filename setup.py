@@ -14,25 +14,15 @@ with open('tenx/version.py') as f:
 setup(
     name='tenx',
     version=__version__,
-    description='10X Genomics Pipeline Commands',
+    description='10X Genomics CLI',
     long_description=readme,
     author='Eddie Belter',
     author_email='ebetler@wustl.edu',
     license=license,
-    #url='https://github.com/ernfrid/cromwell_cost',
+    url='https://github.com/hall-lab/tenx-gcp.git',
     install_requires=[
-        'click==6.7',
-        #'clint==0.5.1',
-        #'google-api-python-client==1.7.3',
-        #'google-auth==1.5.1',
-        #'python-dateutil==2.7.3',
-        #'requests==2.20.0',
-        #'tabulate==0.8.2',
-        #'cytoolz==0.9.0.1',
-        #'toolz==0.9.0',
-        #'PyMySQL==0.9.3',
-        #'pyparsing==2.3.1',
-        #'pyhocon==0.3.51'
+        'click==7.0',
+        'pyyaml==5.1',
     ],
     entry_points='''
         [console_scripts]
