@@ -36,17 +36,17 @@ def install_packages():
         print "Failed to install packages with yum. Trying again in 5 seconds"
         time.sleep(5)
 
-    while subprocess.call(['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']):
-        print "Failed to install google python api client. Trying again 5 seconds."
+    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']
+    rv = subprocess.call(cmd)
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
     subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
-    while subprocess.call(['pip', 'install', '-U', 'crcmod']):
-        print "Failed to install crcmod. Trying again 5 seconds."
-        time.sleep(5)
+    rv = subprocess.call(['pip', 'install', '-U', 'crcmod'])
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
-    while subprocess.call(['timedatectl', 'set-timezone', 'America/Chicago']):
-        print "Failed to set timezone with timedatectl. Trying again 5 seconds."
-        time.sleep(5)
+    cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
+    rv = subprocess.call(cmd)
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
     subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
     subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/' '/etc/boto.cfg'])
@@ -105,11 +105,12 @@ def install_tenx_cli():
     print "Installing tenx cli..."
 
     os.chdir('/tmp')
-    subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
-    os.chdir('tenx-gcp')
+    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+    if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
 
-    while subprocess.call(['pip', 'install', '.']):
-        print "Failed to install tenx cli. Trying again 5 seconds."
+    os.chdir('tenx-gcp')
+    rv = subprocess.call(['pip', 'install', '.'])
+    if rv != 0: raise Exception("Failed to install tenx cli.")
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
