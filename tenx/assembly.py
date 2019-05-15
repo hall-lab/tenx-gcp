@@ -73,7 +73,7 @@ def run_mkoutput(asm):
    script_f.flush()
    print(script)
    rv = subprocess.call(['bash', script_f.name])
-   if rv != 0: raise Exception("Failed to run 'assemble' bash script.")
+   if rv != 0: raise Exception("Failed to run 'mkoutput' bash script.")
    fastas = glob.glob( os.path.join(asm.mkoutput_directory(), '*fasta.gz') )
    if len(fastas) != 4: raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but only found {}.".format(asm.mkoutput_directory(), len(fastas)))
 
