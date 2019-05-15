@@ -36,7 +36,7 @@ def install_packages():
         print "Failed to install packages with yum. Trying again in 5 seconds"
         time.sleep(5)
 
-    while subprocess.call(['pip', 'install', '--upgrade', 'google-api-python-client']):
+    while subprocess.call(['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']):
         print "Failed to install google python api client. Trying again 5 seconds."
 
     subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
@@ -97,34 +97,25 @@ def install_supernova():
 
 #-- install_supernova
 
-def install_tenx_scripts():
-    if os.path.exists( os.path.join(APPS_DIR, "tenx-scripts", "tenxrc") ):
-        print "Already installed tenx-scripts...SKIPPING"
+def install_tenx_cli():
+
+    if os.path.exists( os.path.join(APPS_DIR, "usr", "bin", "tenx") ):
+        print "Already installed tenx cli...SKIPPING"
         return
-    print "Installing tenx-scripts..."
+    print "Installing tenx cli..."
 
     os.chdir('/tmp')
     subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
     os.chdir('tenx-gcp')
 
-    for subdir in ( 'common', 'supernova' ):
-        for fn in glob.glob( os.path.join('scripts', subdir, "*") ):
-            if os.path.basename(fn).endswith("bats"): continue
-            dest_fn = os.path.join(APPS_DIR, 'tenx-scripts', os.path.basename(fn))
-            shutil.copy(fn, dest_fn)
-            os.chmod(dest_fn, 0777)
-
-    while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
-       'http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenxrc',
-       '-o', os.path.join(APPS_DIR, 'tenx-scripts', 'tenxrc')]):
-        print "Failed curl tenxrc! Trying again in 5 seconds..."
-        time.sleep (5)
+    while subprocess.call(['pip', 'install', '.']):
+        print "Failed to install tenx cli. Trying again 5 seconds."
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
     print "Installing tenx-scripts...OK"
 
-#-- install_tenx_scripts
+#-- install_tenx_cli
 
 def add_supernova_profile():
     fn = os.path.join(os.path.sep, "etc", "profile.d", "supernova.sh")
@@ -159,7 +150,7 @@ if __name__ == '__main__':
     install_packages()
     create_data_directory_structures()
     install_supernova()
-    install_tenx_scripts()
+    install_tenx_cli()
     add_supernova_profile()
     add_tenx_config_file()
     print "Startup script...DONE"
