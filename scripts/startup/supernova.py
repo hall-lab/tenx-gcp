@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, subprocess, time
+import glob, os, shutil, requests, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR = '@DATA_DIR@'
