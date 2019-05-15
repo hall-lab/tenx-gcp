@@ -12,21 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+{% set networkName = env["deployment"] + "-network" %}
+
 resources:
-- name: {{properties["cluster_name"]}}-network
+- name: {{ networkName }}
   type: compute.v1.network
   properties:
     autoCreateSubnetworks: false
-- name: {{properties["cluster_name"]}}-subnet
+- name: {{ env["deployment"] }}-subnet
   type: compute.v1.subnetwork
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     ipCidrRange: 10.10.0.0/16
     region: {{ properties["region"] }}
-- name: {{properties["cluster_name"]}}-tenx-web-ui
+- name: {{ env["deployment"] }}-tenx-web-ui
   type: compute.v1.firewall
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     sourceRanges: ["0.0.0.0/0"]
     targetTags: ["tenx-web-ui"]
     priority: 990
@@ -36,10 +38,10 @@ resources:
     - IPProtocol: ICMP
 
 {% if properties['ssh_source_ranges'] %}
-- name: {{properties["cluster_name"]}}-tenx-ssh-restricted
+- name: {{ env["deployment"] }}-tenx-ssh-restricted
   type: compute.v1.firewall
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     sourceRanges: {{ properties['ssh_source_ranges'] }}
     targetTags: ["tenx-ssh-restricted"]
     priority: 1000
@@ -49,7 +51,7 @@ resources:
     - IPProtocol: ICMP
 {% endif %}
 
-- name: {{ properties["cluster_name"] }}
+- name: {{ env["deployment"] }}
   type: compute.v1.instance
   properties:
     zone: {{ properties["zone"] }}
@@ -65,7 +67,7 @@ resources:
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
         diskSizeGb: {{ properties["disk_size"] }}
     networkInterfaces:
-    - subnetwork: $(ref.{{properties["cluster_name"]}}-subnet.selfLink)
+    - subnetwork: $(ref.{{ properties["cluster_name"] }}-subnet.selfLink)
       accessConfigs:
       - name: External NAT
         type: ONE_TO_ONE_NAT
