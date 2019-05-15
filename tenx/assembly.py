@@ -1,4 +1,4 @@
-import glob, os, subprocess, sys, tempfile
+import glob, os, shutil, subprocess, sys, tempfile
 from app import TenxApp
 
 class TenxAssembly():
@@ -88,13 +88,13 @@ def run_upload(asm):
     os.chdir(asm.directory())
     if os.path.exists("ASSEMBLER_CS"):
         sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
-        os.rmtree("ASSEMBLER_CS")
+        shutil.rmtree("ASSEMBLER_CS")
 
     sys.stderr.write("Uploading to: {}".format(asm.remote_url()))
     subprocess.call(["gsutil", "-m", "rsync", "-r", ".", asm.remote_url()])
 
     # TODO verify
 
-    sys.stderr.write("Upload assembly...OK")
+    sys.stderr.write("Upload assembly...OK\n")
 
 #-- run_upload
