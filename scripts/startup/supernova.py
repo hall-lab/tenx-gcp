@@ -134,8 +134,8 @@ def add_supernova_profile():
 
     print "Adding {} ...".format(fn)
     with open(fn, "w") as f:
-        f.write("TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
-        f.write('PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
+        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
+        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
         f.write("source /apps/supernova/sourceme.bash\n")
 
 #-- add_supernova_profile
