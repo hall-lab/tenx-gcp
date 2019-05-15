@@ -13,8 +13,7 @@ resources:
     zone                    : <ZONE>
     #project_name            : <PROJECT>
 
-    # CLUSTER [recommended]
-    cluster_name            : supernova1
+    # CLUSTER
     machine_type            : n1-highmem-64
     disk_size               : 2000
     #ssh_source_ranges       : [ <IPS> ]

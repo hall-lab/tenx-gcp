@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, subprocess, time
+import glob, os, shutil, requests, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR = '@DATA_DIR@'
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_VERSION = '@SUPERNOVA_VERSION@'
+
+TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
+TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
 
 def install_packages():
 
@@ -33,17 +36,17 @@ def install_packages():
         print "Failed to install packages with yum. Trying again in 5 seconds"
         time.sleep(5)
 
-    while subprocess.call(['pip', 'install', '--upgrade', 'google-api-python-client']):
-        print "Failed to install google python api client. Trying again 5 seconds."
+    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']
+    rv = subprocess.call(cmd)
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
     subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
-    while subprocess.call(['pip', 'install', '-U', 'crcmod']):
-        print "Failed to install crcmod. Trying again 5 seconds."
-        time.sleep(5)
+    rv = subprocess.call(['pip', 'install', '-U', 'crcmod'])
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
-    while subprocess.call(['timedatectl', 'set-timezone', 'America/Chicago']):
-        print "Failed to set timezone with timedatectl. Trying again 5 seconds."
-        time.sleep(5)
+    cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
+    rv = subprocess.call(cmd)
+    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
     subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
     subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/' '/etc/boto.cfg'])
@@ -57,6 +60,9 @@ def create_data_directory_structures():
 
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
         os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
+
+    if not os.path.exists(TENX_ETC_DIRECTORY):
+        os.makedirs(TENX_ETC_DIRECTORY)
 
 #-- create_data_directory_structures
 
@@ -91,53 +97,62 @@ def install_supernova():
 
 #-- install_supernova
 
-def install_tenx_scripts():
-    if os.path.exists( os.path.join(APPS_DIR, "tenx-scripts", "tenxrc") ):
-        print "Already installed tenx-scripts...SKIPPING"
+def install_tenx_cli():
+
+    if os.path.exists( os.path.join(APPS_DIR, "usr", "bin", "tenx") ):
+        print "Already installed tenx cli...SKIPPING"
         return
-    print "Installing tenx-scripts..."
+    print "Installing tenx cli..."
 
     os.chdir('/tmp')
-    subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+    if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
+
     os.chdir('tenx-gcp')
-
-    for subdir in ( 'common', 'supernova' ):
-        for fn in glob.glob( os.path.join('scripts', subdir, "*") ):
-            if os.path.basename(fn).endswith("bats"): continue
-            dest_fn = os.path.join(APPS_DIR, 'tenx-scripts', os.path.basename(fn))
-            shutil.copy(fn, dest_fn)
-            os.chmod(dest_fn, 0777)
-
-    while subprocess.call(['curl', '-H', 'Metadata-Flavor:Google', 
-       'http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenxrc',
-       '-o', os.path.join(APPS_DIR, 'tenx-scripts', 'tenxrc')]):
-        print "Failed curl tenxrc! Trying again in 5 seconds..."
-        time.sleep (5)
+    rv = subprocess.call(['pip', 'install', '.'])
+    if rv != 0: raise Exception("Failed to install tenx cli.")
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
     print "Installing tenx-scripts...OK"
 
-#-- install_tenx_scripts
+#-- install_tenx_cli
 
 def add_supernova_profile():
-    fn = "/etc/profile.d/supernova.sh"
+    fn = os.path.join(os.path.sep, "etc", "profile.d", "supernova.sh")
     if os.path.exists(fn):
-        print "Already installed supernova profile.d config...SKIPPING"
+        print("Already added {} ...SKIPPING".format(fn))
         return
 
-    print "Installing supernova profile.d script..."
+    print "Adding {} ...".format(fn)
     with open(fn, "w") as f:
-        f.write('PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
+        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
+        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
         f.write("source /apps/supernova/sourceme.bash\n")
 
-#-- install_tenx_scripts
+#-- add_supernova_profile
+
+def add_tenx_config_file():
+    if os.path.exists(TENX_CONFIG_FILE):
+        print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
+        return
+
+    print "Adding {} ...".format(TENX_CONFIG_FILE)
+    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
+    print("GET {}".format(url))
+    response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
+    if not response.ok: raise Exception("GET failed for {}".format(url))
+    with open(TENX_CONFIG_FILE, "w") as f:
+        f.write(response.content)
+
+#-- add_tenx_config_file
 
 if __name__ == '__main__':
     install_packages()
     create_data_directory_structures()
     install_supernova()
-    install_tenx_scripts()
+    install_tenx_cli()
     add_supernova_profile()
+    add_tenx_config_file()
     print "Startup script...DONE"
 #-- __main__

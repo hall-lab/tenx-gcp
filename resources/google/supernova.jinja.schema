@@ -19,11 +19,11 @@ info:
     Create a 10X Genomics Supernova cluster on GCP.
 
 imports:
-- path: scripts/startup/supernova.py
-- path: scripts/tenxrc
+- path: ../../scripts/startup/supernova.py
+- path: ../../scripts/tenxrc
+- path: ../config/tenx.yaml
 
 required:
-- cluster_name
 - data_dir
 - disk_size_gb
 - machine_type
@@ -33,10 +33,6 @@ required:
 - zone
 
 properties:
-  cluster_name:
-    type        : string
-    description : Name of the cluster.
-
   data_dir:
     type        : string
     default     : /mnt/disks/data
