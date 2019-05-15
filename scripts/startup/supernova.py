@@ -7,6 +7,9 @@ DATA_DIR = '@DATA_DIR@'
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_VERSION = '@SUPERNOVA_VERSION@'
 
+TENX_ETC_DIRECTORY = os.path.join(os.pat.sep, "etc", "tenx")
+TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
+
 def install_packages():
 
     packages = [
@@ -57,6 +60,9 @@ def create_data_directory_structures():
 
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
         os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
+
+    if not os.path.exists(TENX_ETC_DIRECTORY):
+        os.makedirs(TENX_ETC_DIRECTORY)
 
 #-- create_data_directory_structures
 
@@ -121,17 +127,33 @@ def install_tenx_scripts():
 #-- install_tenx_scripts
 
 def add_supernova_profile():
-    fn = "/etc/profile.d/supernova.sh"
+    fn = os.join.path(os.path.sep, "etc", "profile.d", "supernova.sh")
     if os.path.exists(fn):
-        print "Already installed supernova profile.d config...SKIPPING"
+        print("Already added {} ...SKIPPING".format(fn))
         return
 
-    print "Installing supernova profile.d script..."
+    print "Adding {} ...".format(fn)
     with open(fn, "w") as f:
+        f.write("TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
         f.write('PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
         f.write("source /apps/supernova/sourceme.bash\n")
 
-#-- install_tenx_scripts
+#-- add_supernova_profile
+
+def add_tenx_config_file():
+    if os.path.exists(TENX_CONFIG_FILE):
+        print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
+        return
+
+    print "Adding {} ...".format(TENX_CONFIG_FILE)
+    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx_config",
+    print("GET {}".format(url))
+    response = requests.get(url)
+    if not response.ok: raise Exception("GET failed for {}".format(url))
+    with open(TENX_CONFIG_FILE, "w") as f:
+        f.write(response.content)
+
+#-- add_tenx_config_file
 
 if __name__ == '__main__':
     install_packages()
@@ -139,5 +161,6 @@ if __name__ == '__main__':
     install_supernova()
     install_tenx_scripts()
     add_supernova_profile()
+    add_tenx_config_file()
     print "Startup script...DONE"
 #-- __main__

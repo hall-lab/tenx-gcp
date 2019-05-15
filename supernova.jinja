@@ -89,3 +89,6 @@ resources:
         - key: tenxrc
           value: |
             {{ imports["scripts/tenxrc"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
+        - key: tenx-config
+          value: |
+            {{ imports["resources/config/tenx.yaml"]|indent(12)|replace("@DATA_DIR@",properties["data_dir"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
