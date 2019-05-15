@@ -47,12 +47,17 @@ tenx_assembly_cmd.add_command(asm_mkoutput, name="mkoutput")
 @click.argument('sample-name', type=click.STRING)
 def asm_pipeline(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
     reads.download(reads.TenxReads(sample_name=sample_name))
     asm = assembly.TenxAssembly(sample_name=sample_name)
     assembly.run_assemble(asm)
     assembly.run_mkoutput(asm)
-    print( report.run_duration_basic(util.run_duration(asm.directory)) )
+    run_duration = util.run_duration(asm.directory())
+    print( report.run_duration_basic(run_duration) )
+    with open(os.path.join(asm.directory(), "outs", "run-duration.txt")) as f:
+        f.write( report.run_duration_basic(run_duration) )
     assembly.run_upload(asm)
+    sys.stderr.write("Run assembly pipeline...OK")
 tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 
 @click.command(short_help="Send the assembly to the cloud")
