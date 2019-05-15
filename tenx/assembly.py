@@ -43,7 +43,8 @@ def run_assemble(asm):
    script_f = tempfile.NamedTemporaryFile()
    script_f.write(script)
    script_f.flush()
-   subprocess.call(['bash', script_f.name])
+   rv = subprocess.call(['bash', script_f.name])
+   if rv != 0: raise Exception("Failed to run 'assemble' bash script.")
    if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
 
 #-- assemble
@@ -70,7 +71,9 @@ def run_mkoutput(asm):
    script_f = tempfile.NamedTemporaryFile()
    script_f.write(script)
    script_f.flush()
-   subprocess.call(['bash', script_f.name])
+   print(script)
+   rv = subprocess.call(['bash', script_f.name])
+   if rv != 0: raise Exception("Failed to run 'assemble' bash script.")
    fastas = glob.glob( os.path.join(asm.mkoutput_directory(), '*fasta.gz') )
    if len(fastas) != 4: raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but only found {}.".format(asm.mkoutput_directory(), len(fastas)))
 
