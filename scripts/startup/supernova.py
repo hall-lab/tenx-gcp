@@ -7,7 +7,7 @@ DATA_DIR = '@DATA_DIR@'
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_VERSION = '@SUPERNOVA_VERSION@'
 
-TENX_ETC_DIRECTORY = os.path.join(os.pat.sep, "etc", "tenx")
+TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
 TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
 
 def install_packages():
@@ -127,7 +127,7 @@ def install_tenx_scripts():
 #-- install_tenx_scripts
 
 def add_supernova_profile():
-    fn = os.join.path(os.path.sep, "etc", "profile.d", "supernova.sh")
+    fn = os.path.join(os.path.sep, "etc", "profile.d", "supernova.sh")
     if os.path.exists(fn):
         print("Already added {} ...SKIPPING".format(fn))
         return
@@ -146,9 +146,9 @@ def add_tenx_config_file():
         return
 
     print "Adding {} ...".format(TENX_CONFIG_FILE)
-    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx_config",
+    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
     print("GET {}".format(url))
-    response = requests.get(url)
+    response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
     if not response.ok: raise Exception("GET failed for {}".format(url))
     with open(TENX_CONFIG_FILE, "w") as f:
         f.write(response.content)
