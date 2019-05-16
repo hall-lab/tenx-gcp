@@ -57,6 +57,7 @@ def asm_pipeline(sample_name):
     with open(os.path.join(asm.directory(), "outs", "run-duration.txt")) as f:
         f.write( report.run_duration_basic(run_duration) )
     assembly.run_upload(asm)
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
     sys.stderr.write("Run assembly pipeline...OK")
 tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 
@@ -102,4 +103,15 @@ cli.add_command(tenx_util_cmd, name='util')
 def tenx_util_runduration(directory):
     print( report.run_duration_basic(util.run_duration(directory)) )
 tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
+
+@click.command()
+@click.argument('local', type=click.Path(exists=True))
+@click.argument('remote', type=click.STRING)
+def tenx_util_verify_upload(directory, remote_url):
+    """Check if all files from LOCAL directory are on REMOTE url."""
+    sys.stderr.write("Local directory: {}\n".format(directory))
+    sys.stderr.write("Remote URL: {}\n".format(remote_url))
+    util.verify_upload(ldir=directory, rurl=remote_url)
+    sys.stderr.write("All local files found on remote!")
+tenx_util_cmd.add_command(tenx_util_verify_upload, name='verify-upload')
 #-- UTIL

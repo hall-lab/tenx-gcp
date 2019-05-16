@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 from datetime import datetime, timedelta
-import json, os
+import json, os, re, subprocess, sys
 
 def run_duration(run_dir):
     #ASSEMBLER_CS ALIGNER_CS BASIC_CS PHASER_SVCALLER_CS
@@ -40,3 +38,41 @@ def run_duration(run_dir):
     return run
 
 #-- run_duration
+
+def verify_upload(ldir, rurl):
+    remote = build_remote(rurl)
+
+    if not ldir.endswith('/'): ldir += '/'
+    regex = re.compile(r"" + ldir + r"")
+    missing = []
+    ldir_file_cnt = 0;
+    for root, dirs, files in os.walk(ldir):
+        ldir_file_cnt += len(files)
+        for f in files:
+            fpath = re.sub(regex, '', os.path.join(root, f))
+            if not fpath in remote: missing.append(fpath)
+            # FIXME check size
+
+    if ldir_file_cnt == 0:
+        raise Exception("Local directory does not contain any files!")
+    if missing:
+        raise Exception("Remote is missing these files:\n{}".format("\n".join(missing)))
+
+#--verify_upload
+
+def build_remote(rurl):
+
+    if not rurl.endswith('/'): rurl += '/'
+    regex = re.compile(r"" + rurl + r"")
+    remote = {}
+    out = subprocess.check_output(['gsutil', 'ls', '-l', rurl + '**'])
+    for l in out.split("\n"):
+        t = l.split() # no arg splits on spaces
+        if len(t) == 0: continue # blank line
+        replaced = re.sub(regex, '', t[2])
+        remote[replaced] = t[0] # file & size
+        # FIXME what about TOTAL?
+
+    return remote
+
+#-- build_remote
