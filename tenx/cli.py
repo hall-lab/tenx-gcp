@@ -47,12 +47,18 @@ tenx_assembly_cmd.add_command(asm_mkoutput, name="mkoutput")
 @click.argument('sample-name', type=click.STRING)
 def asm_pipeline(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
     reads.download(reads.TenxReads(sample_name=sample_name))
     asm = assembly.TenxAssembly(sample_name=sample_name)
     assembly.run_assemble(asm)
     assembly.run_mkoutput(asm)
-    print( report.run_duration_basic(util.run_duration(asm.directory)) )
+    run_duration = util.run_duration(asm.directory())
+    print( report.run_duration_basic(run_duration) )
+    with open(os.path.join(asm.directory(), "outs", "run-duration.txt")) as f:
+        f.write( report.run_duration_basic(run_duration) )
     assembly.run_upload(asm)
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
+    sys.stderr.write("Run assembly pipeline...OK")
 tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 
 @click.command(short_help="Send the assembly to the cloud")
@@ -97,4 +103,15 @@ cli.add_command(tenx_util_cmd, name='util')
 def tenx_util_runduration(directory):
     print( report.run_duration_basic(util.run_duration(directory)) )
 tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
+
+@click.command()
+@click.argument('local', type=click.Path(exists=True))
+@click.argument('remote', type=click.STRING)
+def tenx_util_verify_upload(directory, remote_url):
+    """Check if all files from LOCAL directory are on REMOTE url."""
+    sys.stderr.write("Local directory: {}\n".format(directory))
+    sys.stderr.write("Remote URL: {}\n".format(remote_url))
+    util.verify_upload(ldir=directory, rurl=remote_url)
+    sys.stderr.write("All local files found on remote!")
+tenx_util_cmd.add_command(tenx_util_verify_upload, name='verify-upload')
 #-- UTIL

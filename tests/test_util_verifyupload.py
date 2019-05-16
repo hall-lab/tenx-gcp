@@ -1,11 +1,10 @@
 #!/usrbin/env python
 
-import os, subprocess, sys, tempfile, unittest
+import os, subprocess, unittest
 from mock import patch
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../scripts/common')))
-from verify_upload import build_remote, run
-from pprint import pprint
+from .context import tenx
+from tenx import util
 
 class VerifyUploadTest(unittest.TestCase):
 
@@ -43,27 +42,25 @@ class VerifyUploadTest(unittest.TestCase):
     @patch('subprocess.check_output')
     def test_build_remote(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        remote = build_remote(rurl="gs://data")
+        remote = util.build_remote(rurl="gs://data")
         self.assertDictEqual(self.expected_remote, remote)
 
     @patch('subprocess.check_output')
     def test_empty(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        with self.assertRaises(Exception) as cm:
-            run(ldir="verify-upload-t/empty", rurl="gs://data")
-        self.assertTrue("No files found in verify-upload-t/empty/" in cm.exception)
+        with self.assertRaisesRegexp(Exception, "Local directory does not contain any files!"):
+            util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "empty"), rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test_missing(self, test_patch):
         test_patch.return_value = self.gsutil_missing_output
-        with self.assertRaises(Exception) as cm:
-            run(ldir="verify-upload-t/success", rurl="gs://data")
-        self.assertTrue("Remote is missing these files:\ngatk-4.0.0.0.zip" in cm.exception)
+        with self.assertRaisesRegexp(Exception, "Remote is missing these files:\ngatk-4.0.0.0.zip"):
+            util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test_success(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        run(ldir="verify-upload-t/success", rurl="gs://data")
+        util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
 
 #-- VerifyUploadTest
 
