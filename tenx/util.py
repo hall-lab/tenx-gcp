@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import json, os, re, subprocess, sys
 
-def run_duration(run_dir):
+def calculate_compute_metrics(run_dir):
     #ASSEMBLER_CS ALIGNER_CS BASIC_CS PHASER_SVCALLER_CS
     pwd = os.getcwd()
     paths = []
@@ -13,7 +13,7 @@ def run_duration(run_dir):
     finally:
         if len(paths) == 0: os.chdir(pwd)
 
-    run = {
+    metrics = {
         "directory": run_dir,
         "core_hours": 0,
         "duration": timedelta(0),
@@ -27,17 +27,17 @@ def run_duration(run_dir):
                 with open( os.path.join(root, fname) ) as f:
                     data = json.load(f)
 
-                run['jobs'] += 1
-                run['duration'] += timedelta(seconds=data['wallclock']['duration_seconds'])
-                run['mem'] += data['memGB']
-                run['threads'] += data['threads']
-                run['core_hours'] += (data['wallclock']['duration_seconds']/3600) * data['threads']
+                metrics['jobs'] += 1
+                metrics['duration'] += timedelta(seconds=data['wallclock']['duration_seconds'])
+                metrics['mem'] += data['memGB']
+                metrics['threads'] += data['threads']
+                metrics['core_hours'] += (data['wallclock']['duration_seconds']/3600) * data['threads']
 
-    run['core_hours'] = round(run['core_hours'], 0)
+    metrics['core_hours'] = round(metrics['core_hours'], 0)
     os.chdir(pwd)
-    return run
+    return metrics
 
-#-- run_duration
+#-- calculate_compute_metrics
 
 def verify_upload(ldir, rurl):
     remote = build_remote(rurl)

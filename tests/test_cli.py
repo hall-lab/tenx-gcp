@@ -51,9 +51,9 @@ class TenxCliTest(unittest.TestCase):
         self.assertEqual(rv, 0)
 
     def test4_tenx_reads_download(self):
-        rv = subprocess.call(['tenx', 'util', 'run-duration', '--help'])
+        rv = subprocess.call(['tenx', 'util', 'calculate-compute-metrics', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'util', 'run-duration'])
+        rv = subprocess.call(['tenx', 'util', 'calculate-compute-metrics'])
         self.assertEqual(rv, 2)
 
 # -- TenxCliTest

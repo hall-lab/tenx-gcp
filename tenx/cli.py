@@ -59,10 +59,10 @@ def asm_pipeline(sample_name):
     asm = assembly.TenxAssembly(sample_name=sample_name)
     assembly.run_assemble(asm)
     assembly.run_mkoutput(asm)
-    run_duration = util.run_duration(asm.directory())
-    print( report.run_duration_basic(run_duration) )
-    with open(os.path.join(asm.directory(), "outs", "run-duration.txt")) as f:
-        f.write( report.run_duration_basic(run_duration) )
+    compute_metrics = util.calculate_compute_metrics(asm.directory())
+    print( report.compute_metrics_basic(compute_metrics) )
+    with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt")) as f:
+        f.write( report.compute_metrics_basic(metrics=compute_metrics) )
     assembly.run_upload(asm)
     util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
     sys.stderr.write("Run assembly pipeline...OK")
@@ -113,12 +113,12 @@ cli.add_command(tenx_util_cmd, name='util')
 
 @click.command()
 @click.argument('directory', type=click.Path(exists=True))
-def tenx_util_runduration(directory):
+def tenx_util_calculate_compute_metrics(directory):
     """
     Calculate the compute metrics for a 10X genomics pipeline run.
     """
-    print( report.run_duration_basic(util.run_duration(directory)) )
-tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
+    print( report.compute_metrics_basic(util.calculate_compute_metrics(directory)) )
+tenx_util_cmd.add_command(tenx_util_calculate_compute_metrics, name='calculate-compute-metrics')
 
 @click.command()
 @click.argument('local', type=click.Path(exists=True))
