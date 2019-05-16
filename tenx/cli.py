@@ -1,4 +1,4 @@
-import click, os
+import click, os, sys
 
 from tenx.version import __version__
 from tenx import app, assembly, reads, report, util
@@ -32,6 +32,7 @@ cli.add_command(tenx_assembly_cmd, name="assembly")
 @click.command(short_help="create an assembly with supernova")
 @click.argument('sample-name', type=click.STRING)
 def asm_assemble(sample_name):
+    """Create an assembly with supernova."""
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_assemble, name="assemble")
@@ -39,6 +40,7 @@ tenx_assembly_cmd.add_command(asm_assemble, name="assemble")
 @click.command(short_help="run mkoutput on an assembly")
 @click.argument('sample-name', type=click.STRING)
 def asm_mkoutput(sample_name):
+    """Run mkoutput on a supernova assembly."""
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_mkoutput, name="mkoutput")
@@ -46,6 +48,11 @@ tenx_assembly_cmd.add_command(asm_mkoutput, name="mkoutput")
 @click.command(short_help="run the full supernova assembly pipeline")
 @click.argument('sample-name', type=click.STRING)
 def asm_pipeline(sample_name):
+    """
+    Fully automated pipeline to create a supernova assembly.
+
+    Process includes: downloading reads, running supernova, mkoutput, and then uploading the assembly.
+    """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
     reads.download(reads.TenxReads(sample_name=sample_name))
@@ -64,6 +71,9 @@ tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 @click.command(short_help="Send the assembly to the cloud")
 @click.argument('sample-name', type=click.STRING)
 def asm_upload(sample_name):
+    """
+    Upload an assembly from the local directory to cloud storage.
+    """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_upload(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_upload, name="upload")
@@ -83,6 +93,9 @@ cli.add_command(tenx_reads_cmd)
 @click.command(short_help="Download reads from the cloud!")
 @click.argument('sample-name', type=click.STRING)
 def reads_download(sample_name):
+    """
+    Download reads from cloud storage to local directory.
+    """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     reads.download(reads.TenxReads(sample_name=sample_name))
 tenx_reads_cmd.add_command(reads_download, name="download")
@@ -101,6 +114,9 @@ cli.add_command(tenx_util_cmd, name='util')
 @click.command()
 @click.argument('directory', type=click.Path(exists=True))
 def tenx_util_runduration(directory):
+    """
+    Calculate the compute metrics for a 10X genomics pipeline run.
+    """
     print( report.run_duration_basic(util.run_duration(directory)) )
 tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
 
@@ -108,7 +124,9 @@ tenx_util_cmd.add_command(tenx_util_runduration, name='run-duration')
 @click.argument('local', type=click.Path(exists=True))
 @click.argument('remote', type=click.STRING)
 def tenx_util_verify_upload(directory, remote_url):
-    """Check if all files from LOCAL directory are on REMOTE url."""
+    """
+    Check if all files from LOCAL directory are on REMOTE url.
+    """
     sys.stderr.write("Local directory: {}\n".format(directory))
     sys.stderr.write("Remote URL: {}\n".format(remote_url))
     util.verify_upload(ldir=directory, rurl=remote_url)
