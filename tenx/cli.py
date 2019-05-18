@@ -13,12 +13,57 @@ def cli():
     app.TenxApp(os.environ.get('TENX_CONFIG_FILE', None))
     pass
 
+# ALIGNMENT
+# - align (run longranger only command)
+# - pipeline (run-supernova - full pipeline)
+# - upload (sends assembly to object store)
+@click.group()
+def tenx_aln_cmd():
+    """
+    Commands, Pipeline, and Helpers for Alignments
+    """
+    pass
+
+cli.add_command(tenx_aln_cmd, name="alignment")
+
+@click.command(short_help="align with longranger")
+@click.argument('sample-name', type=click.STRING)
+@click.argument('ref-name', type=click.STRING)
+def aln_align(sample_name, ref_name):
+    """
+    Create alignments with longranger.
+    """
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+tenx_aln_cmd.add_command(aln_align, name="align")
+
+@click.command(short_help="align with longranger")
+@click.argument('sample-name', type=click.STRING)
+@click.argument('ref-name', type=click.STRING)
+def aln_pipeline(sample_name, ref_name):
+    """
+    Fully automated pipeline to create longranger alignments.
+
+    Process includes: downloading reads & reference, running longranger, and then uploading the alignments to the cloud.
+    """
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+tenx_aln_cmd.add_command(aln_pipeline, name="pipeline")
+
+@click.command(short_help="to the cloud")
+@click.argument('sample-name', type=click.STRING)
+def aln_upload(sample_name):
+    """
+    Upload an assembly from the local directory to cloud storage.
+    """
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+tenx_aln_cmd.add_command(aln_upload, name="upload")
+
+#-- ALIGNMENT
+
 # ASSEMBLY
 # - asm (run supernova only command)
 # - mkoutput (runs mkputput on an assembly
 # - pipeline (run-supernova - full pipeline)
 # - upload (sends assembly to object store)
-# FUTURE download, list, view
 
 @click.group()
 def tenx_assembly_cmd():
@@ -77,6 +122,7 @@ def asm_upload(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_upload(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_upload, name="upload")
+
 #-- ASSEMBLY
 
 # READS
@@ -100,6 +146,28 @@ def reads_download(sample_name):
     reads.download(reads.TenxReads(sample_name=sample_name))
 tenx_reads_cmd.add_command(reads_download, name="download")
 #-- READS
+
+# REFERENCE
+# - download (fetch reference from the cloud)
+@click.group()
+def tenx_ref_cmd():
+    """
+    Commands for Referecne Sequecnes
+    """
+    pass
+
+cli.add_command(tenx_ref_cmd, name="ref")
+
+@click.command(short_help="fetch reference sequences")
+@click.argument('ref-name', type=click.STRING)
+def ref_download(ref_name):
+    """
+    Download refeence sequences from cloud storage to local disk.
+    """
+    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+tenx_ref_cmd.add_command(ref_download, name="download")
+
+#-- REFERENCE
 
 # UTIL
 @click.group()
