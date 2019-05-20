@@ -26,6 +26,18 @@ class TenxAlignmentTest(unittest.TestCase):
         aln = alignment.TenxAlignment(sample_name='TEST_FAIL')
         self.assertFalse(aln.is_successful())
 
+    @patch('subprocess.call')
+    def test4_run_upload(self, test_patch):
+        # TODO test ASSEMBLER_CS dir is removed?
+        test_patch.return_value = '0'
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_alignment')
+        aln = alignment.TenxAlignment(sample_name='TEST_SUCCESS')
+        alignment.run_upload(aln)
+
+        aln = alignment.TenxAlignment(sample_name='TEST_FAIL')
+        with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful alignment"):
+            alignment.run_upload(aln)
+
 # -- TenxAlignmentTest
 
 if __name__ == '__main__':

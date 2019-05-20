@@ -55,6 +55,7 @@ def aln_upload(sample_name):
     Upload an assembly from the local directory to cloud storage.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
 tenx_aln_cmd.add_command(aln_upload, name="upload")
 
 #-- ALIGNMENT

@@ -1,5 +1,7 @@
 import glob, os, shutil, subprocess, sys, tempfile
+
 from app import TenxApp
+import util
 
 class TenxAlignment():
 
@@ -25,3 +27,25 @@ class TenxAlignment():
         return os.path.exists( os.path.join(self.outs_directory(), "summary.csv") )
 
 #-- TenxAlignment
+
+def run_upload(aln):
+    sys.stderr.write("Upload {} alignment...\n".format(aln.sample_name))
+
+    if not aln.is_successful(): raise Exception("Refusing to upload an unsuccessful alignment!")
+
+    sys.stderr.write("Entering {} ...\n".format(aln.directory()))
+    os.chdir(aln.directory())
+    for cs_subdir in ('ALIGNER_CS', 'PHASER_SVCALLER_CS'):
+        if os.path.exists(cs_subdir):
+            sys.stderr.write("Removing logging directory {} prior to upload.\n".format(cs_subdir))
+            shutil.rmtree(cs_subdir)
+
+    sys.stderr.write("Uploading to: {}\n".format(aln.remote_url()))
+    subprocess.call(["gsutil", "-m", "rsync", "-r", ".", aln.remote_url()])
+
+    sys.stderr.write("Verify upload alignment...\n")
+    util.verify_upload(ldir=aln.directory(), rurl=aln.remote_url())
+
+    sys.stderr.write("Upload alignment...OK\n")
+
+#-- run_upload
