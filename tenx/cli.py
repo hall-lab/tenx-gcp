@@ -106,10 +106,9 @@ def asm_pipeline(sample_name):
     assembly.run_mkoutput(asm)
     compute_metrics = util.calculate_compute_metrics(asm.directory())
     print( report.compute_metrics_basic(compute_metrics) )
-    with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt")) as f:
+    with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt"), "w") as f:
         f.write( report.compute_metrics_basic(metrics=compute_metrics) )
     assembly.run_upload(asm)
-    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
     sys.stderr.write("Run assembly pipeline...OK")
 tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 
