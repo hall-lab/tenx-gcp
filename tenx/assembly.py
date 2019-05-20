@@ -1,5 +1,7 @@
 import glob, os, shutil, subprocess, sys, tempfile
+
 from app import TenxApp
+import util
 
 class TenxAssembly():
 
@@ -80,20 +82,21 @@ def run_mkoutput(asm):
 #-- mkoutput
 
 def run_upload(asm):
-    sys.stderr.write("Upload {} assembly...".format(asm.sample_name))
+    sys.stderr.write("Upload {} assembly...\n".format(asm.sample_name))
 
     if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
 
-    sys.stderr.write("Entering {} ...".format(asm.directory()))
+    sys.stderr.write("Entering {} ...\n".format(asm.directory()))
     os.chdir(asm.directory())
     if os.path.exists("ASSEMBLER_CS"):
         sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
         shutil.rmtree("ASSEMBLER_CS")
 
-    sys.stderr.write("Uploading to: {}".format(asm.remote_url()))
+    sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
     subprocess.call(["gsutil", "-m", "rsync", "-r", ".", asm.remote_url()])
 
-    # TODO verify
+    sys.stderr.write("Verify upload assembly...\n")
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
 
     sys.stderr.write("Upload assembly...OK\n")
 
