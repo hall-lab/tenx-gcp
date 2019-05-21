@@ -88,12 +88,14 @@ def run_upload(asm):
 
     sys.stderr.write("Entering {} ...\n".format(asm.directory()))
     os.chdir(asm.directory())
-    if os.path.exists("ASSEMBLER_CS"):
-        sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
-        shutil.rmtree("ASSEMBLER_CS")
+
+    # FIXME Not removing ASSEMBLER_CS, skipping it instead with -x. Maybe parameterize? Send to cloud, remove?
+    #if os.path.exists("ASSEMBLER_CS"):
+    #    sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
+    #    shutil.rmtree("ASSEMBLER_CS")
 
     sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
-    subprocess.call(["gsutil", "-m", "rsync", "-r", ".", asm.remote_url()])
+    subprocess.call(["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()])
 
     sys.stderr.write("Verify upload assembly...\n")
     util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
