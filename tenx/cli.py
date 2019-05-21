@@ -1,12 +1,14 @@
 import click, os, sys
 
+import tenx.app as app
 from tenx.version import __version__
 from tenx import app, assembly, reads, report, util
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version=__version__)
-def cli():
+@click.pass_context
+def cli(ctx):
     """
     10X CLI
     """
@@ -57,8 +59,6 @@ def aln_upload(sample_name):
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
 tenx_aln_cmd.add_command(aln_upload, name="upload")
-
-#-- ALIGNMENT
 
 # ASSEMBLY
 # - asm (run supernova only command)
