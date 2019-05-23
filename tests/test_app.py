@@ -15,12 +15,25 @@ class TenxAppTest(unittest.TestCase):
         tenxapp = TenxApp()
         self.assertIsNotNone(TenxApp.config)
 
-        # init w/ config
+        # re-init w/ config
         TenxApp.config = None
-        tenxapp = TenxApp("tests/test_app/tenx.yaml")
+        self.assertIsNone(TenxApp.config)
+        tenxapp = TenxApp( os.path.join("tests", "test_app", "tenx.yaml") )
         self.assertIsNotNone(tenxapp)
         self.assertIsNotNone(tenxapp.config)
         self.assertEqual(tenxapp.config['environment'], 'test')
+
+    def test3_script_template(self):
+        scripts_path = TenxApp.config.pop('TENX_SCRIPTS_PATH')
+        with self.assertRaisesRegexp(Exception, "Scripts directory \(TENX_SCRIPTS_PATH\) is not set in tenx config\!"):
+            TenxApp.load_script_template('blah')
+
+        TenxApp.config['TENX_SCRIPTS_PATH'] = scripts_path
+        with self.assertRaisesRegexp(Exception, "Failed to find script template file: {}". format(os.path.join(TenxApp.config['TENX_SCRIPTS_PATH'], 'blah.jinja'))):
+            TenxApp.load_script_template('blah')
+
+        script_template = TenxApp.load_script_template('foo')
+        self.assertIsNotNone(script_template)
 
 # -- TenxAppTest
 
