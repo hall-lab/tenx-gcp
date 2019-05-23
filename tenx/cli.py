@@ -54,7 +54,7 @@ tenx_aln_cmd.add_command(aln_pipeline, name="pipeline")
 @click.argument('sample-name', type=click.STRING)
 def aln_upload(sample_name):
     """
-    Upload an assembly from the local directory to cloud storage.
+    Upload an assembly from local disk to cloud storage.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
@@ -78,7 +78,9 @@ cli.add_command(tenx_assembly_cmd, name="assembly")
 @click.command(short_help="create an assembly with supernova")
 @click.argument('sample-name', type=click.STRING)
 def asm_assemble(sample_name):
-    """Create an assembly with supernova."""
+    """
+    Create an assembly with supernova.
+    """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_assemble, name="assemble")
@@ -86,7 +88,9 @@ tenx_assembly_cmd.add_command(asm_assemble, name="assemble")
 @click.command(short_help="run mkoutput on an assembly")
 @click.argument('sample-name', type=click.STRING)
 def asm_mkoutput(sample_name):
-    """Run mkoutput on a supernova assembly."""
+    """
+    Run mkoutput on a supernova assembly.
+    """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
 tenx_assembly_cmd.add_command(asm_mkoutput, name="mkoutput")
@@ -117,7 +121,7 @@ tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 @click.argument('sample-name', type=click.STRING)
 def asm_upload(sample_name):
     """
-    Upload an assembly from the local directory to cloud storage.
+    Upload an assembly from local disk to cloud storage.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_upload(assembly.TenxAssembly(sample_name=sample_name))
@@ -130,7 +134,7 @@ tenx_assembly_cmd.add_command(asm_upload, name="upload")
 @click.group(name="reads")
 def tenx_reads_cmd():
     """
-    Commands and Helpers for 10X Reads
+    Commands for Reads
     """
     pass
 
@@ -140,7 +144,7 @@ cli.add_command(tenx_reads_cmd)
 @click.argument('sample-name', type=click.STRING)
 def reads_download(sample_name):
     """
-    Download reads from cloud storage to local directory.
+    Download reads from cloud storage to local disk.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     reads.download(reads.TenxReads(sample_name=sample_name))
@@ -152,7 +156,7 @@ tenx_reads_cmd.add_command(reads_download, name="download")
 @click.group()
 def tenx_ref_cmd():
     """
-    Commands for Referecne Sequecnes
+    Commands for Reference Sequences
     """
     pass
 
@@ -162,7 +166,7 @@ cli.add_command(tenx_ref_cmd, name="ref")
 @click.argument('ref-name', type=click.STRING)
 def ref_download(ref_name):
     """
-    Download refeence sequences from cloud storage to local disk.
+    Download reference sequences from cloud storage to local disk.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
 tenx_ref_cmd.add_command(ref_download, name="download")
