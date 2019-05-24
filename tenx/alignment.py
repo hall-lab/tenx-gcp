@@ -28,6 +28,29 @@ class TenxAlignment():
 
 #-- TenxAlignment
 
+def run_align(aln, ref, job_params):
+   sys.stderr.write("Creating alignments for {}".format(aln.sample_name))
+
+   sample_d = aln.sample_directory()
+   os.makedirs(sample_d)
+   sys.stderr.write("Entering {}".format(sample_d))
+   pwd = os.getcwd()
+   os.chdir(sample_d)
+
+   try:
+       cmd = ["supernova", "wgs", "--id=alignment",
+           "--sample={}".format(aln.sample_name), "--fastqs={}".format(aln.reads_directory()), "--reference={}".format(ref.directory()),
+           "--uiport=18080", "--jobmode=".format(job["mode"]), "--localmem={}".format(job.["mem"]), "--localcores={}".format(job["cores"])]
+       sys.stderr.write("Running {} ...".format(' '.join(cmd)))
+       subprocess.check_call(cmd)
+   except:
+       sys.stderr.write("Failed to run supernova!")
+       raise
+   finally:
+       os.chdir(pwd)
+
+#-- align
+
 def run_upload(aln):
     sys.stderr.write("Upload {} alignment...\n".format(aln.sample_name))
 

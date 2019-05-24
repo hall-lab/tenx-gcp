@@ -36,6 +36,7 @@ def aln_align(sample_name, ref_name):
     Create alignments with longranger.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
 tenx_aln_cmd.add_command(aln_align, name="align")
 
 @click.command(short_help="align with longranger")
