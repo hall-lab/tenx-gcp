@@ -2,7 +2,10 @@ import click, os, sys
 
 import tenx.app as app
 from tenx.version import __version__
-from tenx import app, assembly, reads, report, util
+from tenx import app, alignment, assembly, reads, reference, report, util
+from alignment import TenxAlignment
+from reads import TenxReads
+from reference import TenxReference
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -16,9 +19,9 @@ def cli(ctx):
     pass
 
 # ALIGNMENT
-# - align (run longranger only command)
-# - pipeline (run-supernova - full pipeline)
-# - upload (sends assembly to object store)
+# - align
+# - pipeline (dl rds, dl ref, aln, ul aln)
+# - upload
 @click.group()
 def tenx_aln_cmd():
     """
@@ -36,7 +39,7 @@ def aln_align(sample_name, ref_name):
     Create alignments with longranger.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
-    alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
+    alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReads(sample_name=sample_name), TenxReference(name=ref_name))
 tenx_aln_cmd.add_command(aln_align, name="align")
 
 @click.command(short_help="align with longranger")
@@ -106,7 +109,7 @@ def asm_pipeline(sample_name):
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
-    reads.download(reads.TenxReads(sample_name=sample_name))
+    reads.download(TenxReads(sample_name=sample_name))
     asm = assembly.TenxAssembly(sample_name=sample_name)
     assembly.run_assemble(asm)
     assembly.run_mkoutput(asm)
@@ -148,7 +151,7 @@ def reads_download(sample_name):
     Download reads from cloud storage to local disk.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
-    reads.download(reads.TenxReads(sample_name=sample_name))
+    reads.download(TenxReads(sample_name=sample_name))
 tenx_reads_cmd.add_command(reads_download, name="download")
 #-- READS
 
