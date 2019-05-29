@@ -8,6 +8,30 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx'])
         self.assertEqual(rv, 0)
 
+    # ALIGNMENT
+    def test2_tenx_alignment(self):
+        rv = subprocess.call(['tenx', 'alignment'])
+        self.assertEqual(rv, 0)
+
+    def test2_tenx_alignment_align(self):
+        rv = subprocess.call(['tenx', 'alignment', 'align', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'alignment', 'align'])
+        self.assertEqual(rv, 2)
+
+    def test2_tenx_alignment_pipeline(self):
+        rv = subprocess.call(['tenx', 'alignment', 'pipeline', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'alignment', 'pipeline'])
+        self.assertEqual(rv, 2)
+
+    def test2_tenx_alignment_upload(self):
+        rv = subprocess.call(['tenx', 'alignment', 'upload', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'alignment', 'upload'])
+        self.assertEqual(rv, 2)
+
+    # ASSEMBLY
     def test2_tenx_assembly(self):
         rv = subprocess.call(['tenx', 'assembly'])
         self.assertEqual(rv, 0)
@@ -36,6 +60,7 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'assembly', 'upload'])
         self.assertEqual(rv, 2)
 
+    # READS
     def test3_tenx_reads(self):
         rv = subprocess.call(['tenx', 'reads'])
         self.assertEqual(rv, 0)
@@ -54,6 +79,17 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'util', 'calculate-compute-metrics', '--help'])
         self.assertEqual(rv, 0)
         rv = subprocess.call(['tenx', 'util', 'calculate-compute-metrics'])
+        self.assertEqual(rv, 2)
+
+    # REFERENCE
+    def test2_tenx_ref(self):
+        rv = subprocess.call(['tenx', 'ref'])
+        self.assertEqual(rv, 0)
+
+    def test2_tenx_ref_download(self):
+        rv = subprocess.call(['tenx', 'ref', 'download', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'ref', 'download'])
         self.assertEqual(rv, 2)
 
 # -- TenxCliTest

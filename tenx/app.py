@@ -1,4 +1,4 @@
-import logging, yaml
+import jinja2, logging, os, yaml
 
 class TenxApp(object):
     config = None # class variable, used as a singleton for the app config
@@ -16,5 +16,16 @@ class TenxApp(object):
             TenxApp.config = {}
 
     # -- __init
+
+    @staticmethod
+    def load_script_template(name):
+        if not 'TENX_SCRIPTS_PATH' in TenxApp.config.keys(): raise Exception("Scripts directory (TENX_SCRIPTS_PATH) is not set in tenx config!")
+        script_fn = os.path.join(TenxApp.config['TENX_SCRIPTS_PATH'], name + '.jinja')
+        if not os.path.exists(script_fn): raise Exception("Failed to find script template file: {}".format(script_fn))
+        with open(script_fn, 'r') as f:
+            script_template = jinja2.Template(f.read())
+        return script_template
+
+#-- load_script_template_for
 
 # -- TenxApp

@@ -1,1 +1,2 @@
 environment: test
+TENX_SCRIPTS_PATH: tests/test_app

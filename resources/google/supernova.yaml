@@ -19,7 +19,7 @@ resources:
     #ssh_source_ranges       : [ <IPS> ]
 
     # DIRS/URLS
-    data_dir                : <DATA_DIR>
+    #data_dir                : <DATA_DIR>
     remote_data_url         : <REMOVE_DATA_URL>
     supernova_version       : <SUPERNOVA_VERSION>
 #  [END supernova_yaml]

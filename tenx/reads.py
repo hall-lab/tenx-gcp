@@ -11,7 +11,7 @@ class TenxReads():
     def remote_url(self):
         return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample_name, 'reads')
 
-    def local_directory(self):
+    def directory(self):
         return os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], self.sample_name, 'reads')
 
 #-- TenxReads
@@ -19,7 +19,7 @@ class TenxReads():
 def download(reads):
     sys.stderr.write("Fetching {0} fastqs from the object store...\n".format(reads.sample_name))
 
-    ldir = reads.local_directory()
+    ldir = reads.directory()
     if not os.path.exists(ldir):
         os.makedirs(ldir)
 
