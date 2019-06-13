@@ -46,16 +46,28 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 
 ### Create the Deployment
 
-In an authenticated GCP session, enter the _resources/google_ directory. Run the command below to create the deployment named _supernova1_. The deployemnt name will be prepended to all assoiciated assets.
+In an authenticated GCP session, enter the _resources/google_ directory. Run the command below to create the deployment named _supernova1_. The deployment name will be prepended to all assoiciated assets. Use a different deployment name as needed.
 ```
-$ gcloud deploymewnt manager deployments create supernova1 --config supernova.yaml
+$ gcloud deployment-manager deployments create supernova1 --config supernova.yaml
 ```
+
+### Assests Created
+
+This is list of assets created in the deployment. All assests are preppended with the deployment name and a '-'.
+
+| Assest | Name | Purpose |
+| --- | --- | --- |
+| supernova01                             | compute.v1.instance   | the supernova compute instance: run supernova here |
+| supernova01-network                     | compute.v1.network    | network for compute instance and firewalls |
+| supernova01-network-subnet              | compute.v1.subnetwork | subnet for compute instance and firewalls |
+| supernova01-network-tenx-ssh-restricted | compute.v1.firewall   | firewall of whitelisted IPS for SSH |
+| supernova01-network-tenx-web-ui         | compute.v1.firewall   | firewall to allow access to the 10X web UI |
 
 ### Start Supernova Pipeline
 
-SSH into the supernova1 VM.
+SSH into the supernova1 compute instance.
 ```
-$ gcloud ssh supernova1
+$ gcloud compute ssh supernova1
 ```
 Then, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
 ```
