@@ -41,7 +41,6 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 
 | Property | Notes |
 | --- | --- |
-| data_dir          | local working directory |
 | project_name      | project name label to add to instances |
 | ssh_source_ranges | IP ranges to restrict SSH access |
 

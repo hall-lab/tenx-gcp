@@ -3,7 +3,7 @@
 import glob, os, shutil, requests, subprocess, time
 
 APPS_DIR = '/apps'
-DATA_DIR = '@DATA_DIR@'
+DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_VERSION = '@SUPERNOVA_VERSION@'
 

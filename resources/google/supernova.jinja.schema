@@ -23,7 +23,6 @@ imports:
 - path: ../config/tenx.yaml
 
 required:
-- data_dir
 - disk_size_gb
 - machine_type
 - region
@@ -32,11 +31,6 @@ required:
 - zone
 
 properties:
-  data_dir:
-    type        : string
-    default     : /mnt/disks/data
-    description : Local data directory to store reads and assemblies.
-
   disk_size_gb:
     type        : integer
     default     : 2000
