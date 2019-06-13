@@ -5,7 +5,7 @@ import glob, os, shutil, requests, subprocess, time
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
-SUPERNOVA_VERSION = '@SUPERNOVA_VERSION@'
+SUPERNOVA_SOFTWARE_URL = '@SUPERNOVA_SOFTWARE_URL@'
 
 TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
 TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
@@ -73,17 +73,16 @@ def install_supernova():
 
     print "Install supernova..."
     os.chdir(APPS_DIR)
-    supernova_bn = '-'.join(['supernova', SUPERNOVA_VERSION])
-    supernova_tgz = '.'.join([supernova_bn, "tgz"])
-    supernova_url = os.path.join(REMOTE_DATA_URL, "software", supernova_tgz)
 
-    print "Download supernova from " + supernova_url
-    subprocess.call(['gsutil', 'ls', '-l', supernova_url]) # check if exists
-    while subprocess.call(['gsutil', '-m', 'cp', supernova_url, '.']):
+    print "Download supernova from " + SUPERNOVA_SOFTWARE_URL
+    subprocess.call(['gsutil', 'ls', '-l', SUPERNOVA_SOFTWARE_URL]) # check if exists
+    while subprocess.call(['gsutil', '-m', 'cp', SUPERNOVA_SOFTWARE_URL, '.']):
         print "Failed to download supernova! Trying again in 5 seconds..."
         time.sleep (5)
 
-    if not os.path.exists(supernova_tgz): raise Exception("Failed to find DL'd supernova tgz!")
+    supernova_glob = glob.glob("supernova*gz")
+    if not len(supernova_glob): raise Exception("Failed to find DL'd supernova tgz!")
+    supernova_tgz = supernova_glob[0]
     print "Found supernova TGZ: " + supernova_tgz
 
     print "UNTAR supernova..."
@@ -91,7 +90,9 @@ def install_supernova():
         print "Failed to untar the supernova tgz! Trying again in 5 seconds..."
         time.sleep (5)
 
-    shutil.move(supernova_bn, 'supernova')
+    supernova_dir = re.sub(r'\.t(ar\.)?gz', "", supernova_tgz)
+    if not os.path.exists(supernova_bn): raise Exception("Failed to find untarred supnova directory!")
+    shutil.move(supernova_dir, 'supernova')
     os.remove(supernova_tgz)
     print "Install supernova...OK"
 

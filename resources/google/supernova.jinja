@@ -87,7 +87,7 @@ resources:
       items:
         - key: startup-script
           value: |
-            {{ imports["../startup-scripts/supernova.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_VERSION@",properties["supernova_version"]) }}
+            {{ imports["../startup-scripts/supernova.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"]) }}
         - key: tenx-config
           value: |
             {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}

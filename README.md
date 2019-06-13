@@ -32,17 +32,17 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 
 | Property | Notes |
 | --- | --- |
-| service_account   | service account email to have authorized on the supernova VM |
-| region/zone       | area to run instances, should match data location region/zone |
-| remote_data_url   | bucket location of reads, software, and assemblies |
-| supernova_version | supernova version to use, tgz must live at ${REMOTE_DATA_URL}/software/supernova-${SUPERNOVA_VERSION}.tgz |
+| service_account        | service account email to have authorized on the supernova VM |
+| region/zone            | area to run instances, should match data location region/zone |
+| remote_data_url        | bucket location of reads, software, and assemblies |
+| supernova_software_url | supernova software TGZ URL (GS://) to download and untar |
 
 #### Optional Supernova Properties
 
 | Property | Notes |
 | --- | --- |
 | project_name      | project name label to add to instances |
-| ssh_source_ranges | IP ranges to restrict SSH access |
+| ssh_source_ranges | whitelist of IP ranges to allow SSH access to supernova compute instance |
 
 ### Create the Deployment
 

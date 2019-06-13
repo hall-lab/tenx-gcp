@@ -28,6 +28,7 @@ required:
 - region
 - remote_data_url
 - service_account
+- supernova_software_url
 - zone
 
 properties:
@@ -64,6 +65,10 @@ properties:
   ssh_source_ranges:
     type        : array
     description : Restrict supernova compute instance access to a whitelist of IP addresses via a firewall. No firewall is created if no IPs given.
+
+  supernova_software_url:
+    type        : string
+    description : Supernova software TGZ URL (gs://) to download and untar. This should be obtained from 10X Genomics, and saved in a project bucket.
 
   zone:
     type        : string

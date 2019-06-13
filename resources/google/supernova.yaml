@@ -13,12 +13,12 @@ resources:
     zone                    : <ZONE>
     #project_name            : <PROJECT>
 
-    # CLUSTER
+    # MACHINE
     machine_type            : n1-highmem-64
     disk_size               : 2000
     #ssh_source_ranges       : [ <IPS> ]
 
     # DIRS/URLS
-    remote_data_url         : <REMOVE_DATA_URL>
-    supernova_version       : <SUPERNOVA_VERSION>
+    remote_data_url         : <REMOTE_DATA_URL>
+    supernova_software_url  : <SUPERNOVA_SOFTWARE_URL>
 #  [END supernova_yaml]
