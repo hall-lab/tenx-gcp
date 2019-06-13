@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, requests, subprocess, time
+import glob, os, shutil, re, requests, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
@@ -91,7 +91,7 @@ def install_supernova():
         time.sleep (5)
 
     supernova_dir = re.sub(r'\.t(ar\.)?gz', "", supernova_tgz)
-    if not os.path.exists(supernova_bn): raise Exception("Failed to find untarred supnova directory!")
+    if not os.path.exists(supernova_dir): raise Exception("Failed to find untarred supnova directory!")
     shutil.move(supernova_dir, 'supernova')
     os.remove(supernova_tgz)
     print "Install supernova...OK"
