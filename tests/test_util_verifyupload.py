@@ -40,27 +40,32 @@ class VerifyUploadTest(unittest.TestCase):
 """
 
     @patch('subprocess.check_output')
-    def test_build_remote(self, test_patch):
+    def test1_build_remote(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
         remote = util.build_remote(rurl="gs://data")
         self.assertDictEqual(self.expected_remote, remote)
 
     @patch('subprocess.check_output')
-    def test_empty(self, test_patch):
+    def test2_empty(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        with self.assertRaisesRegexp(Exception, "Local directory does not contain any files!"):
+        with self.assertRaisesRegex(Exception, "Local directory does not contain any files!"):
             util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "empty"), rurl="gs://data")
 
     @patch('subprocess.check_output')
-    def test_missing(self, test_patch):
+    def test3_missing(self, test_patch):
         test_patch.return_value = self.gsutil_missing_output
-        with self.assertRaisesRegexp(Exception, "Remote is missing these files:\ngatk-4.0.0.0.zip"):
+        with self.assertRaisesRegex(Exception, "Remote is missing these files:\ngatk-4.0.0.0.zip"):
             util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
 
     @patch('subprocess.check_output')
-    def test_success(self, test_patch):
+    def test4_success(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
         util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
+
+    @patch('subprocess.check_output')
+    def test5_ignored(self, test_patch):
+        test_patch.return_value = self.gsutil_missing_output
+        util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data", ignore="gatk")
 
 #-- VerifyUploadTest
 

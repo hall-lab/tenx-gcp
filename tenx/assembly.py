@@ -98,7 +98,7 @@ def run_upload(asm):
     subprocess.call(["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()])
 
     sys.stderr.write("Verify upload assembly...\n")
-    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url())
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url(), ignore="ASSEMBLER_CS")
 
     sys.stderr.write("Upload assembly...OK\n")
 
