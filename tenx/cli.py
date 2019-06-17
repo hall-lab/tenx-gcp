@@ -199,13 +199,14 @@ tenx_util_cmd.add_command(tenx_util_calculate_compute_metrics, name='calculate-c
 @click.command()
 @click.argument('local', type=click.Path(exists=True))
 @click.argument('remote', type=click.STRING)
-def tenx_util_verify_upload(local, remote):
+@click.option('--ignore', type=click.STRING, required=False, help="Ignore all files staring with this string. Useful for skipping log dirs.")
+def tenx_util_verify_upload(local, remote, ignore):
     """
     Check if all files from LOCAL directory are on REMOTE url.
     """
     sys.stderr.write("Local directory: {}\n".format(local))
     sys.stderr.write("Remote URL: {}\n".format(remote))
-    util.verify_upload(ldir=local, rurl=remote)
+    util.verify_upload(ldir=local, rurl=remote, ignore=ignore)
     sys.stderr.write("All local files found on remote!\n")
 tenx_util_cmd.add_command(tenx_util_verify_upload, name='verify-upload')
 
