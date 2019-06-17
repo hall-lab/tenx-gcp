@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'click==7.0',
         'pyyaml==5.1',
-        'jinja2==2.10',
+        'Jinja2>=2.10.1',
     ],
     entry_points='''
         [console_scripts]
