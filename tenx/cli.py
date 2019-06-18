@@ -1,4 +1,4 @@
-import click, os, sys
+import click, os, socket, sys
 
 import tenx.app as app
 from tenx.version import __version__
@@ -6,6 +6,7 @@ from tenx import app, alignment, assembly, reads, reference, report, util
 from alignment import TenxAlignment
 from reads import TenxReads
 from reference import TenxReference
+import notifications
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -109,16 +110,24 @@ def asm_pipeline(sample_name):
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
-    reads.download(TenxReads(sample_name=sample_name))
-    asm = assembly.TenxAssembly(sample_name=sample_name)
-    assembly.run_assemble(asm)
-    assembly.run_mkoutput(asm)
-    compute_metrics = util.calculate_compute_metrics(asm.directory())
-    print( report.compute_metrics_basic(compute_metrics) )
-    with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt"), "w") as f:
-        f.write( report.compute_metrics_basic(metrics=compute_metrics) )
-    assembly.run_upload(asm)
-    sys.stderr.write("Run assembly pipeline...OK")
+    try:
+        reads.download(TenxReads(sample_name=sample_name))
+        asm = assembly.TenxAssembly(sample_name=sample_name)
+        assembly.run_assemble(asm)
+        assembly.run_mkoutput(asm)
+        compute_metrics = util.calculate_compute_metrics(asm.directory())
+        print( report.compute_metrics_basic(compute_metrics) )
+        with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt"), "w") as f:
+            f.write( report.compute_metrics_basic(metrics=compute_metrics) )
+        assembly.run_upload(asm)
+        sys.stderr.write("Run assembly pipeline...OK")
+    except BaseException as ex:
+        sys.stderr.write("Exception: {}\n".format(ex))
+        sys.stderr.write("Exception encountered, sending notifications if configured...\n")
+        notifications.slack("{} FAILED {}".format(sample_name, socket.gethostname()))
+        raise
+    sys.stderr.write("Finished, sending notifications if configured...\n")
+    notifications.slack("{} SUCCESS {}".format(sample_name, socket.gethostname()))
 tenx_assembly_cmd.add_command(asm_pipeline, name="pipeline")
 
 @click.command(short_help="Send the assembly to the cloud")
