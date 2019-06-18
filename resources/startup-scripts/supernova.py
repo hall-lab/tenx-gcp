@@ -49,7 +49,7 @@ def install_packages():
     if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
 
     subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
-    subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/' '/etc/boto.cfg'])
+    subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/', '/etc/boto.cfg'])
 
 #-- install_packages
 
