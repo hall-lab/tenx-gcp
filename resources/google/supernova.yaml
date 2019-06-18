@@ -21,4 +21,7 @@ resources:
     # DIRS/URLS
     remote_data_url         : <REMOTE_DATA_URL>
     supernova_software_url  : <SUPERNOVA_SOFTWARE_URL>
+
+    # TENX CONFIG
+    #notification            : <SLACK_URL>
 #  [END supernova_yaml]

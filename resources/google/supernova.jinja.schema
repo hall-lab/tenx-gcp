@@ -49,6 +49,10 @@ properties:
     default     : adhoc
     description : Project name to use in label on instances.
 
+  notification:
+    type        : string
+    description : Slack URL to post to a channel when pipelines have completed.
+
   region:
     type        : string
     description : Region to run the instances in.

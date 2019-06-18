@@ -90,4 +90,4 @@ resources:
             {{ imports["../startup-scripts/supernova.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"]) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"]) }}
+            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}

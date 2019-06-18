@@ -42,6 +42,7 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 | Property | Notes |
 | --- | --- |
 | project_name      | project name label to add to instances |
+| notification      | slack url to post message (see making a slack app) |
 | ssh_source_ranges | whitelist of IP ranges to allow SSH access to supernova compute instance |
 
 ### Create the Deployment
