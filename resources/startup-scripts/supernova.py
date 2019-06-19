@@ -12,9 +12,9 @@ TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
 
 def start_motd():
     msg = """
-*** SUPERNOVA AND TENX IS CURRENTLY BEING INSTALLED/CONFIGURED IN THE BACKGROUND ***
-***              A TERMINAL BROADCAST WILL ANNOUNCE WHEN COMPLETE                ***
-
+***    SUPERNOVA AND TENX IS CURRENTLY BEING INSTALLED/CONFIGURED IN THE BACKGROUND   ***
+***                 A TERMINAL BROADCAST WILL ANNOUNCE WHEN COMPLETE                  ***
+*** IF THIS MESSAGE PERSISTS FOR AN UNEXPECTED AMOUNT OF TIME, CONTACT YOUR SYS ADMIN ***
 """
     f = open('/etc/motd', 'w')
     f.write(msg)
@@ -164,19 +164,24 @@ def end_motd():
     f = open('/etc/motd', 'w')
     f.write('')
     f.close()
-    subprocess.call(['wall', '-n', '*** SUPERNOVA AND TENX INSTALLATION COMPLETE ***'])
+
+    msg = """
+*** SUPERNOVA AND TENX INSTALLATION COMPLETE ***
+***        YOU MAY NEED TO LOG OUT/IN        ***
+"""
+    subprocess.call(['wall', '-n', msg])
 
 #-- end_motd
 
 if __name__ == '__main__':
     print "Startup script...STARTING"
     start_motd()
+    add_supernova_profile()
+    add_tenx_config_file()
     install_packages()
     create_data_directory_structures()
     install_supernova()
     install_tenx_cli()
-    add_supernova_profile()
-    add_tenx_config_file()
     end_motd()
     print "Startup script...DONE"
 #-- __main__
