@@ -110,6 +110,7 @@ def asm_pipeline(sample_name):
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
+    notifications.slack("{} START {}".format(sample_name, socket.gethostname()))
     try:
         reads.download(TenxReads(sample_name=sample_name))
         asm = assembly.TenxAssembly(sample_name=sample_name)
