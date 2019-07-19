@@ -51,7 +51,9 @@ resources:
     - IPProtocol: ICMP
 {% endif %}
 
-- name: {{ env["deployment"] }}
+
+{% for n in range(properties['node_count']) %}
+- name: {{ env["deployment"] }}-{{ n + 1 }}
   type: compute.v1.instance
   properties:
     zone: {{ properties["zone"] }}
@@ -91,3 +93,4 @@ resources:
         - key: tenx-config
           value: |
             {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+{% endfor %}

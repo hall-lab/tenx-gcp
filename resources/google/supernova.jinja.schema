@@ -25,6 +25,7 @@ imports:
 required:
 - disk_size_gb
 - machine_type
+- node_count
 - region
 - remote_data_url
 - service_account
@@ -43,6 +44,11 @@ properties:
     type        : string
     description : |
       Machine type to use for compute node instances, eg. n1-highmem-64.
+
+  node_count:
+    type        : integer
+    default     : 1
+    description : Number of supernova instances to create.
 
   project_name:
     type        : string
