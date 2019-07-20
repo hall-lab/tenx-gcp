@@ -176,10 +176,10 @@ def end_motd():
 if __name__ == '__main__':
     print "Startup script...STARTING"
     start_motd()
+    create_data_directory_structures()
     add_supernova_profile()
     add_tenx_config_file()
     install_packages()
-    create_data_directory_structures()
     install_supernova()
     install_tenx_cli()
     end_motd()
