@@ -3,7 +3,9 @@
 CLI, config, and resources for running 10X Genomics pipelines
 
 # Pipelines
+
 [supernova](#supernova)
+
 [longranger](#longranger)
 
 <a name="supernova"/>
@@ -41,7 +43,8 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 
 | Property | Notes |
 | --- | --- |
-| project_name      | project name label to add to instances |
+| project_name      | project name label to add to instances, useful for accounting |
+| node_count        | number of compute instances to spin up. It is recommended to only run one supernova assemble per instance |
 | notification      | slack url to post message (see making a slack app) |
 | ssh_source_ranges | whitelist of IP ranges to allow SSH access to supernova compute instance |
 
@@ -49,16 +52,16 @@ Update these properties need to be set in the YAML (*resources/google/supernova.
 
 In an authenticated GCP session, enter the _resources/google_ directory. Run the command below to create the deployment named _supernova1_. The deployment name will be prepended to all assoiciated assets. Use a different deployment name as needed.
 ```
-$ gcloud deployment-manager deployments create supernova1 --config supernova.yaml
+$ gcloud deployment-manager deployments create supernova01 --config supernova.yaml
 ```
 
 ### Assests Created
 
-This is list of assets created in the deployment. All assests are preppended with the deployment name and a '-'.
+This is list of assets created in the deployment. All assests are preppended with the **deployment name** and a '-'. The compute instances with have a number appended to them. The number of compute instances depends on the *node_count* in the deployment YAML. It is recommended to only run one supernova assembly per compute instance.
 
 | Assest | Name | Purpose |
 | --- | --- | --- |
-| supernova01                             | compute.v1.instance   | the supernova compute instance: run supernova here |
+| supernova01-1 (to node_count)           | compute.v1.instance   | the supernova compute instances, run supernova here |
 | supernova01-network                     | compute.v1.network    | network for compute instance and firewalls |
 | supernova01-network-subnet              | compute.v1.subnetwork | subnet for compute instance and firewalls |
 | supernova01-network-tenx-ssh-restricted | compute.v1.firewall   | firewall of whitelisted IPS for SSH |
@@ -66,17 +69,17 @@ This is list of assets created in the deployment. All assests are preppended wit
 
 ### Start Supernova Pipeline
 
-SSH into the supernova1 compute instance.
+SSH into the supernova01-1 compute instance.
 ```
-$ gcloud compute ssh supernova1
+$ gcloud compute ssh supernova01-1
 ```
 Then, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
 ```
-[you@soupernova1 ~]$ tenx assembly pipeline ${SAMPLE_NAME} &> log &
+[you@soupernova01-1 ~]$ tenx assembly pipeline ${SAMPLE_NAME} &> log &
 ```
 Make sure to logout out of the session, and not let it exit happen because of timeout. Logout, exit or <CNTRL-D> your SSH session.
 ```
-[you@soupernova1 ~]$ logout
+[you@soupernova01-1 ~]$ logout
 ```
 
 <a name="longranger"/>
