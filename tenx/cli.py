@@ -30,7 +30,7 @@ def tenx_aln_cmd():
     """
     pass
 
-cli.add_command(tenx_aln_cmd, name="alignment")
+cli.add_command(tenx_aln_cmd, name="aln")
 
 @click.command(short_help="align with longranger")
 @click.argument('sample-name', type=click.STRING)
