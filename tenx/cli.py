@@ -43,7 +43,7 @@ def aln_align(sample_name, ref_name):
     alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReads(sample_name=sample_name), TenxReference(name=ref_name))
 tenx_aln_cmd.add_command(aln_align, name="align")
 
-@click.command(short_help="align with longranger")
+@click.command(short_help="run the full longranger wgs pipeline")
 @click.argument('sample-name', type=click.STRING)
 @click.argument('ref-name', type=click.STRING)
 def aln_pipeline(sample_name, ref_name):

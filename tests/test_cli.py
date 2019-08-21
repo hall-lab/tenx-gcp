@@ -13,19 +13,19 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'aln'])
         self.assertEqual(rv, 0)
 
-    def test2_tenx_alignment_align(self):
+    def test2_tenx_aln_align(self):
         rv = subprocess.call(['tenx', 'aln', 'align', '--help'])
         self.assertEqual(rv, 0)
         rv = subprocess.call(['tenx', 'aln', 'align'])
         self.assertEqual(rv, 2)
 
-    def test2_tenx_alignment_pipeline(self):
+    def test2_tenx_aln_pipeline(self):
         rv = subprocess.call(['tenx', 'aln', 'pipeline', '--help'])
         self.assertEqual(rv, 0)
         rv = subprocess.call(['tenx', 'aln', 'pipeline'])
         self.assertEqual(rv, 2)
 
-    def test2_tenx_alignment_upload(self):
+    def test2_tenx_aln_upload(self):
         rv = subprocess.call(['tenx', 'aln', 'upload', '--help'])
         self.assertEqual(rv, 0)
         rv = subprocess.call(['tenx', 'aln', 'upload'])
