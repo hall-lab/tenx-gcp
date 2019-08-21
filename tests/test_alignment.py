@@ -52,6 +52,7 @@ class TenxAlignmentTest(unittest.TestCase):
     @patch('subprocess.check_call')
     @patch('tenx.util.verify_upload')
     def test4_run_upload(self, upload_patch, verify_patch):
+        sys.stderr = StringIO.StringIO()
         aln = TenxAlignment(sample_name='TEST_FAIL')
         with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful alignment"):
             alignment.run_upload(aln)
