@@ -1,4 +1,4 @@
-import os, subprocess, tempfile, unittest
+import os, StringIO, subprocess, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -40,15 +40,25 @@ class TenxAlignmentTest(unittest.TestCase):
             alignment.run_align(aln, TenxReference(name="REF"), TenxReads(sample_name="TEST_SUCCESS"))
 
     @patch('subprocess.check_call')
-    def test4_run_upload(self, test_patch):
-        test_patch.return_value = '0'
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_alignment')
-        aln = TenxAlignment(sample_name='TEST_SUCCESS')
-        alignment.run_upload(aln)
-
+    @patch('tenx.util.verify_upload')
+    def test4_run_upload(self, upload_patch, verify_patch):
         aln = TenxAlignment(sample_name='TEST_FAIL')
         with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful alignment"):
             alignment.run_upload(aln)
+
+        upload_patch.return_value = "0"
+        verify_patch.return_value = "1"
+        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_alignment')
+
+        err = StringIO.StringIO()
+        sys.stderr = err
+
+        aln = TenxAlignment(sample_name='TEST_SUCCESS')
+        alignment.run_upload(aln)
+
+        expected_err = "Upload TEST_SUCCESS alignment...\nEntering tests/test_alignment/TEST_SUCCESS/alignment ...\nUploading to: gs://data/TEST_SUCCESS/alignment\nVerify upload alignment...\nUpload alignment...OK\n"
+        self.assertEqual(err.getvalue(), expected_err)
+        sys.stderr = sys.__stderr__
 
 # -- TenxAlignmentTest
 
