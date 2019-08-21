@@ -30,14 +30,24 @@ class TenxAlignmentTest(unittest.TestCase):
 
     @patch('subprocess.check_call')
     def test2_run_align(self, test_patch):
+        #aln = TenxAlignment(sample_name='TEST_FAIL')
+        #with self.assertRaisesRegexp(Exception, "Longranger exited 0, but {} does not exist!".format(aln.outs_directory())):
+        #    alignment.run_align(aln, TenxReference(name="REF"), TenxReads(sample_name="TEST_SUCCESS"))
+
         test_patch.return_value = '0'
         TenxApp.config['TENX_DATA_PATH'] = os.path.join(os.getcwd(), 'tests', 'test_alignment')
-        aln = TenxAlignment(sample_name='TEST_SUCCESS')
-        alignment.run_align(aln, TenxReference(name="REF"), TenxReads(sample_name="TEST_SUCCESS"))
 
-        aln = TenxAlignment(sample_name='TEST_FAIL')
-        with self.assertRaisesRegexp(Exception, "Longranger exited 0, but {} does not exist!".format(aln.outs_directory())):
-            alignment.run_align(aln, TenxReference(name="REF"), TenxReads(sample_name="TEST_SUCCESS"))
+        err = StringIO.StringIO()
+        sys.stderr = err
+
+        aln = TenxAlignment(sample_name='TEST_SUCCESS')
+        rds = TenxReads(sample_name='TEST_SUCCESS')
+        ref = TenxReference(name="REF")
+        alignment.run_align(aln, ref, rds)
+
+        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --uiport=18080 --jobmode= --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
+        self.assertEqual(err.getvalue(), expected_err)
+        sys.stderr = sys.__stderr__
 
     @patch('subprocess.check_call')
     @patch('tenx.util.verify_upload')
