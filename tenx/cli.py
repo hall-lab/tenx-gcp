@@ -205,6 +205,7 @@ def ref_download(ref_name):
     Download reference sequences from cloud storage to local disk.
     """
     assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    reference.download(TenxReference(name=ref_name))
 tenx_ref_cmd.add_command(ref_download, name="download")
 
 #-- REFERENCE
