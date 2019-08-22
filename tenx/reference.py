@@ -21,7 +21,7 @@ class TenxReference():
         return ".".join([self.name, "tar", "gz"])
 
     def remote_url(self):
-        return os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'references', self.tgz_bn())
+        return os.path.join(TenxApp.config['TENX_REMOTE_REFS_URL'], self.tgz_bn())
 
 #-- TenxReference
 
