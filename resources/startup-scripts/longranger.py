@@ -66,6 +66,7 @@ def install_packages():
         'python-pip',
         'python-setuptool',
         'redhat-rpm-config',
+        'screen',
 	'sssd-client',
 	'sudo',
 	'which',

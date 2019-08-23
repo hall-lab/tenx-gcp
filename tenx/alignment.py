@@ -34,15 +34,15 @@ def run_align(aln, ref, rds):
    pwd = os.getcwd()
    os.chdir(sample_d)
    job = { # FIXME
-       "cores": 1,
-       "mem": 6,
-       "mode": "slurm",
+       "cores": 14,#1,
+       "mem": 96,#6,
+       "mode": "local",#"slurm",
    }
 
    try:
        cmd = ["longranger", "wgs", "--id=alignment",
-           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()),
-           "--uiport=18080", "--jobmode=".format(job["mode"]), "--localmem={}".format(job["mem"]), "--localcores={}".format(job["cores"])]
+           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()), "--vcmode=freebayes",
+           "--uiport=18080", "--jobmode={}".format(job["mode"]), "--localmem={}".format(job["mem"]), "--localcores={}".format(job["cores"])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)
        if not os.path.exists(aln.outs_directory()): raise Exception("Longranger exited 0, but {} does not exist!".format(aln.outs_directory()))

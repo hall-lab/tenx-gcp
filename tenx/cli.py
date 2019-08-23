@@ -60,14 +60,14 @@ def aln_pipeline(sample_name, ref_name):
         reference.download(ref)
         rds = TenxReads(sample_name=sample_name)
         reads.download(rds)
-        aln = alinment.TenxAlignment(sample_name=sample_name)
-        aln.run_align(aln, ref, rds)
+        aln = alignment.TenxAlignment(sample_name=sample_name)
+        alignment.run_align(aln, ref, rds)
         compute_metrics = util.calculate_compute_metrics(aln.directory())
         print( report.compute_metrics_basic(compute_metrics) )
         with open(os.path.join(aln.directory(), "outs", "compute-metrics.txt"), "w") as f:
             f.write( report.compute_metrics_basic(metrics=compute_metrics) )
         alignment.run_upload(aln)
-        sys.stderr.write("Run longranger wgs alignemnt pipeline...OK")
+        sys.stderr.write("Run longranger wgs alignment pipeline...OK")
     except BaseException as ex:
         sys.stderr.write("Exception: {}\n".format(ex))
         sys.stderr.write("Exception encountered, sending notifications if configured...\n")
