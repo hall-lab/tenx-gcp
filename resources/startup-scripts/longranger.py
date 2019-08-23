@@ -98,22 +98,23 @@ def install_packages():
 def mount_data_disk_and_create_dirs():
 
     if not os.path.exists(DATA_DIR):
+	os.makedirs(DATA_DIR)
         cmd = ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"]
-        sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
-        os.makedirs(DATA_DIR)
-        os.chmod(DATA_DIR, 0777)
-        os.makedirs(os.path.join(DATA_DIR, "references"))
-        os.chmod(DATA_DIR, 0777)
-
-        cmd = ["mkdir", "-p", DATA_DIR]
-        sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
+    cmds = [
+	    ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR],
+	    ["chmod", "0775", DATA_DIR],
+	    ["chmod", "u+s", DATA_DIR],
+	    ["chmod", "g+s", DATA_DIR],
+	    ["chgrp", "-R", "adm", DATA_DIR],
+	    ["mkdir", "-p", os.path.join(DATA_DIR, "references")],
+	    ["chmod", "0775", os.path.join(DATA_DIR, "references")],
+	    ];
+    for cmd in cmds:
+	sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
-
-    cmd = ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR]
-    sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
 
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
         os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
