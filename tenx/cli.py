@@ -56,7 +56,7 @@ def aln_pipeline(sample_name, ref_name):
     sys.stderr.write("Run longranger wgs pipeline for {}".format(sample_name))
     notifications.slack("{} ALN START {}".format(sample_name, socket.gethostname()))
     try:
-        ref = TenxRef(name=ref_name)
+        ref = TenxReference(name=ref_name)
         reference.download(ref)
         rds = TenxReads(sample_name=sample_name)
         reads.download(rds)
