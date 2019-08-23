@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, re, requests, subprocess, time
+import glob, os, shutil, re, requests, subprocess, sys, time
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
@@ -98,18 +98,18 @@ def mount_data_disk_and_create_dirs():
 
     if not os.path.exists(DATA_DIR):
         cmd = ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"]
-        sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+        sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
         os.makedirs(DATA_DIR)
         os.chmod(DATA_DIR, 0777)
 
         cmd = ["mkdir", "-p", DATA_DIR]
-        sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+        sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
-    cmd = ["mount", "-o", "discard,defaults", "/dev/sdb" DATA_DIR]
-    sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+    cmd = ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR]
+    sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
