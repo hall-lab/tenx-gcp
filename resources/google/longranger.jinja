@@ -66,6 +66,15 @@ resources:
       autoDelete: true
       initializeParams:
         sourceImage: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/family/centos-7
+        #sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20190813
+        diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+        diskSizeGb: 10
+    - deviceName: secondary
+      type: PERSISTENT
+      mode: READ_WRITE
+      kind: compute#attachedDisk
+      autoDelete: TRUE
+      initializeParams:
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
         diskSizeGb: {{ properties["disk_size"] }}
     networkInterfaces:
@@ -89,8 +98,8 @@ resources:
       items:
         - key: startup-script
           value: |
-            {{ imports["../startup-scripts/longranger.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"]) }}
+            {{ imports["../startup-scripts/longranger.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"]) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}

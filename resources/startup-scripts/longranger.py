@@ -94,10 +94,23 @@ def install_packages():
 
 #-- install_packages
 
-def create_data_directory_structures():
+def mount_data_disk_and_create_dirs():
+
     if not os.path.exists(DATA_DIR):
+        cmd = ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"]
+        sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+        subprocess.check_call(cmd)
+
         os.makedirs(DATA_DIR)
         os.chmod(DATA_DIR, 0777)
+
+        cmd = ["mkdir", "-p", DATA_DIR]
+        sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+        subprocess.check_call(cmd)
+
+    cmd = ["mount", "-o", "discard,defaults", "/dev/sdb" DATA_DIR]
+    sys.stderr.write("RUNNING: {}".format(cmd.join(" ")))
+    subprocess.check_call(cmd)
 
     if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
         os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
@@ -105,7 +118,7 @@ def create_data_directory_structures():
     if not os.path.exists(TENX_ETC_DIRECTORY):
         os.makedirs(TENX_ETC_DIRECTORY)
 
-#-- create_data_directory_structures
+#-- mount_data_disk_and_create_dirs
 
 def install_longranger():
     if os.path.exists( os.path.join(APPS_DIR, "longranger") ):
@@ -176,7 +189,7 @@ def end_motd():
 if __name__ == '__main__':
     print "Startup script...STARTING"
     start_motd()
-    create_data_directory_structures()
+    mount_data_disk_and_create_dirs()
     add_longranger_profile()
     add_tenx_config_file()
     install_packages()
