@@ -1,0 +1,105 @@
+# Copyright 2015 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{% set networkName = env["deployment"] + "-network" %}
+
+resources:
+- name: {{ networkName }}
+  type: compute.v1.network
+  properties:
+    autoCreateSubnetworks: false
+- name: {{ networkName }}-subnet
+  type: compute.v1.subnetwork
+  properties:
+    network: $(ref.{{ networkName }}.selfLink)
+    ipCidrRange: 10.10.0.0/16
+    region: {{ properties["region"] }}
+- name: {{ networkName }}-tenx-web-ui
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ networkName }}.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    targetTags: ["tenx-web-ui"]
+    priority: 990
+    allowed:
+    - IPProtocol: TCP
+      ports: ["18080"]
+    - IPProtocol: ICMP
+
+{% if properties['ssh_source_ranges'] %}
+- name: {{ networkName }}-tenx-ssh-restricted
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ networkName }}.selfLink)
+    sourceRanges: {{ properties['ssh_source_ranges'] }}
+    targetTags: ["tenx-ssh-restricted"]
+    priority: 1000
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+    - IPProtocol: ICMP
+{% endif %}
+
+
+{% for n in range(properties['node_count']) %}
+- name: {{ env["deployment"] }}-{{ n + 1 }}
+  type: compute.v1.instance
+  properties:
+    zone: {{ properties["zone"] }}
+    machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/{{ properties["machine_type"] }}
+    minCpuPlatform: Intel Skylake
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/family/centos-7
+        #sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20190813
+        diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+        diskSizeGb: 10
+    - deviceName: secondary
+      type: PERSISTENT
+      mode: READ_WRITE
+      kind: compute#attachedDisk
+      autoDelete: TRUE
+      initializeParams:
+        diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
+        diskSizeGb: {{ properties["disk_size"] }}
+    networkInterfaces:
+    - subnetwork: $(ref.{{ networkName }}-subnet.selfLink)
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+    serviceAccounts:
+      - email: {{ properties["service_account"] }}
+        scopes:
+        - "https://www.googleapis.com/auth/logging.write"
+        - "https://www.googleapis.com/auth/devstorage.read_write"
+    labels:
+      pipeline: longranger
+      project: {{ properties['project_name'] }}
+    tags:
+      items:
+        - tenx-web-ui
+        - tenx-ssh-restricted
+    metadata:
+      items:
+        - key: startup-script
+          value: |
+            {{ imports["../startup-scripts/longranger.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"]) }}
+        - key: tenx-config
+          value: |
+            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+{% endfor %}

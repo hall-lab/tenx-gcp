@@ -1,0 +1,99 @@
+# Copyright 2019 Washington University. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+info:
+  title: A template for creating a 10X Genomics Longranger cluster.
+  author: Eddie Belter
+  description: |
+    Create a 10X Genomics Longranger cluster on GCP with variable number |
+    nodes. Then using the tenx CLI, run commadns to create and manipulate |
+    longranger alignments.
+
+imports:
+- path: ../startup-scripts/longranger.py
+- path: ../config/tenx.yaml
+
+required:
+- disk_size_gb
+- machine_type
+- node_count
+- project
+- region
+- remote_data_url
+- remote_refs_url
+- service_account
+- longranger_software_url
+- zone
+
+properties:
+  disk_size_gb:
+    type        : integer
+    default     : 2000
+    minimum     : 10
+    maximum     : 64000
+    description : Size of disk for compute nodes.
+
+  machine_type:
+    type        : string
+    deafult     : n1-highmem-16
+    description : |
+      Machine type to use for compute node instances, default: n1-highmem-16.
+
+  node_count:
+    type        : integer
+    default     : 1
+    description : Number of longranger instances to create.
+
+  project:
+    type        : string
+    description : Project name to use in label on instances.
+
+  notification:
+    type        : string
+    description : Slack URL to post to a channel when pipelines have completed.
+
+  region:
+    type        : string
+    description : Region to run the instances in.
+
+  remote_data_url:
+    type        : string
+    description : Remote data URL (gs://) where pull read fastqs and software, and to push |
+      finished assemblies. There should be sample subdirectories, each with a reads subdir. |
+      The alignments will be pushed to the alignment subdir of the sample.
+
+  remote_refs_url:
+    type        : string
+    description : Remote data URL (gs://) containing the references that could be used. These |
+      should be downloaded and saved to this bucket from tenx, and left as TGZs.
+
+  service_account:
+    type        : string
+    default     : default
+    description : Service account for compute instances to use.
+
+  ssh_source_ranges:
+    type        : array
+    description : Restrict compute instance access to a whitelist of IP addresses via a |
+      firewall. No firewall is created if no IPs given.
+
+  longranger_software_url:
+    type        : string
+    description : Longranger software TGZ URL (gs://) to download and untar. This should be |
+      obtained from 10X Genomics, and saved in a project bucket.
+
+  zone:
+    type        : string
+    description : Zone to run the instances in based on region.
+

@@ -17,10 +17,11 @@
 
 # [START cluster_yaml]
 imports:
-- path: longranger.jinja
+- path: longranger-slurm.jinja
+
 resources:
-- name: longranger-slurm
-  type: longranger.jinja
+- name: longranger-slurm-cluster
+  type: longranger-slurm.jinja
   properties:
     # PROJECT
     service_account         : <SERVICE_ACCOUNT>

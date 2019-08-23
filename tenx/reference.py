@@ -21,7 +21,7 @@ class TenxReference():
         return ".".join([self.name, "tar", "gz"])
 
     def remote_url(self):
-        return os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'references', self.tgz_bn())
+        return os.path.join(TenxApp.config['TENX_REMOTE_REFS_URL'], self.tgz_bn())
 
 #-- TenxReference
 
@@ -39,8 +39,8 @@ def download(reference):
         os.makedirs(refs_d)
 
     rurl = reference.remote_url()
-    sys.stderr.write("Checking for sample reference at {0} ...\n".format(rurl))
-    subprocess.check_call(['gsutil',  'ls', rurl])
+    sys.stderr.write("Checking for reference at {0} ...\n".format(rurl))
+    subprocess.check_call(['gsutil', 'ls', rurl])
 
     pwd = os.getcwd()
     try:

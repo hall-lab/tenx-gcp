@@ -25,7 +25,7 @@ class TenxAlignment():
 
 #-- TenxAlignment
 
-def run_align(aln, rds, ref):
+def run_align(aln, ref, rds):
    sys.stderr.write("Creating alignments for {}\n".format(aln.sample_name))
 
    sample_d = aln.sample_directory()
@@ -41,7 +41,7 @@ def run_align(aln, rds, ref):
 
    try:
        cmd = ["longranger", "wgs", "--id=alignment",
-           "--sample={}".format(aln.sample_name), "--fastqs={}".format(rds.directory()), "--reference={}".format(ref.directory()),
+           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()),
            "--uiport=18080", "--jobmode=".format(job["mode"]), "--localmem={}".format(job["mem"]), "--localcores={}".format(job["cores"])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)

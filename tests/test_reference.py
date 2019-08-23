@@ -1,4 +1,4 @@
-import gzip, os, shutil, subprocess, tarfile, tempfile, unittest
+import gzip, os, shutil, StringIO, subprocess, sys, tarfile, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -24,20 +24,31 @@ class TenxAppTest(unittest.TestCase):
         test_patch.return_value = 1
         r = reference.TenxReference(name='refdata-GRCh38-2.1.0')
         self.assertIsNotNone(r)
+
+        err = StringIO.StringIO()
+        sys.stderr = err
+
         with self.assertRaisesRegexp(Exception, 'Failed to download reference'):
             reference.download(r)
         self.assertTrue(os.path.exists(r.references_directory()))
+        sys.stderr = sys.__stderr__
 
     @patch('subprocess.check_call')
     def test3_download(self, test_patch):
         test_patch.return_value = 1
+
         r = reference.TenxReference(name='refdata-GRCh38-2.1.0')
         self.assertIsNotNone(r)
         shutil.copyfile(os.path.join('tests', 'test_reference', r.tgz_bn()), os.path.join(r.references_directory(), r.tgz_bn()))
         subprocess.call(['tar', 'zxf', os.path.join(r.references_directory(), r.tgz_bn()), '-C', r.references_directory()])
+
+        err = StringIO.StringIO()
+        sys.stderr = err
+
         reference.download(r)
         self.assertTrue(os.path.exists(r.directory()))
         self.assertTrue(os.path.exists(r.genome_fasta_fn()))
+        sys.stderr = sys.__stderr__
 
 # -- TenxAppTest
 

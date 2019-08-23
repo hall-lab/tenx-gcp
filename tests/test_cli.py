@@ -10,25 +10,25 @@ class TenxCliTest(unittest.TestCase):
 
     # ALIGNMENT
     def test2_tenx_alignment(self):
-        rv = subprocess.call(['tenx', 'alignment'])
+        rv = subprocess.call(['tenx', 'aln'])
         self.assertEqual(rv, 0)
 
-    def test2_tenx_alignment_align(self):
-        rv = subprocess.call(['tenx', 'alignment', 'align', '--help'])
+    def test2_tenx_aln_align(self):
+        rv = subprocess.call(['tenx', 'aln', 'align', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'alignment', 'align'])
+        rv = subprocess.call(['tenx', 'aln', 'align'])
         self.assertEqual(rv, 2)
 
-    def test2_tenx_alignment_pipeline(self):
-        rv = subprocess.call(['tenx', 'alignment', 'pipeline', '--help'])
+    def test2_tenx_aln_pipeline(self):
+        rv = subprocess.call(['tenx', 'aln', 'pipeline', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'alignment', 'pipeline'])
+        rv = subprocess.call(['tenx', 'aln', 'pipeline'])
         self.assertEqual(rv, 2)
 
-    def test2_tenx_alignment_upload(self):
-        rv = subprocess.call(['tenx', 'alignment', 'upload', '--help'])
+    def test2_tenx_aln_upload(self):
+        rv = subprocess.call(['tenx', 'aln', 'upload', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'alignment', 'upload'])
+        rv = subprocess.call(['tenx', 'aln', 'upload'])
         self.assertEqual(rv, 2)
 
     # ASSEMBLY
