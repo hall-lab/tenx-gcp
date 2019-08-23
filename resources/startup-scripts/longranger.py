@@ -103,6 +103,8 @@ def mount_data_disk_and_create_dirs():
 
         os.makedirs(DATA_DIR)
         os.chmod(DATA_DIR, 0777)
+        os.makedirs(os.path.join(DATA_DIR, "references"))
+        os.chmod(DATA_DIR, 0777)
 
         cmd = ["mkdir", "-p", DATA_DIR]
         sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
