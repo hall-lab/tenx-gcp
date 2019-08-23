@@ -22,6 +22,35 @@ def start_motd():
 
 #-- start_motd()
 
+def add_longranger_profile():
+    fn = os.path.join(os.path.sep, "etc", "profile.d", "longranger.sh")
+    if os.path.exists(fn):
+        print("Already added {} ...SKIPPING".format(fn))
+        return
+
+    print "Adding {} ...".format(fn)
+    with open(fn, "w") as f:
+        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
+        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
+        f.write("source /apps/longranger/sourceme.bash\n")
+
+#-- add_longranger_profile
+
+def add_tenx_config_file():
+    if os.path.exists(TENX_CONFIG_FILE):
+        print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
+        return
+
+    print "Adding {} ...".format(TENX_CONFIG_FILE)
+    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
+    print("GET {}".format(url))
+    response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
+    if not response.ok: raise Exception("GET failed for {}".format(url))
+    with open(TENX_CONFIG_FILE, "w") as f:
+        f.write(response.content)
+
+#-- add_tenx_config_file
+
 def install_packages():
 
     packages = [
@@ -130,35 +159,6 @@ def install_tenx_cli():
     print "Installing tenx-scripts...OK"
 
 #-- install_tenx_cli
-
-def add_longranger_profile():
-    fn = os.path.join(os.path.sep, "etc", "profile.d", "longranger.sh")
-    if os.path.exists(fn):
-        print("Already added {} ...SKIPPING".format(fn))
-        return
-
-    print "Adding {} ...".format(fn)
-    with open(fn, "w") as f:
-        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
-        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
-        f.write("source /apps/longranger/sourceme.bash\n")
-
-#-- add_longranger_profile
-
-def add_tenx_config_file():
-    if os.path.exists(TENX_CONFIG_FILE):
-        print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
-        return
-
-    print "Adding {} ...".format(TENX_CONFIG_FILE)
-    url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
-    print("GET {}".format(url))
-    response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
-    if not response.ok: raise Exception("GET failed for {}".format(url))
-    with open(TENX_CONFIG_FILE, "w") as f:
-        f.write(response.content)
-
-#-- add_tenx_config_file
 
 def end_motd():
     f = open('/etc/motd', 'w')
