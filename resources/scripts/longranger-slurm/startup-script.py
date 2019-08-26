@@ -198,8 +198,6 @@ def install_packages():
             'python-devel',
             'python-setuptools',
             'redhat-rpm-config',
-            # java for GATK
-            'java-1.8.0-openjdk.x86_64',
             ]
 
     while subprocess.call(['yum', 'install', '-y'] + packages):
@@ -778,37 +776,6 @@ WantedBy=multi-user.target
 #END install_controller_service_scripts()
 
 
-def install_gatk():
-    print "Install GATK..."
-
-    if os.path.isdir(APPS_DIR + '/gatk-4.0.0'):
-        print "GATK already installed..."
-        return
-    os.chdir(APPS_DIR)
-
-    gatk_zip = 'gatk-4.0.0.0.zip'
-    gatk_url = os.path.join(REMOTE_DATA_URL, "software", gatk_zip)
-    print "Download GATK from " + gatk_url
-    while subprocess.call(['gsutil', '-m', 'cp', gatk_url, '.']):
-        print "Failed to download GATK! Trying again in 5 seconds..."
-        time.sleep (5)
-
-    assert os.path.exists(gatk_zip), "Failed to find DL'd GATK!"
-    print "Found GATK: " + gatk_zip
-
-    print "UNZIP GATK..."
-    while subprocess.call(['bsdtar', 'zxf', gatk_zip]):
-        print "Failed to unzip the GATK zip! Trying again in 5 seconds..."
-        time.sleep (5)
-
-    os.remove(gatk_zip)
-
-    os.chdir('/')
-    print "Install gatk...OK"
-
-# END install_gatk():
-
-
 def install_compute_service_scripts():
 
     install_slurm_tmpfile()
@@ -996,7 +963,6 @@ def main():
         print("RUNNING: {}".format(" ".join(cmd)))
         subprocess.check_call(cmd)
         os.remove(lr_startup_script)
-        install_gatk()
         #-- install longranger
 
         install_slurm()
