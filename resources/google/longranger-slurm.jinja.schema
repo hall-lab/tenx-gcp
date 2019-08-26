@@ -35,9 +35,12 @@ required:
 - default_account
 - default_users
 - login_machine_type
+- longranger_software_url
 - max_node_count
 - private_google_access
 - region
+- remote_data_url
+- remote_refs_url
 - slurm_version
 - static_node_count
 - zone
@@ -194,6 +197,11 @@ properties:
     default     : 0
     description : Number of login nodes in the cluster.
 
+  longranger_software_url:
+    type        : string
+    description : Longranger software TGZ URL (gs://) to download and untar. This should be |
+      obtained from 10X Genomics, and saved in a project bucket.
+
   max_node_count:
     type        : integer
     description : Maximum number of instances that the cluster can grow to.
@@ -227,6 +235,17 @@ properties:
   region:
     type        : string
     description : Region to run the instances in.
+
+  remote_data_url:
+    type        : string
+    description : Remote data URL (gs://) where pull read fastqs and software, and to push |
+      finished assemblies. There should be sample subdirectories, each with a reads subdir. |
+      The alignments will be pushed to the alignment subdir of the sample.
+
+  remote_refs_url:
+    type        : string
+    description : Remote data URL (gs://) containing the references that could be used. These |
+      should be downloaded and saved to this bucket from tenx, and left as TGZs.
 
   service_account:
     type        : string
