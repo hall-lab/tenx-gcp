@@ -15,22 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+{% set networkName = env["deployment"] + "-slurm-net" %}
+
 resources:
-- name: {{properties["cluster_name"]}}-slurm-network
+- name: {{ networkName }}
   type: compute.v1.network
   properties:
     autoCreateSubnetworks: false
 - name: {{properties["cluster_name"]}}-slurm-subnet
   type: compute.v1.subnetwork
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-slurm-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     ipCidrRange: {{ properties["cidr"]}}
     region: {{ properties["region"] }}
     privateIpGoogleAccess: {{ properties["private_google_access"]}}
 - name: {{properties["cluster_name"]}}-ssh-firewall-rule
   type: compute.v1.firewall
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-slurm-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     sourceRanges: ["0.0.0.0/0"]
     allowed:
     - IPProtocol: TCP
@@ -39,7 +41,7 @@ resources:
 - name: {{properties["cluster_name"]}}-all-internal-firewall-rule
   type: compute.v1.firewall
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-slurm-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     sourceRanges: [{{properties["cidr"]}}]
     allowed:
     - IPProtocol: TCP
@@ -50,7 +52,7 @@ resources:
 - name: {{properties["cluster_name"]}}-tenx-ui
   type: compute.v1.firewall
   properties:
-    network: $(ref.{{properties["cluster_name"]}}-slurm-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
     sourceRanges: ["0.0.0.0/0"]
     targetTags: ["tenx-ui-accessible"]
     priority: 990
@@ -66,7 +68,7 @@ resources:
   {% if properties['vpc_net'] %}
     network: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/global/networks/{{ properties["vpc_net"]}}
   {% else %}
-    network: $(ref.{{properties["cluster_name"]}}-slurm-network.selfLink)
+    network: $(ref.{{ networkName }}.selfLink)
   {% endif %}
     region: {{ properties["region"] }}
     nats:
