@@ -45,7 +45,6 @@ GPU_TYPE          = '@GPU_TYPE@'
 GPU_COUNT         = @GPU_COUNT@
 NFS_APPS_SERVER   = '@NFS_APPS_SERVER@'
 NFS_HOME_SERVER   = '@NFS_HOME_SERVER@'
-CONTROLLER_SECONDARY_DISK = @CONTROLLER_SECONDARY_DISK@
 DATA_DIR      = '@DATA_DIR@'
 REMOTE_DATA_URL   = '@REMOTE_DATA_URL@'
 CONTROL_MACHINE = CLUSTER_NAME + '-controller'
@@ -283,8 +282,7 @@ def setup_nfs_exports():
 %s  *(rw,sync,no_subtree_check,no_root_squash)
 /etc/munge *(rw,sync,no_subtree_check,no_root_squash)
 """ % APPS_DIR)
-    if CONTROLLER_SECONDARY_DISK:
-        f.write("""
+    f.write("""
 %s  *(rw,sync,no_subtree_check,no_root_squash)
 """ % DATA_DIR)
     f.close()
@@ -942,9 +940,8 @@ def setup_nfs_home_vols():
 def setup_nfs_sec_vols():
     f = open('/etc/fstab', 'a')
 
-    if CONTROLLER_SECONDARY_DISK:
-        if ((INSTANCE_TYPE != "controller")):
-            f.write("""
+    if ((INSTANCE_TYPE != "controller")):
+        f.write("""
 {1}:{0}    {0}     nfs      rw,sync,hard,intr  0     0
 """.format(DATA_DIR, CONTROL_MACHINE))
     f.close()
@@ -1007,9 +1004,8 @@ def main():
         os.makedirs(APPS_DIR + '/slurm')
         print "ww Created Slurm Folders"
 
-    if CONTROLLER_SECONDARY_DISK:
-        if not os.path.exists(DATA_DIR):
-            os.makedirs(DATA_DIR)
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
 
     start_motd()
 
@@ -1021,7 +1017,7 @@ def main():
     setup_munge()
     setup_bash_profile()
 
-    if (CONTROLLER_SECONDARY_DISK and (INSTANCE_TYPE == "controller")):
+    if INSTANCE_TYPE == "controller":
         setup_secondary_disks()
 
     setup_nfs_apps_vols()

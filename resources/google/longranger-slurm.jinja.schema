@@ -50,7 +50,6 @@ optional:
 - compute_disk_size_gb
 - controller_disk_type
 - controller_disk_size_gb
-- controller_secondary_disk
 - controller_secondary_disk_type
 - controller_secondary_disk_size_gb
 - cpu_platform
@@ -112,11 +111,6 @@ properties:
     minimum     : 10
     maximum     : 2000
     description : Size of disk for the controller.
-
-  controller_secondary_disk:
-    type        : boolean
-    default     : False
-    description : Create secondary disk mounted to controller node (True/False)
 
   controller_secondary_disk_type:
     enum        : ["pd-ssd", "pd-standard"]
