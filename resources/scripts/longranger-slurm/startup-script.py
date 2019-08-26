@@ -17,6 +17,7 @@
 import httplib
 import os
 import re
+import requests
 import shlex
 import shutil
 import socket
@@ -777,39 +778,6 @@ WantedBy=multi-user.target
 #END install_controller_service_scripts()
 
 
-def install_longranger():
-    print "Install longranger..."
-
-    if os.path.isdir(APPS_DIR + '/longranger'):
-        print "lonranger already installed..."
-        return
-    os.chdir(APPS_DIR)
-
-    # LONGRANGER
-    longranger_bn = 'longranger-2.2.2'
-    longranger_tgz = '.'.join([longranger_bn, 'tgz'])
-    longranger_url = os.path.join(REMOTE_DATA_URL, "software", longranger_tgz)
-    print "Download longranger from " + longranger_url
-    while subprocess.call(['gsutil', '-m', 'cp', longranger_url, '.']):
-        print "Failed to download longranger! Trying again in 5 seconds..."
-        time.sleep (5)
-
-    assert os.path.exists(longranger_tgz), "Failed to find DL'd longranger tgz!"
-    print "Found longranger TGZ: " + longranger_tgz
-
-    print "UNTAR longranger..."
-    while subprocess.call(['bsdtar', 'zxf', longranger_tgz]):
-        print "Failed to untar the longranger tgz! Trying again in 5 seconds..."
-        time.sleep (5)
-
-    shutil.move(longranger_bn, 'longranger')
-    os.remove(longranger_tgz)
-
-    print "Install longranger...OK"
-
-# END install_longranger():
-
-
 def install_gatk():
     print "Install GATK..."
 
@@ -839,17 +807,6 @@ def install_gatk():
     print "Install gatk...OK"
 
 # END install_gatk():
-
-
-def create_data_directory_structure():
-    print "Create data directory structure..."
-
-    os.mkdir(DATA_DIR + '/references')
-    os.chmod(DATA_DIR + '/references', 0o777)
-
-    print "Create data directory structure...OK"
-
-# END create_data_directory_structure
 
 
 def install_compute_service_scripts():
@@ -1028,9 +985,19 @@ def main():
     start_munge()
 
     if INSTANCE_TYPE == "controller":
-        install_longranger()
+        url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/lr-startup-script"
+        print("GET {}".format(url))
+        lr_startup_script = os.path.join("tmp", "lr-startup-script.py")
+        response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
+        if not response.ok: raise Exception("GET failed for {}".format(url))
+        with open(lr_startup_script, "w") as f:
+            f.write(response.content)
+        cmd = ["usr/bin/env", "python", lr_startup_script]
+        print("RUNNING: {}".format(" ".join(cmd)))
+        subprocess.check_call(cmd)
+        os.remove(lr_startup_script)
         install_gatk()
-        create_data_directory_structure()
+        #-- install longranger
 
         install_slurm()
 
