@@ -23,9 +23,9 @@ info:
     Create a 10X Genomics Longranger Slurm GCP Cluster
 
 imports:
-- path: scripts/longranger-slurm/startup-script.py
-- path: scripts/longranger-slurm/resume.py
-- path: scripts/longranger-slurm/suspend.py
+- path: ../scripts/longranger-slurm/startup-script.py
+- path: ../scripts/longranger-slurm/resume.py
+- path: ../scripts/longranger-slurm/suspend.py
 
 required:
 - cidr
