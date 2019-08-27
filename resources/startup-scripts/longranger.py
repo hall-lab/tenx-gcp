@@ -98,30 +98,28 @@ def install_packages():
 
 def mount_data_disk_and_create_dirs():
 
+    cmds = []
     if not os.path.exists(DATA_DIR):
 	os.makedirs(DATA_DIR)
-        cmd = ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"]
-        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-        subprocess.check_call(cmd)
-
-    cmds = [
+        cmd +=[
+            ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"]
 	    ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR],
-	    ["chmod", "0775", DATA_DIR],
-	    ["chmod", "u+s", DATA_DIR],
-	    ["chmod", "g+s", DATA_DIR],
-	    ["chgrp", "-R", "adm", DATA_DIR],
-	    ["mkdir", "-p", os.path.join(DATA_DIR, "references")],
-	    ["chmod", "0775", os.path.join(DATA_DIR, "references")],
-	    ];
+        ]
+
+    cmds += [
+        ["chmod", "0775", DATA_DIR],
+        ["chmod", "u+s", DATA_DIR],
+        ["chmod", "g+s", DATA_DIR],
+        ["chgrp", "-R", "adm", DATA_DIR],
+	["mkdir", "-p", os.path.join(DATA_DIR, "references")],
+        ["chmod", "0775", os.path.join(DATA_DIR, "references")],
+    ]
     for cmd in cmds:
 	sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
-    if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
-        os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
-
-    if not os.path.exists(TENX_ETC_DIRECTORY):
-        os.makedirs(TENX_ETC_DIRECTORY)
+    if not os.path.exists(TENX_PATH):
+        os.makedirs(TENX_PATH)
 
 #-- mount_data_disk_and_create_dirs
 
@@ -169,7 +167,7 @@ def install_tenx_cli():
     if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
 
     os.chdir('tenx-gcp')
-    rv = subprocess.call(['pip', 'install', '.'])
+    rv = subprocess.call(["pip", "install", "--prefix", TENX_PATH, "."])
     if rv != 0: raise Exception("Failed to install tenx cli.")
 
     os.chdir('/tmp')

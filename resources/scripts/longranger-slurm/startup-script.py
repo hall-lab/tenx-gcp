@@ -46,7 +46,7 @@ GPU_TYPE          = '@GPU_TYPE@'
 GPU_COUNT         = @GPU_COUNT@
 NFS_APPS_SERVER   = '@NFS_APPS_SERVER@'
 NFS_HOME_SERVER   = '@NFS_HOME_SERVER@'
-DATA_DIR      = '@DATA_DIR@'
+DATA_DIR          = '/mnt/disks/data'
 REMOTE_DATA_URL   = '@REMOTE_DATA_URL@'
 CONTROL_MACHINE = CLUSTER_NAME + '-controller'
 
@@ -959,7 +959,7 @@ def main():
         if not response.ok: raise Exception("GET failed for {}".format(url))
         with open(lr_startup_script, "w") as f:
             f.write(response.content)
-        cmd = ["usr/bin/env", "python", lr_startup_script]
+        cmd = ["python", lr_startup_script]
         print("RUNNING: {}".format(" ".join(cmd)))
         subprocess.check_call(cmd)
         os.remove(lr_startup_script)
