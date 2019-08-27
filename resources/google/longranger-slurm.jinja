@@ -16,13 +16,14 @@
 # limitations under the License.
 
 {% set networkName = env["deployment"] + "-slurm-net" %}
+{% set subnetName = networkName + "-slurm-subnet" %}
 
 resources:
 - name: {{ networkName }}
   type: compute.v1.network
   properties:
     autoCreateSubnetworks: false
-- name: {{ env["deployment"] }}-slurm-subnet
+- name: {{ subnetName }}
   type: compute.v1.subnetwork
   properties:
     network: $(ref.{{ networkName }}.selfLink)
@@ -79,7 +80,7 @@ resources:
   {% if properties['vpc_net'] %}
       - name: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/regions/{{ properties["region"] }}/subnetworks/{{ properties ["vpc_subnet"] }}
   {% else %}
-      - name: $(ref.{{ env["deployment"] }}-slurm-subnet.selfLink)
+      - name: $(ref.{{ subnetName }}.selfLink)
   {% endif %}
         sourceIpRangesToNat: ["PRIMARY_IP_RANGE"]
 {% endif %}
@@ -109,7 +110,7 @@ resources:
     canIpForward: true
 {% endif %}
     networkInterfaces:
-    - subnetwork: $(ref.{{ env["deployment"] }}-slurm-subnet.selfLink)
+    - subnetwork: $(ref.{{ subnetName }}.selfLink)
       accessConfigs:
       - name: External NAT
         type: ONE_TO_ONE_NAT
@@ -162,7 +163,7 @@ resources:
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/{{ properties["login_disk_type"] }}
         diskSizeGb: {{ properties["login_disk_size_gb"] }}
     networkInterfaces:
-    - subnetwork: $(ref.{{ env["deployment"] }}-slurm-subnet.selfLink)
+    - subnetwork: $(ref.{{ subnetName }}.selfLink)
       accessConfigs:
       - name: External NAT
         type: ONE_TO_ONE_NAT
@@ -213,7 +214,7 @@ resources:
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/{{ properties["compute_disk_type"] }}
         diskSizeGb: {{ properties["compute_disk_size_gb"] }}
     networkInterfaces:
-    - subnetwork: $(ref.{{ env["deployment"] }}-slurm-subnet.selfLink)
+    - subnetwork: $(ref.{{ subnetName }}.selfLink)
   {% if properties['external_compute_ips'] or properties['shared_vpc_host_proj'] %}
       accessConfigs:
       - name: External NAT
