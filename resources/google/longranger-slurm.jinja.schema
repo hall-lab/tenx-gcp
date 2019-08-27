@@ -26,10 +26,10 @@ imports:
 - path: ../scripts/longranger-slurm/startup-script.py
 - path: ../scripts/longranger-slurm/resume.py
 - path: ../scripts/longranger-slurm/suspend.py
+- path: ../startup-scripts/longranger.py
 
 required:
 - cidr
-- cluster_name
 - compute_machine_type
 - controller_machine_type
 - default_account
@@ -73,10 +73,6 @@ properties:
   cidr:
     type        : string
     description : RFC1918 subnet to run instances in, eg. 10.10.0.0/16.
-
-  cluster_name:
-    type        : string
-    description : Name of the cluster
 
   compute_machine_type:
     type        : string
