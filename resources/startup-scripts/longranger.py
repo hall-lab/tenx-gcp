@@ -3,12 +3,11 @@
 import glob, os, shutil, re, requests, subprocess, sys, time
 
 APPS_DIR = '/apps'
+TENX_PATH = os.path.join(APPS_DIR, "tenx")
+TENX_CONFIG_FILE = os.path.join(TENX_PATH, "etc", "config.yaml")
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 LONGRANGER_SOFTWARE_URL = '@LONGRANGER_SOFTWARE_URL@'
-
-TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
-TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
 
 def start_motd():
     msg = """
@@ -30,9 +29,11 @@ def add_longranger_profile():
 
     print "Adding {} ...".format(fn)
     with open(fn, "w") as f:
-        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
-        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
-        f.write("source /apps/longranger/sourceme.bash\n")
+        f.write("TENX_CONFIG_FILE={}\n".format(TENX_CONFIG_FILE))
+        f.write("PATH={}:$PATH\n".format( os.path.join(TENX_PATH, "bin") ))
+        f.write("PYTHONPATH={}\n".format( os.path.join(TENX_PATH, "lib") ))
+        f.write(". /apps/longranger/sourceme.bash\n")
+        #f.write("[ -f /apps/longranger/sourceme.bash ] && . /apps/longranger/sourceme.bash\n")
 
 #-- add_longranger_profile
 

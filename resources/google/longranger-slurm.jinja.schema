@@ -27,6 +27,7 @@ imports:
 - path: ../scripts/longranger-slurm/resume.py
 - path: ../scripts/longranger-slurm/suspend.py
 - path: ../startup-scripts/longranger.py
+- path: ../config/tenx.yaml
 
 required:
 - cidr
