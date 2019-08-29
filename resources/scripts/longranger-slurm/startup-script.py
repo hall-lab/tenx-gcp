@@ -165,6 +165,7 @@ def install_packages():
             'bsdtar',
             'epel-release',
             'gcc',
+            'git',
             'hwloc',
             'hwloc-devel',
             'libibmad',
@@ -815,6 +816,7 @@ def setup_bash_profile():
     f.write("""
 S_PATH=%s/slurm/current
 PATH=$PATH:$S_PATH/bin:$S_PATH/sbin
+TENX_CONFIG_FILE=/apps/tenx/config.yaml
 """ % APPS_DIR)
     f.close()
 
@@ -916,6 +918,28 @@ def format_disk():
 
 # END format_disk()
 
+def install_tenx_cli():
+
+    if os.path.exists( os.path.join(APPS_DIR, "usr", "bin", "tenx") ):
+        print "Already installed tenx cli...SKIPPING"
+        return
+    print "Installing tenx cli..."
+
+    os.chdir('/tmp')
+    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+    if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
+
+    os.chdir('tenx-gcp')
+    rv = subprocess.call(["pip", "install", "-U", "setuptools"])
+    rv = subprocess.call(["pip", "install", "."])
+    if rv != 0: raise Exception("Failed to install tenx cli.")
+
+    os.chdir('/tmp')
+    shutil.rmtree('tenx-gcp')
+    print "Installing tenx cli...OK"
+
+#-- install_tenx_cli
+
 def main():
     # Disable SELinux
     subprocess.call(shlex.split('setenforce 0'))
@@ -1014,6 +1038,7 @@ def main():
         hostname = socket.gethostname()
 
         # Add any additional installation functions here
+        install_tenx_cli()
 
         subprocess.call(shlex.split('systemctl enable slurmd'))
         setup_slurmd_cronjob()

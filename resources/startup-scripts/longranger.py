@@ -4,7 +4,7 @@ import glob, os, shutil, re, requests, subprocess, sys, time
 
 APPS_DIR = '/apps'
 TENX_PATH = os.path.join(APPS_DIR, "tenx")
-TENX_CONFIG_FILE = os.path.join(TENX_PATH, "etc", "config.yaml")
+TENX_CONFIG_FILE = os.path.join(TENX_PATH, "config.yaml")
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 LONGRANGER_SOFTWARE_URL = '@LONGRANGER_SOFTWARE_URL@'
@@ -30,8 +30,6 @@ def add_longranger_profile():
     print "Adding {} ...".format(fn)
     with open(fn, "w") as f:
         f.write("TENX_CONFIG_FILE={}\n".format(TENX_CONFIG_FILE))
-        f.write("PATH={}:$PATH\n".format( os.path.join(TENX_PATH, "bin") ))
-        f.write("PYTHONPATH={}\n".format( os.path.join(TENX_PATH, "lib") ))
         f.write(". /apps/longranger/sourceme.bash\n")
         #f.write("[ -f /apps/longranger/sourceme.bash ] && . /apps/longranger/sourceme.bash\n")
 
@@ -167,12 +165,12 @@ def install_tenx_cli():
     if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
 
     os.chdir('tenx-gcp')
-    rv = subprocess.call(["pip", "install", "--prefix", TENX_PATH, "."])
+    rv = subprocess.call(["pip", "install", "."])
     if rv != 0: raise Exception("Failed to install tenx cli.")
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
-    print "Installing tenx-scripts...OK"
+    print "Installing tenx cli...OK"
 
 #-- install_tenx_cli
 
