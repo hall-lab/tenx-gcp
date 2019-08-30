@@ -33,16 +33,12 @@ def run_align(aln, ref, rds):
    sys.stderr.write("Entering {}\n".format(sample_d))
    pwd = os.getcwd()
    os.chdir(sample_d)
-   job = { # FIXME
-       "cores": 14,#1,
-       "mem": 96,#6,
-       "mode": "local",#"slurm",
-   }
 
    try:
        cmd = ["longranger", "wgs", "--id=alignment",
-           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()), "--vcmode=freebayes",
-           "--uiport=18080", "--jobmode={}".format(job["mode"]), "--localmem={}".format(job["mem"]), "--localcores={}".format(job["cores"])]
+           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()), "--uiport=18080",
+            "--vcmode={}".format(TenxApp.config['TENX_ALN_VCMODE']), "--jobmode={}".format(TenxApp.config['TENX_ALN_MODE']),
+            "--localmem={}".format(TenxApp.config['TENX_ALN_MEM']), "--localcores={}".format(TenxApp.config['TENX_ALN_CORES'])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)
        if not os.path.exists(aln.outs_directory()): raise Exception("Longranger exited 0, but {} does not exist!".format(aln.outs_directory()))

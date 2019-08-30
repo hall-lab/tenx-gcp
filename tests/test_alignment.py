@@ -36,6 +36,10 @@ class TenxAlignmentTest(unittest.TestCase):
 
         test_patch.return_value = '0'
         TenxApp.config['TENX_DATA_PATH'] = os.path.join(os.getcwd(), 'tests', 'test_alignment')
+        TenxApp.config['TENX_ALN_MODE'] = 'local'
+        TenxApp.config['TENX_ALN_CORES'] = '1'
+        TenxApp.config['TENX_ALN_MEM'] = '6'
+        TenxApp.config['TENX_ALN_VCMODE'] = 'freebayes'
 
         err = StringIO.StringIO()
         sys.stderr = err
@@ -45,7 +49,7 @@ class TenxAlignmentTest(unittest.TestCase):
         ref = TenxReference(name="REF")
         alignment.run_align(aln, ref, rds)
 
-        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --uiport=18080 --jobmode= --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
+        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --uiport=18080 --vcmode=freebayes --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
