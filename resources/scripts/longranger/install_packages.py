@@ -4,32 +4,7 @@ import subprocess
 
 def install_packages():
 
-    packages = [
-        'bsdtar',
-	'ca-certificates',
-        'gcc',
-        'git',
-	'less',
-	'make',
-	'openssl',
-	'openssl-devel',
-        'python-devel',
-        'python-pip',
-        'python-setuptool',
-        'redhat-rpm-config',
-        'screen',
-	'sssd-client',
-	'sudo',
-	'which',
-	'unzip',
-	'vim',
-        ]
-
-
-    cmd = ['yum', 'install', '-y'] + packages
-    subprocess.check_call(cmd)
-
-    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']
+    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client', 'setuptools', 'pyyaml']
     rv = subprocess.check_call(cmd)
 
     subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv

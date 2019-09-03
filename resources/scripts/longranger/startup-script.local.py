@@ -10,13 +10,35 @@ def run_cmd(cmd):
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
-#-- run_script
+def install_packages():
+    packages = [
+        'bsdtar',
+	'ca-certificates',
+        'gcc',
+        'git',
+	'less',
+	'make',
+	'openssl',
+	'openssl-devel',
+        'python-devel',
+        'python-pip',
+        'python-setuptool',
+        'redhat-rpm-config',
+        'screen',
+	'sssd-client',
+	'sudo',
+	'which',
+	'unzip',
+	'vim',
+        ]
+
+    cmd = ['yum', 'install', '-y'] + packages
+    subprocess.check_call(cmd)
 
 if __name__ == '__main__':
     sys.stderr.write("Startup script...\n")
 
-    run_cmd(["yum", "install", "-y", "git"])
-    run_cmd(["pip", "install", "pyyaml"])
+    install_packages()
     chpath( os.path.join(os.path.sep, "tmp") )
     run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
     chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
