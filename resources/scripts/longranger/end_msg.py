@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, shutil
+import os, shutil, subprocess
 
 def end_motd():
     if os.path.exists("/etc/motd.bak"):
