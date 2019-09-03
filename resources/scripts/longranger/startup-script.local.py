@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, subprocess, sys
+import os, shutil, subprocess, sys
 
 def chpath(path):
     sys.stderr.write("Entering {}\n".format(path))
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     chpath( os.path.join(os.path.sep, "tmp") )
     sys.stderr.write("Removing tenx-gcp git repo...\n")
-    os.rmtree("tenx-gcp")
+    shutil.rmtree("tenx-gcp")
 
     print "Startup script...DONE"
 
