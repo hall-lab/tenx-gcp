@@ -98,8 +98,8 @@ resources:
       items:
         - key: startup-script
           value: |
-            {{ imports["../startup-scripts/longranger.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"]) }}
+            {{ imports["../scripts/longranger/startup-script.local.py"]|indent(12) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}
