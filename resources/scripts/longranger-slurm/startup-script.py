@@ -22,6 +22,7 @@ import shlex
 import shutil
 import socket
 import subprocess
+import sys
 import time
 import urllib
 import urllib2
@@ -47,7 +48,6 @@ GPU_COUNT         = @GPU_COUNT@
 NFS_APPS_SERVER   = '@NFS_APPS_SERVER@'
 NFS_HOME_SERVER   = '@NFS_HOME_SERVER@'
 DATA_DIR          = '/mnt/disks/data'
-REMOTE_DATA_URL   = '@REMOTE_DATA_URL@'
 CONTROL_MACHINE = CLUSTER_NAME + '-controller'
 
 SLURM_PREFIX  = APPS_DIR + '/slurm/slurm-' + SLURM_VERSION
@@ -163,15 +163,18 @@ def install_packages():
     packages = [
             'bind-utils',
             'bsdtar',
+	    'ca-certificates',
             'epel-release',
             'gcc',
             'git',
             'hwloc',
             'hwloc-devel',
+	    'less',
             'libibmad',
             'libibumad',
             'lua',
             'lua-devel',
+	    'make',
             'man2html',
             'mariadb',
             'mariadb-devel',
@@ -183,21 +186,27 @@ def install_packages():
             'nfs-utils',
             'numactl',
             'numactl-devel',
+            'openmpi',
+	    'openssl',
             'openssl-devel',
             'pam-devel',
+            'pdsh',
             'perl-ExtUtils-MakeMaker',
+            'python-devel',
             'python-pip',
+            'python-setuptools',
             'readline-devel',
             'rpm-build',
             'rrdtool-devel',
+            'screen',
+	    'sssd-client',
+	    'sudo',
+            'tmux',
+            'unzip',
             'vim',
             'wget',
-            'tmux',
-            'pdsh',
-            'openmpi',
+	    'which',
             # crcmod pkgs for gsutil
-            'python-devel',
-            'python-setuptools',
             'redhat-rpm-config',
             ]
 
@@ -918,27 +927,17 @@ def format_disk():
 
 # END format_disk()
 
-def install_tenx_cli():
+def chpath(path):
+    sys.stderr.write("Entering {}\n".format(path))
+    os.chdir(path)
 
-    if os.path.exists( os.path.join(APPS_DIR, "usr", "bin", "tenx") ):
-        print "Already installed tenx cli...SKIPPING"
-        return
-    print "Installing tenx cli..."
+#-- chpath
 
-    os.chdir('/tmp')
-    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
-    if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
+def run_cmd(cmd):
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
 
-    os.chdir('tenx-gcp')
-    rv = subprocess.call(["pip", "install", "-U", "setuptools"])
-    rv = subprocess.call(["pip", "install", "."])
-    if rv != 0: raise Exception("Failed to install tenx cli.")
-
-    os.chdir('/tmp')
-    shutil.rmtree('tenx-gcp')
-    print "Installing tenx cli...OK"
-
-#-- install_tenx_cli
+#-- run_cmd
 
 def main():
     # Disable SELinux
@@ -975,24 +974,28 @@ def main():
 
     start_munge()
 
+    # Git the tenx-gcp repo
+    pwd = os.getcwd()
+    chpath( os.path.join(os.path.sep, "tmp") )
+    run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
+    chpath(pwd)
+
     if INSTANCE_TYPE == "controller":
-        url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/lr-startup-script"
-        print("GET {}".format(url))
-        lr_startup_script = os.path.join("tmp", "lr-startup-script.py")
-        response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
-        if not response.ok: raise Exception("GET failed for {}".format(url))
-        with open(lr_startup_script, "w") as f:
-            f.write(response.content)
-        cmd = ["python", lr_startup_script]
-        print("RUNNING: {}".format(" ".join(cmd)))
-        subprocess.check_call(cmd)
-        os.remove(lr_startup_script)
-        #-- install longranger
+        # Install and configure tenx and longrnager
+        scripts = [
+                "configure_data_disk.py",
+                "add_profiled.py",
+                "add_tenx_config.py",
+                "install_longranger.py",
+                "install_tenx_cli.py",
+                ]
+        chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
+        for script in scripts:
+            run_cmd(["python", script])
+        chpath(pwd)
+        #--
 
         install_slurm()
-
-        # Add any additional installation functions here
-
         install_controller_service_scripts()
 
         subprocess.call(shlex.split('systemctl enable mariadb'))
@@ -1033,17 +1036,33 @@ def main():
         subprocess.call(shlex.split('gcloud compute instances remove-metadata '+ CONTROL_MACHINE + ' --zone=' + ZONE + ' --keys=startup-script'))
 
     elif INSTANCE_TYPE == "compute":
+        # Install and configure tenx and longrnager
+        scripts = [
+                "add_profiled.py",
+                "add_tenx_config.py",
+                "install_tenx_cli.py",
+                ]
+        chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
+        for script in scripts:
+            run_cmd(["python", script])
+        chpath(pwd)
+        #--
+
         install_compute_service_scripts()
 
         hostname = socket.gethostname()
-
-        # Add any additional installation functions here
-        install_tenx_cli()
 
         subprocess.call(shlex.split('systemctl enable slurmd'))
         setup_slurmd_cronjob()
         subprocess.call(shlex.split('systemctl start slurmd'))
         subprocess.call(shlex.split('gcloud compute instances remove-metadata '+ hostname + ' --zone=' + ZONE + ' --keys=startup-script'))
+
+    # Tenx GCP Cleanup
+    chpath( os.path.join(os.path.sep, "tmp") )
+    sys.stderr.write("Removing tenx-gcp git repo...\n")
+    shutil.rmtree("tenx-gcp")
+    chpath(pwd)
+    #--
 
     end_motd()
 
