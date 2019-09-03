@@ -7,7 +7,7 @@ def chpath(path):
     os.chdir(path)
 
 def run_cmd(cmd):
-    sys.stderr.write("RUNNING: {}".format(" ".join(cmd)))
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
 #-- run_script

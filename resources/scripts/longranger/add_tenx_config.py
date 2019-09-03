@@ -6,7 +6,7 @@ def add_tenx_config_file():
     # /apps/tenx/config.yaml
     tenx_apps_path = os.path.join( os.path.sep, "apps", "tenx")
     if not os.path.exists(tenx_apps_path):
-        os.path.makedirs(tenx_apps_path)
+        os.makedirs(tenx_apps_path)
 
     tenx_config_file = os.path.join(tenx_apps_path, "config.yaml")
     if os.path.exists(tenx_config_file):
