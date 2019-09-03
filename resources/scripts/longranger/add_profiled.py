@@ -13,7 +13,7 @@ def add_profiled():
         f.write("export TENX_CONFIG_FILE=/apps/tenx/config.yaml\n")
         f.write("[ -f /apps/longranger/sourceme.bash ] && . /apps/longranger/sourceme.bash\n")
 
-#-- add_longranger_profile
+#-- add_profiled
 
 if __name__ == '__main__':
     add_profiled()

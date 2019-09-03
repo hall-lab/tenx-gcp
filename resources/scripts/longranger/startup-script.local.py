@@ -6,9 +6,13 @@ def chpath(path):
     sys.stderr.write("Entering {}\n".format(path))
     os.chdir(path)
 
+#-- chpath
+
 def run_cmd(cmd):
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
+
+#-- run_cmd
 
 def install_packages():
     packages = [
@@ -34,6 +38,8 @@ def install_packages():
 
     cmd = ['yum', 'install', '-y'] + packages
     subprocess.check_call(cmd)
+
+#-- install_packages
 
 if __name__ == '__main__':
     sys.stderr.write("Startup script...\n")
@@ -61,6 +67,4 @@ if __name__ == '__main__':
     sys.stderr.write("Removing tenx-gcp git repo...\n")
     shutil.rmtree("tenx-gcp")
 
-    print "Startup script...DONE"
-
-#-- __main__
+    sys.stderr.write("Startup script...DONE\n")
