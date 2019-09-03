@@ -23,7 +23,7 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     longranger_glob = glob.glob("longranger*gz")
     if not len(longranger_glob): raise Exception("Failed to find DL'd longranger tgz!")
     longranger_tgz = longranger_glob[0]
-    sys.stderr.write("Found longranger TGZ: {}".format(longranger_tgz))
+    sys.stderr.write("Found longranger TGZ: {}\n".format(longranger_tgz))
 
     sys.stderr.write("UNTAR longranger...\n")
     subprocess.check_call(['bsdtar', 'zxf', longranger_tgz])
@@ -33,7 +33,7 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     shutil.move(longranger_dir, 'longranger')
     os.remove(longranger_tgz)
     os.chdir(pwd)
-    sys.stderr.write("Install longranger...OK")
+    sys.stderr.write("Install longranger...OK\n")
 
 #-- install_longranger
 

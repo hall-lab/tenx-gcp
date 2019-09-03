@@ -19,8 +19,6 @@ def install_tenx_cli():
     rv = subprocess.call(["pip", "install", "."])
     if rv != 0: raise Exception("Failed to install tenx cli.")
 
-    os.chdir('/tmp')
-    shutil.rmtree('tenx-gcp')
     os.chdir(pwd)
     print "Installing tenx cli...OK"
 
