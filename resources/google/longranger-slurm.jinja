@@ -16,7 +16,7 @@
 # limitations under the License.
 
 {% set networkName = env["deployment"] + "-slurm-net" %}
-{% set subnetName = networkName + "-slurm-subnet" %}
+{% set subnetName = env["deployment"] + "-slurm-subnet" %}
 
 resources:
 - name: {{ networkName }}
