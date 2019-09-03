@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, subprocess
+import os, subprocess, sys
 
 def chpath(path):
     sys.stderr.write("Entering {}\n".format(path))
@@ -15,8 +15,9 @@ def run_cmd(cmd):
 if __name__ == '__main__':
     sys.stderr.write("Startup script...\n")
 
+    run_cmd(["yum", "install", "-y", "git"])
     chpath( os.path.join(os.path.sep, "tmp") )
-    run_cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
+    run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
     chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
 
     sys.stderr.write("Running scripts...\n")
