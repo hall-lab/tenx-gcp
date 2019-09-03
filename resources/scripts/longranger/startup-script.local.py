@@ -38,6 +38,7 @@ def install_packages():
 if __name__ == '__main__':
     sys.stderr.write("Startup script...\n")
 
+    run_cmd("begin_msg.py")
     install_packages()
     chpath( os.path.join(os.path.sep, "tmp") )
     run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
@@ -45,7 +46,6 @@ if __name__ == '__main__':
 
     sys.stderr.write("Running scripts...\n")
     scripts = [
-            "begin_msg.py",
             "configure_data_disk.py",
             "add_profiled.py",
             "add_tenx_config.py",
