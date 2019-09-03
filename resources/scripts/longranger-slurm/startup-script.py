@@ -986,8 +986,8 @@ def main():
                 "configure_data_disk.py",
                 "add_profiled.py",
                 "add_tenx_config.py",
-                "install_longranger.py",
                 "install_tenx_cli.py",
+                "install_longranger.py",
                 ]
         chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
         for script in scripts:
