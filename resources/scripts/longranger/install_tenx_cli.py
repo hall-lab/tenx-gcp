@@ -10,8 +10,9 @@ def install_tenx_cli():
     print "Installing tenx cli..."
 
     os.chdir('/tmp')
-    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
-    if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
+    if not os.path.exists("tenx-gcp"):
+        rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
+        if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
 
     os.chdir('tenx-gcp')
     rv = subprocess.call(["pip", "install", "."])
