@@ -9,6 +9,7 @@ def install_tenx_cli():
         return
     print "Installing tenx cli..."
 
+    pwd = os.getcwd()
     os.chdir('/tmp')
     if not os.path.exists("tenx-gcp"):
         rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
@@ -20,6 +21,7 @@ def install_tenx_cli():
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
+    os.chdir(pwd)
     print "Installing tenx cli...OK"
 
 #-- install_tenx_cli

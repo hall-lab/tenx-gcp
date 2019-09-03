@@ -13,6 +13,7 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     sys.stderr.write("Entering {} ...\n".format(APPS_DIR))
     if not os.path.exists(APPS_DIR):
         os.makedirs(APPS_DIR)
+    pwd = os.getcwd()
     os.chdir(APPS_DIR)
 
     sys.stderr.write("Download longranger from {}\n".format(LONGRANGER_SOFTWARE_URL))
@@ -31,6 +32,7 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     if not os.path.exists(longranger_dir): raise Exception("Failed to find untarred supnova directory!")
     shutil.move(longranger_dir, 'longranger')
     os.remove(longranger_tgz)
+    os.chdir(pwd)
     sys.stderr.write("Install longranger...OK")
 
 #-- install_longranger
