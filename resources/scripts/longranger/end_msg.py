@@ -5,7 +5,7 @@ import os, shutil
 def end_motd():
     if os.path.exists("/etc/motd.bak"):
         shutil.copy("/etc/motd.bak", "/etc/motd") 
-    else
+    else:
         f = open('/etc/motd', 'w')
         f.write('')
         f.close()
