@@ -15,12 +15,12 @@ def configure_data_disk():
         ]
 
     cmds += [
-        ["chmod", "0775", DATA_DIR],
+        ["chmod", "0777", DATA_DIR],
         ["chmod", "u+s", DATA_DIR],
         ["chmod", "g+s", DATA_DIR],
         ["chgrp", "-R", "adm", DATA_DIR],
 	["mkdir", "-p", os.path.join(DATA_DIR, "references")],
-        ["chmod", "0775", os.path.join(DATA_DIR, "references")],
+        ["chmod", "0777", os.path.join(DATA_DIR, "references")],
     ]
     for cmd in cmds:
 	sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
