@@ -21,7 +21,7 @@ info:
     longranger alignments.
 
 imports:
-- path: ../startup-scripts/longranger.py
+- path: ../scripts/longranger/startup-script.local.py
 - path: ../config/tenx.yaml
 
 required:
