@@ -977,7 +977,7 @@ def main():
     # Git the tenx-gcp repo
     pwd = os.getcwd()
     chpath( os.path.join(os.path.sep, "tmp") )
-    run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
+    run_cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
     chpath(pwd)
 
     if INSTANCE_TYPE == "controller":

@@ -47,7 +47,7 @@ if __name__ == '__main__':
     run_cmd("begin_msg.py")
     install_packages()
     chpath( os.path.join(os.path.sep, "tmp") )
-    run_cmd(["git", "clone", "--single-branch", "--branch", "lr-split-scripts", "https://github.com/hall-lab/tenx-gcp.git"])
+    run_cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
     chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
 
     sys.stderr.write("Running scripts...\n")
