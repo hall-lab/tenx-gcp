@@ -19,9 +19,14 @@ def configure_data_disk():
         ["chmod", "u+s", DATA_DIR],
         ["chmod", "g+s", DATA_DIR],
         ["chgrp", "-R", "adm", DATA_DIR],
-	["mkdir", "-p", os.path.join(DATA_DIR, "references")],
-        ["chmod", "0777", os.path.join(DATA_DIR, "references")],
     ]
+
+    for subdir in ["references", "logs", "scripts"]:
+        cmds += [
+            ["mkdir", "-p", os.path.join(DATA_DIR, subdir)],
+            ["chmod", "0777", os.path.join(DATA_DIR, subdir)],
+        ]
+
     for cmd in cmds:
 	sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
