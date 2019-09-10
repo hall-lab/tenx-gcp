@@ -31,6 +31,7 @@ setup(
     ''',
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    packages=find_packages(exclude=('tests', 'docs')),
+    packages=find_packages(include=['tenx'], exclude=('tests', 'docs')),
     include_package_data=True,
+    package_data={"tenx": ["job-templates/*"]}
 )

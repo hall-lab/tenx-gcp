@@ -26,6 +26,19 @@ class TenxApp(object):
             script_template = jinja2.Template(f.read())
         return script_template
 
-#-- load_script_template_for
+#-- load_script_template
+
+    @staticmethod
+    def load_job_template(name):
+        job_templates_p = os.path.join( os.path.dirname(os.path.abspath(__file__)), "job-templates")
+        if not os.path.exists(job_templates_p): raise Exception("Cannot find job templates directory!")
+
+        template_fn = os.path.join(job_templates_p, name + '.sh')
+        if not os.path.exists(template_fn): raise Exception("Failed to find job template file: {}".format(template_fn))
+        with open(template_fn, 'r') as f:
+            job_template = jinja2.Template(f.read())
+        return job_template
+
+#-- load_job_template
 
 # -- TenxApp
