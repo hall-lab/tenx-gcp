@@ -1,12 +1,20 @@
-import unittest
+import re, unittest
 
 from .context import tenx
 from tenx import workload
 
 class TenxJobTest(unittest.TestCase):
 
-    def test10_job(self):
-        job = workload.Job(name="test", manager="slurm")
+    def test1_job(self):
+        job = workload.Job(name="aln-pipeline", manager="slurm")
+        self.assertIsNotNone(job)
+
+    def test2_template(self):
+        job = workload.Job(name="aln-pipeline", manager="slurm")
+        self.assertIsNotNone(job)
+        self.assertRegexpMatches(job.template_fn(), re.compile("aln-pipeline.sbatch.sh$"))
+        template = job.load_template()
+        self.assertIsNotNone(template)
 
 # -- TenxJobTest
 

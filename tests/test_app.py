@@ -36,16 +36,6 @@ class TenxAppTest(unittest.TestCase):
         script_template = TenxApp.load_script_template('foo')
         self.assertIsNotNone(script_template)
 
-    @patch('os.path.dirname')
-    def test4_job_template(self, dirname_patch):
-        dirname_patch.return_value = os.path.join("/")
-        with self.assertRaisesRegexp(Exception, "Cannot find job templates directory!"):
-            TenxApp.load_job_template('aln-pipeline.sbatch.sh')
-
-        dirname_patch.return_value = os.path.join("tenx")
-        script_template = TenxApp.load_job_template('aln-pipeline.sbatch')
-        self.assertIsNotNone(script_template)
-
 # -- TenxAppTest
 
 if __name__ == '__main__':
