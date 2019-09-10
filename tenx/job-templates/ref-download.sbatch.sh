@@ -7,7 +7,7 @@
 #SBATCH --signal=2
 #SBATCH --no-requeue
 #SBATCH --mem=8G
-#SBATCH -o logs/{{ REF_NAME }}.ref-dl.out
+#SBATCH -o {{ TENX_DATA_PATH }}/logs/{{ REF_NAME }}.ref-dl.out
 
 set -e
 tenx ref download {{ REF_NAME }}
