@@ -1,4 +1,4 @@
-import jinja2, os
+import jinja2, os, subprocess, sys, tempfile
 
 class Job():
 
@@ -27,13 +27,20 @@ class Job():
             job_template = jinja2.Template(f.read())
         return job_template
 
+    #-- job template
+
     def write_script(self, params, script_fn):
         template = self.load_template()
-        if not script_fn:
-            script_fn = "test"
         with open(script_fn, "w") as f:
             f.write(template.render(params))
 
-    #-- job template
+    def launch_script(self, params):
+        script_f = tempfile.NamedTemporaryFile()
+        self.write_script(params=params, script_fn=script_f.name)
+        cmd = [self.launch_cmd(), script_f.name]
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        subprocess.check_call(cmd)
+
+    #-- job script
 
 #-- Job
