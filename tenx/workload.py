@@ -27,6 +27,13 @@ class Job():
             job_template = jinja2.Template(f.read())
         return job_template
 
+    def write_script(self, params, script_fn):
+        template = self.load_template()
+        if not script_fn:
+            script_fn = "test"
+        with open(script_fn, "w") as f:
+            f.write(template.render(params))
+
     #-- job template
 
 #-- Job
