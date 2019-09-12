@@ -10,6 +10,9 @@ class TenxJobTest(unittest.TestCase):
         job = workload.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
 
+        job2 = workload.Job.from_fn(fn=job.teamplte_bn)
+        self.assertIsNotNone(job2)
+
     def test2_template(self):
         templates_p = workload.Job.templates_path()
         self.assertRegexpMatches(templates_p, re.compile("tenx\/job\-templates"))

@@ -6,6 +6,10 @@ class Job():
         self.name = name
         self.manager = manager
 
+    def from_fn(fn):
+        (name, manager, suffix) = f.split(".")
+        return Job(name=name, manager=manager)
+
     #-- __init__    
 
     def launch_cmd(self):
