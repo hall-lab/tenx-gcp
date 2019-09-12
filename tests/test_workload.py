@@ -16,7 +16,8 @@ class TenxJobTest(unittest.TestCase):
 
         job = workload.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
-        self.assertRegexpMatches(job.template_fn(), re.compile("aln-pipeline.sbatch.sh$"))
+        self.assertEqual(job.template_bn(), "aln-pipeline.slurm.sh")
+        self.assertRegexpMatches(job.template_fn(), re.compile("aln-pipeline.slurm.sh$"))
 
         template = job.load_template()
         self.assertIsNotNone(template)
@@ -28,7 +29,7 @@ class TenxJobTest(unittest.TestCase):
 
         script_f = tempfile.NamedTemporaryFile()
         job.write_script(params={"SAMPLE_NAME": "__SAMPLE__", "REF_NAME": "__REF__"}, script_fn=script_f.name)
-        self.assertTrue( filecmp.cmp(script_f.name, os.path.join("tests", "test_workload", "aln-pipeline.sbatch.sh")) )
+        self.assertTrue( filecmp.cmp(script_f.name, os.path.join("tests", "test_workload", "aln-pipeline.slurm.sh")) )
 
         check_call_patch.return_value = '0'
         err = StringIO.StringIO()

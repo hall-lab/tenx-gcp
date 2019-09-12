@@ -20,10 +20,13 @@ class Job():
 
     #-- attrs
 
+    def template_bn(self):
+        return ".".join([self.name, self.manager, "sh"])
+
     def template_fn(self):
         job_templates_p = self.templates_path()
         if not os.path.exists(job_templates_p): raise Exception("Cannot find job templates directory!")
-        template_fn = os.path.join(job_templates_p, ".".join([self.name, self.launch_cmd(), "sh"]))
+        template_fn = os.path.join(job_templates_p, self.template_bn())
         if not os.path.exists(template_fn): raise Exception("Failed to find job template file: {}".format(template_fn))
         return template_fn
 

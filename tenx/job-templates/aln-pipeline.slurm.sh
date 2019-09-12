@@ -1,8 +1,8 @@
 #!/bin/bash
-# PURPOSE:  Run the "tenx aln pipeline" command on a slurm cluster
-# REQUIRES: TENX_DATA_PATH
-#           SAMPLE_NAME (with reads in TENX_DATA_PATH or TENX_REMOTE_DATA_URL)
-#           REF_NAME (with reference in TENX_DATA_PATH)
+#TENX DOC: Run the "tenx aln pipeline" command on a slurm cluster
+#TENX PARAMS:
+#TENX - SAMPLE_NAME: with reads in TENX_DATA_PATH or TENX_REMOTE_DATA_URL
+#TENX   REF_NAME: with reference in TENX_DATA_PATH
 #
 #SBATCH -J {{ SAMPLE_NAME }}.aln
 #SBATCH --nodes=1 --ntasks-per-node=2
