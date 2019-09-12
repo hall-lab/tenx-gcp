@@ -1,14 +1,10 @@
-import jinja2, os, subprocess, sys, tempfile
+import jinja2, os, re, subprocess, sys, tempfile, yaml
 
 class Job():
 
     def __init__(self, name, manager):
         self.name = name
         self.manager = manager
-
-    def from_fn(fn):
-        (name, manager, suffix) = f.split(".")
-        return Job(name=name, manager=manager)
 
     #-- __init__    
 
@@ -40,12 +36,23 @@ class Job():
             job_template = jinja2.Template(f.read())
         return job_template
 
+    @staticmethod
+    def load_template_yaml(template_bn):
+        template_fn = os.path.join(Job.templates_path(), template_bn)
+        yaml_s = ""
+        tenx_re = re.compile("#TENX ")
+        with open(template_fn, "r") as f:
+            for l in f.readlines():
+                if tenx_re.match(l):
+                    yaml_s += re.sub(tenx_re, "", l)
+        return yaml.safe_load(yaml_s)
+
     #-- job template
 
     def write_script(self, params, script_fn):
         template = self.load_template()
         with open(script_fn, "w") as f:
-            f.write(template.render(params))
+            f.write(template.render(params)+"\n")
 
     def launch_script(self, params):
         script_f = tempfile.NamedTemporaryFile()

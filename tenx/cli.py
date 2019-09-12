@@ -1,4 +1,4 @@
-import click, os, socket, sys
+import click, os, socket, sys, tabulate
 
 import tenx.app as app
 from tenx.version import __version__
@@ -7,6 +7,7 @@ from alignment import TenxAlignment
 from reads import TenxReads
 from reference import TenxReference
 import notifications
+from workload import Job
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -164,6 +165,33 @@ def asm_upload(sample_name):
 tenx_assembly_cmd.add_command(asm_upload, name="upload")
 
 #-- ASSEMBLY
+
+# JOBS
+# - list
+# - submit
+@click.group(name="jobs")
+def tenx_jobs_cmd():
+    """
+    Commands to help submit jobs to a workload manager.
+    """
+    pass
+
+cli.add_command(tenx_jobs_cmd)
+
+@click.command(short_help="List available job templates")
+def jobs_list():
+    """
+    List job tamplates and details.
+    """
+    rows = []
+    for fn in os.listdir( Job.templates_path() ):
+        (name, manager, suffix) = fn.split(".")
+        info = Job.load_template_yaml(fn)
+        rows += [[ name, manager, " ".join(info["PARAMS"].keys()) ]]
+    sys.stdout.write( tabulate.tabulate(rows, ["NAME", "MANAGER", "PARAMS"], tablefmt="simple") )
+tenx_jobs_cmd.add_command(jobs_list, name="list")
+
+# --JOBS
 
 # READS
 # - download (fetch reads from the cloud)
