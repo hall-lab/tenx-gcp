@@ -181,7 +181,7 @@ cli.add_command(tenx_jobs_cmd)
 @click.command(short_help="List available job templates")
 def jobs_list():
     """
-    List job tamplates and details.
+    List job templates and details.
     """
     rows = []
     for fn in os.listdir( Job.templates_path() ):
@@ -190,6 +190,21 @@ def jobs_list():
         rows += [[ name, manager, " ".join(info["PARAMS"].keys()) ]]
     sys.stdout.write( tabulate.tabulate(rows, ["NAME", "MANAGER", "PARAMS"], tablefmt="simple") )
 tenx_jobs_cmd.add_command(jobs_list, name="list")
+
+@click.command(short_help="List available job templates")
+@click.argument('template', type=click.STRING)
+@click.argument('manager', type=click.STRING)
+@click.option('--params', type=click.STRING, required=True, help="Parameters for the job template as comma separated key=value pairs. Ex: SAMPLE_NAME=mysample,REF_NAME=grc38")
+def jobs_submit(template, manager, params):
+    """
+    Submit a job template to a workload manager specifying parameters.
+
+    See `list` command for availble command templates and their params.
+    """
+    job = Job(name=template, manager=manager)
+    sys.stderr.write("Template: {}\nManager: {}\n".format(template, manager))
+    job.launch_script(params)
+tenx_jobs_cmd.add_command(jobs_submit, name="submit")
 
 # --JOBS
 
