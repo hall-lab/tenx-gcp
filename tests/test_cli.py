@@ -60,21 +60,21 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'assembly', 'upload'])
         self.assertEqual(rv, 2)
 
-    # JOBS
-    def test2_tenx_jobs(self):
-        rv = subprocess.call(['tenx', 'jobs'])
+    # compute
+    def test2_tenx_compute(self):
+        rv = subprocess.call(['tenx', 'compute'])
         self.assertEqual(rv, 0)
 
-    def test2_tenx_jobs_list(self):
-        rv = subprocess.call(['tenx', 'jobs', 'list', '--help'])
+    def test2_tenx_compute_list_templates(self):
+        rv = subprocess.call(['tenx', 'compute', 'list-templates', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'jobs', 'list'])
+        rv = subprocess.call(['tenx', 'compute', 'list-templates'])
         self.assertEqual(rv, 0)
 
-    def test2_tenx_jobs_submit(self):
-        rv = subprocess.call(['tenx', 'jobs', 'submit', '--help'])
+    def test2_tenx_compute_submit(self):
+        rv = subprocess.call(['tenx', 'compute', 'submit', '--help'])
         self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'jobs', 'submit'])
+        rv = subprocess.call(['tenx', 'compute', 'submit'])
         self.assertEqual(rv, 2)
 
     # READS
