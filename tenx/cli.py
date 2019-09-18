@@ -33,26 +33,8 @@ from compute_cli import tenx_compute_cli
 cli.add_command(tenx_compute_cli, name="compute")
 
 # READS
-# - download (fetch reads from the cloud)
-@click.group(name="reads")
-def tenx_reads_cmd():
-    """
-    Commands for Reads
-    """
-    pass
-
-cli.add_command(tenx_reads_cmd)
-
-@click.command(short_help="Download reads from the cloud!")
-@click.argument('sample-name', type=click.STRING)
-def reads_download(sample_name):
-    """
-    Download reads from cloud storage to local disk.
-    """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
-    reads.download(TenxReads(sample_name=sample_name))
-tenx_reads_cmd.add_command(reads_download, name="download")
-#-- READS
+from reads_cli import tenx_reads_cli
+cli.add_command(tenx_reads_cli, name="reads")
 
 # REFERENCE
 from ref_cli import tenx_ref_cli
