@@ -1,6 +1,4 @@
-import os, subprocess, sys, unittest
-
-from .context import tenx
+import subprocess, unittest
 
 class TenxCliTest(unittest.TestCase):
 
@@ -31,36 +29,7 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'aln', 'upload'])
         self.assertEqual(rv, 2)
 
-    # ASSEMBLY
-    def test2_tenx_assembly(self):
-        rv = subprocess.call(['tenx', 'assembly'])
-        self.assertEqual(rv, 0)
-
-    def test2_tenx_assembly_assemble(self):
-        rv = subprocess.call(['tenx', 'assembly', 'assemble', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'assembly', 'assemble'])
-        self.assertEqual(rv, 2)
-
-    def test2_tenx_assembly_pipeline(self):
-        rv = subprocess.call(['tenx', 'assembly', 'pipeline', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'assembly', 'pipeline'])
-        self.assertEqual(rv, 2)
-
-    def test2_tenx_assembly_mkoutput(self):
-        rv = subprocess.call(['tenx', 'assembly', 'mkoutput', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'assembly', 'mkoutput'])
-        self.assertEqual(rv, 2)
-
-    def test2_tenx_assembly_upload(self):
-        rv = subprocess.call(['tenx', 'assembly', 'upload', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'assembly', 'upload'])
-        self.assertEqual(rv, 2)
-
-    # compute
+    # COMPUTE
     def test2_tenx_compute(self):
         rv = subprocess.call(['tenx', 'compute'])
         self.assertEqual(rv, 0)
