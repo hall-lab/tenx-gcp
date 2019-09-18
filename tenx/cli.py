@@ -55,27 +55,8 @@ tenx_reads_cmd.add_command(reads_download, name="download")
 #-- READS
 
 # REFERENCE
-# - download (fetch reference from the cloud)
-@click.group()
-def tenx_ref_cmd():
-    """
-    Commands for Reference Sequences
-    """
-    pass
-
-cli.add_command(tenx_ref_cmd, name="ref")
-
-@click.command(short_help="fetch reference sequences")
-@click.argument('ref-name', type=click.STRING)
-def ref_download(ref_name):
-    """
-    Download reference sequences from cloud storage to local disk.
-    """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
-    reference.download(TenxReference(name=ref_name))
-tenx_ref_cmd.add_command(ref_download, name="download")
-
-#-- REFERENCE
+from ref_cli import tenx_ref_cli
+cli.add_command(tenx_ref_cli, name="ref")
 
 # UTIL
 @click.group()

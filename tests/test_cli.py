@@ -27,17 +27,6 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'util', 'calculate-compute-metrics'])
         self.assertEqual(rv, 2)
 
-    # REFERENCE
-    def test2_tenx_ref(self):
-        rv = subprocess.call(['tenx', 'ref'])
-        self.assertEqual(rv, 0)
-
-    def test2_tenx_ref_download(self):
-        rv = subprocess.call(['tenx', 'ref', 'download', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'ref', 'download'])
-        self.assertEqual(rv, 2)
-
 # -- TenxCliTest
 
 if __name__ == '__main__':
