@@ -6,23 +6,6 @@ class TenxCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx'])
         self.assertEqual(rv, 0)
 
-    # COMPUTE
-    def test2_tenx_compute(self):
-        rv = subprocess.call(['tenx', 'compute'])
-        self.assertEqual(rv, 0)
-
-    def test2_tenx_compute_list_templates(self):
-        rv = subprocess.call(['tenx', 'compute', 'list-templates', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'compute', 'list-templates'])
-        self.assertEqual(rv, 0)
-
-    def test2_tenx_compute_submit(self):
-        rv = subprocess.call(['tenx', 'compute', 'submit', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'compute', 'submit'])
-        self.assertEqual(rv, 2)
-
     # READS
     def test3_tenx_reads(self):
         rv = subprocess.call(['tenx', 'reads'])

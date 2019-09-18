@@ -29,46 +29,8 @@ from asm_cli import tenx_asm_cli
 cli.add_command(tenx_asm_cli, name="asm")
 
 # COMPUTE
-# - list-templates
-# - submit
-@click.group(name="compute")
-def tenx_compute_cmd():
-    """
-    Commands to work with resources to submit jobs to a compute manager.
-    """
-    pass
-
-cli.add_command(tenx_compute_cmd)
-
-@click.command(short_help="List available job templates")
-def compute_list_templates():
-    """
-    List compute job templates and details.
-    """
-    rows = []
-    for fn in os.listdir( Job.templates_path() ):
-        (name, manager, suffix) = fn.split(".")
-        info = Job.load_template_yaml(fn)
-        rows += [[ name, manager, " ".join(info["PARAMS"].keys()) ]]
-    sys.stdout.write( tabulate.tabulate(rows, ["NAME", "MANAGER", "PARAMS"], tablefmt="simple") )
-tenx_compute_cmd.add_command(compute_list_templates, name="list-templates")
-
-@click.command(short_help="Submit a job to a compute cluster")
-@click.argument('template', type=click.STRING)
-@click.argument('manager', type=click.STRING)
-@click.option('--params', type=click.STRING, required=True, help="Parameters for the job template as comma separated key=value pairs. Ex: SAMPLE_NAME=mysample,REF_NAME=grc38")
-def compute_submit(template, manager, params):
-    """
-    Submit a job template to a compute manager with specified parameters.
-
-    See `list-template` sub-command for availble job templates and their params.
-    """
-    job = Job(name=template, manager=manager)
-    sys.stderr.write("Template: {}\nManager: {}\n".format(template, manager))
-    job.launch_script(params)
-tenx_compute_cmd.add_command(compute_submit, name="submit")
-
-# -- COMPUTE
+from compute_cli import tenx_compute_cli
+cli.add_command(tenx_compute_cli, name="compute")
 
 # READS
 # - download (fetch reads from the cloud)
