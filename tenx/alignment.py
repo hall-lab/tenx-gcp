@@ -37,7 +37,7 @@ def run_align(aln, ref, rds):
    try:
        cmd = ["longranger", "wgs", "--id=alignment",
            "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()),
-            "--vcmode={}".format(TenxApp.config['TENX_ALN_VCMODE']), "--jobmode={}".format(TenxApp.config['TENX_ALN_MODE']),
+            "--vcmode={}".format(TenxApp.config['TENX_ALN_VCMODE']), "--disable-ui", "--jobmode={}".format(TenxApp.config['TENX_ALN_MODE']),
             "--localmem={}".format(TenxApp.config['TENX_ALN_MEM']), "--localcores={}".format(TenxApp.config['TENX_ALN_CORES'])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)

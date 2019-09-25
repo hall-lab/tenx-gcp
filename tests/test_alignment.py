@@ -1,4 +1,4 @@
-import os, StringIO, subprocess, sys, tempfile, unittest
+import os, StringIO, shutil, subprocess, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -10,11 +10,22 @@ from tenx.reference import TenxReference
 
 class TenxAlignmentTest(unittest.TestCase):
 
-    def test10_alignment(self):
-        TenxApp()
-        self.assertIsNotNone(TenxApp.config)
-        TenxApp.config['TENX_DATA_PATH'] = '/tmp'
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+        if TenxApp.config is None: TenxApp()
+        TenxApp.config['TENX_DATA_PATH'] = self.tempdir
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
+        TenxApp.config['TENX_REMOTE_REFS_URL'] = 'gs://data/references'
+        TenxApp.config['TENX_ALN_MODE'] = 'local'
+        TenxApp.config['TENX_ALN_CORES'] = '1'
+        TenxApp.config['TENX_ALN_MEM'] = '6'
+        TenxApp.config['TENX_ALN_VCMODE'] = 'freebayes'
+ 
+    def tearDown(self):
+        shutil.rmtree(self.tempdir)
+        TenxApp.config = None
+
+    def test10_alignment(self):
         aln = TenxAlignment(sample_name='TESTER')
         self.assertEqual(aln.sample_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
         self.assertEqual(aln.directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'alignment'))
@@ -22,34 +33,29 @@ class TenxAlignmentTest(unittest.TestCase):
         self.assertEqual(aln.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'alignment'))
 
     def test11_is_successful(self):
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_alignment')
         aln = TenxAlignment(sample_name='TEST_SUCCESS')
+        os.makedirs( os.path.join(aln.directory(), "outs") )
+        with open(os.path.join(aln.directory(), "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
         self.assertTrue(aln.is_successful())
+
         aln = TenxAlignment(sample_name='TEST_FAIL')
+        os.makedirs(aln.directory())
         self.assertFalse(aln.is_successful())
 
     @patch('subprocess.check_call')
     def test2_run_align(self, test_patch):
-        #aln = TenxAlignment(sample_name='TEST_FAIL')
-        #with self.assertRaisesRegexp(Exception, "Longranger exited 0, but {} does not exist!".format(aln.outs_directory())):
-        #    alignment.run_align(aln, TenxReference(name="REF"), TenxReads(sample_name="TEST_SUCCESS"))
-
         test_patch.return_value = '0'
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join(os.getcwd(), 'tests', 'test_alignment')
-        TenxApp.config['TENX_ALN_MODE'] = 'local'
-        TenxApp.config['TENX_ALN_CORES'] = '1'
-        TenxApp.config['TENX_ALN_MEM'] = '6'
-        TenxApp.config['TENX_ALN_VCMODE'] = 'freebayes'
-
         err = StringIO.StringIO()
         sys.stderr = err
 
         aln = TenxAlignment(sample_name='TEST_SUCCESS')
+        os.makedirs( os.path.join(aln.directory(), "outs") )
+        with open(os.path.join(aln.directory(), "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
         rds = TenxReads(sample_name='TEST_SUCCESS')
         ref = TenxReference(name="REF")
         alignment.run_align(aln, ref, rds)
 
-        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --uiport=18080 --vcmode=freebayes --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
+        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --vcmode=freebayes --disable-ui --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
@@ -58,20 +64,23 @@ class TenxAlignmentTest(unittest.TestCase):
     def test4_run_upload(self, upload_patch, verify_patch):
         sys.stderr = StringIO.StringIO()
         aln = TenxAlignment(sample_name='TEST_FAIL')
+        os.makedirs( os.path.join(aln.directory(), "outs") )
         with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful alignment"):
             alignment.run_upload(aln)
 
         upload_patch.return_value = "0"
         verify_patch.return_value = "1"
-        TenxApp.config['TENX_DATA_PATH'] = os.path.join('tests', 'test_alignment')
+
+        aln = TenxAlignment(sample_name='TEST_SUCCESS')
+        os.makedirs( os.path.join(aln.directory(), "outs") )
+        with open(os.path.join(aln.directory(), "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
 
         err = StringIO.StringIO()
         sys.stderr = err
 
-        aln = TenxAlignment(sample_name='TEST_SUCCESS')
         alignment.run_upload(aln)
 
-        expected_err = "Upload TEST_SUCCESS alignment...\nEntering tests/test_alignment/TEST_SUCCESS/alignment ...\nUploading to: gs://data/TEST_SUCCESS/alignment\nVerify upload alignment...\nUpload alignment...OK\n"
+        expected_err = "Upload TEST_SUCCESS alignment...\nEntering {} ...\nUploading to: {}\nVerify upload alignment...\nUpload alignment...OK\n".format(aln.directory(), aln.remote_url())
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 

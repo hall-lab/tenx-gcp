@@ -1,6 +1,4 @@
-#!/usrbin/env python
-
-import os, subprocess, unittest
+import os, shutil, subprocess, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -9,35 +7,43 @@ from tenx import util
 class VerifyUploadTest(unittest.TestCase):
 
     expected_remote = {
-        'gatk-4.0.0.0.zip': '379508875',
-        'longranger-2.2.2.tgz': '490894203',
-        'loupe-2.1.1.tar.gz': '65286620',
-        'supernova-2.0.1.tgz': '852601404',
-        'supernova-2.1.1.tgz': '1314506272',
-        'perl/verify-upload.pl': '2005',
-        'objects,': 'TOTAL:'
+        "file1": "12",
+        "file2": "12",
+        "dir1/file3": "12",
+        "dir2/file4": "12",
+        "objects,": "TOTAL:",
     }
 
     gsutil_success_output = """
- 379508875  2019-02-19T21:50:30Z  gs://data/gatk-4.0.0.0.zip
- 490894203  2019-01-24T00:20:19Z  gs://data/longranger-2.2.2.tgz
-  65286620  2019-03-07T20:27:34Z  gs://data/loupe-2.1.1.tar.gz
- 852601404  2018-10-02T22:13:33Z  gs://data/supernova-2.0.1.tgz
-1314506272  2018-10-02T22:08:59Z  gs://data/supernova-2.1.1.tgz
-      2005  2018-06-26T18:15:58Z  gs://data/perl/verify-upload.pl
-           TOTAL: 6 objects, 3102799379 bytes (2.89 GiB)
+12  2019-02-19T21:50:30Z  gs://data/file1
+12  2019-01-24T00:20:19Z  gs://data/file2
+12  2019-03-07T20:27:34Z  gs://data/dir1/file3
+12  2018-10-02T22:13:33Z  gs://data/dir2/file4
+           TOTAL: 4 objects, 3102799379 bytes (48 B)
 
-"""
+    """
 
     gsutil_missing_output = """
- 490894203  2019-01-24T00:20:19Z  gs://data/longranger-2.2.2.tgz
-  65286620  2019-03-07T20:27:34Z  gs://data/loupe-2.1.1.tar.gz
- 852601404  2018-10-02T22:13:33Z  gs://data/supernova-2.0.1.tgz
-1314506272  2018-10-02T22:08:59Z  gs://data/supernova-2.1.1.tgz
-      2005  2018-06-26T18:15:58Z  gs://data/perl/verify-upload.pl
-           TOTAL: 5 objects, 2723290504 bytes (2.89 GiB)
-
+12  2019-02-19T21:50:30Z  gs://data/file1
+12  2019-01-24T00:20:19Z  gs://data/file2
+12  2019-03-07T20:27:34Z  gs://data/dir1/file3
+           TOTAL: 3 objects, 3102799379 bytes (48 B)
 """
+
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+        self.empty_dir = os.path.join(self.tempdir, "empty")
+        os.mkdir(self.empty_dir)
+        self.success_dir = os.path.join(self.tempdir, "success")
+        os.makedirs(self.success_dir)
+        for bn in self.expected_remote.keys():
+            fn = os.path.join(self.success_dir, bn)
+            if not os.path.exists(os.path.dirname(fn)):
+                os.makedirs( os.path.dirname(fn) )
+            with open(fn, "w") as f: f.write("A")
+
+    def tearDown(self):
+        shutil.rmtree(self.tempdir)
 
     @patch('subprocess.check_output')
     def test1_build_remote(self, test_patch):
@@ -48,24 +54,24 @@ class VerifyUploadTest(unittest.TestCase):
     @patch('subprocess.check_output')
     def test2_empty(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        with self.assertRaisesRegex(Exception, "Local directory does not contain any files!"):
+        with self.assertRaisesRegexp(Exception, "Local directory does not contain any files!"):
             util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "empty"), rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test3_missing(self, test_patch):
         test_patch.return_value = self.gsutil_missing_output
-        with self.assertRaisesRegex(Exception, "Remote is missing these files:\ngatk-4.0.0.0.zip"):
-            util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
+        with self.assertRaisesRegexp(Exception, "Remote is missing these files:\ndir2/file4"):
+            util.verify_upload(ldir=self.success_dir, rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test4_success(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data")
+        util.verify_upload(ldir=self.success_dir, rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test5_ignored(self, test_patch):
         test_patch.return_value = self.gsutil_missing_output
-        util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "success"), rurl="gs://data", ignore="gatk")
+        util.verify_upload(ldir=self.success_dir, rurl="gs://data", ignore="dir2")
 
 #-- VerifyUploadTest
 

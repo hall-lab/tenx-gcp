@@ -1,4 +1,4 @@
-import filecmp, os, re, StringIO, sys, tempfile, unittest
+import os, re, StringIO, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -27,9 +27,23 @@ class TenxJobTest(unittest.TestCase):
         job = compute.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
 
+        with open(job.template_fn(), "r") as template_f:
+            template = template_f.read()
+
+        for s in ( "REF_NAME", "SAMPLE_NAME" ):
+            s_re = re.compile("\{\{ " + s + " \}\}")
+            template = re.sub(s_re, "___" + s + "___", template)
+
+        s_re = re.compile("\{\{ TENX_DATA_PATH \}\}")
+        template = re.sub(s_re, "", template)
+
         script_f = tempfile.NamedTemporaryFile()
-        job.write_script(params={"SAMPLE_NAME": "__SAMPLE__", "REF_NAME": "__REF__"}, script_fn=script_f.name)
-        self.assertTrue( filecmp.cmp(script_f.name, os.path.join("tests", "test_compute", "aln-pipeline.slurm.sh")) )
+        job.write_script(params={"SAMPLE_NAME": "___SAMPLE_NAME___", "REF_NAME": "___REF_NAME___"}, script_fn=script_f.name)
+
+        script_f.flush()
+        script_f.seek(0, 0)
+        script = script_f.read()
+        self.assertEqual(script, template)
 
         check_call_patch.return_value = '0'
         err = StringIO.StringIO()

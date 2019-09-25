@@ -1,3 +1,0 @@
-environment: test
-TENX_SCRIPTS_PATH: tests/test_app
-TENX_SLACK: https://slack.com

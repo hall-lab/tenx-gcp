@@ -7,17 +7,23 @@ from tenx import reference
 
 class TenxAppTest(unittest.TestCase):
 
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+        if TenxApp.config is None: TenxApp()
+        TenxApp.config['TENX_DATA_PATH'] = self.tempdir
+        TenxApp.config['TENX_REMOTE_REFS_URL'] = 'gs://data/references'
+
+    def tearDown(self):
+        shutil.rmtree(self.tempdir)
+        TenxApp.config = None
+
     def test1_reference(self):
-        tenxapp = TenxApp()
-        self.assertIsNotNone(TenxApp.config)
-        TenxApp.config['TENX_DATA_PATH'] = tempfile.mkdtemp()
-        TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
         r = reference.TenxReference(name='refdata-GRCh38-2.1.0')
         self.assertEqual(r.references_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'references'))
         self.assertEqual(r.directory(), os.path.join(r.references_directory(), r.name))
         self.assertEqual(r.genome_fasta_fn(), os.path.join(r.directory(), 'fasta', 'genome.fa'))
         self.assertEqual(r.tgz_bn(), "refdata-GRCh38-2.1.0.tar.gz")
-        self.assertEqual(r.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'references', r.tgz_bn()))
+        self.assertEqual(r.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_REFS_URL'], r.tgz_bn()))
 
     @patch('subprocess.check_call')
     def test2_download_no_reference(self, test_patch):
@@ -39,8 +45,10 @@ class TenxAppTest(unittest.TestCase):
 
         r = reference.TenxReference(name='refdata-GRCh38-2.1.0')
         self.assertIsNotNone(r)
-        shutil.copyfile(os.path.join('tests', 'test_reference', r.tgz_bn()), os.path.join(r.references_directory(), r.tgz_bn()))
-        subprocess.call(['tar', 'zxf', os.path.join(r.references_directory(), r.tgz_bn()), '-C', r.references_directory()])
+        os.makedirs(r.directory())
+        genome_fasta_fn = r.genome_fasta_fn()
+        os.makedirs( os.path.dirname(genome_fasta_fn) )
+        with open(genome_fasta_fn, "w") as f: f.write(">SEQ1\nATGC")
 
         err = StringIO.StringIO()
         sys.stderr = err

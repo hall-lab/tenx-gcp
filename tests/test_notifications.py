@@ -8,7 +8,7 @@ from tenx import notifications
 from tenx.app import TenxApp
 
 class NotificationsTest(unittest.TestCase):
-    app = TenxApp( os.path.join("tests", "test_app", "tenx.yaml") )
+    app = TenxApp()
 
     class Response(object):
         def __init__(self, ok):
@@ -16,6 +16,7 @@ class NotificationsTest(unittest.TestCase):
 
     @patch('requests.post')
     def test1_slack(self, test_patch):
+        TenxApp.config['TENX_NOTIFICATIONS_SLACK'] = "https://slack.com"
         notok_response = NotificationsTest.Response(ok=False)
         test_patch.return_value = notok_response
         with self.assertRaisesRegexp(Exception, 'Slack POST failed for {}'.format(self.app.config['TENX_NOTIFICATIONS_SLACK'])):
