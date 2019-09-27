@@ -31,55 +31,57 @@ class TenxAssembly():
 
 #-- TenxAssembly
 
-def assemble_script(asm):
-    return """#!/bin/bash
-set -e
-source /apps/supernova/sourceme.bash
-mkdir -p {TENX_SAMPLE_DIRECTORY}
-cd {TENX_SAMPLE_DIRECTORY}
-supernova run --id=assembly --fastqs={TENX_RDS_DIRECTORY} --uiport=18080 --nodebugmem --localcores=50 --localmem=400
-""".format(TENX_SAMPLE_DIRECTORY=asm.sample_directory(), TENX_RDS_DIRECTORY=asm.reads_directory())
-
 def run_assemble(asm):
-   script = assemble_script(asm)
-   script_f = tempfile.NamedTemporaryFile()
-   script_f.write(script)
-   script_f.flush()
-   rv = subprocess.call(['bash', script_f.name])
-   if rv != 0: raise Exception("Failed to run 'assemble' bash script.")
-   if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
+    cmd = ["supernova", "--help"]
+    sys.stderr.write("Checking if supernova is in PATH...\nRUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+
+    sample_d = asm.sample_directory()
+    if not os.path.exists(sample_d):
+        os.makedirs(sample_d)
+    pwd = os.getcwd()
+    os.chdir(sample_d)
+
+    cmd = [
+        "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.reads_directory()), "--uiport=18080", "--nodebugmem",
+        "--localcores={}".format(TenxApp.config['TENX_ASM_LOCALCORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_LOCALMEM']),
+    ]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+
+    os.chdir(pwd)
+    if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
 
 #-- assemble
 
-def mkoutput_script(asm):
-    return """#!/bin/bash
-set -e
-source /apps/supernova/sourceme.bash
-echo Running mkoutput...
-echo Entering {TENX_ASM_MKOUTPUT_PATH}
-mkdir -p {TENX_ASM_MKOUTPUT_PATH}
-cd {TENX_ASM_MKOUTPUT_PATH}
-echo Running mkoutput raw...
-supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.raw --style=raw
-echo Running mkoutput megabubbles...
-supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.megabubbles --style=megabubbles
-echo Running mkoutput pseudohap2...
-supernova mkoutput --asmdir={TENX_ASM_OUTS_ASSEMBLY_DIRECTORY} --outprefix={TENX_SAMPLE}.pseudohap2 --style=pseudohap2
-echo Running mkoutput...OK
-""".format(TENX_ASM_PATH=asm.directory(), TENX_SAMPLE=asm.sample_name, TENX_ASM_MKOUTPUT_PATH=asm.mkoutput_directory(), TENX_ASM_OUTS_ASSEMBLY_DIRECTORY=asm.outs_assembly_directory())
-
 def run_mkoutput(asm):
-   script = mkoutput_script(asm)
-   script_f = tempfile.NamedTemporaryFile()
-   script_f.write(script)
-   script_f.flush()
-   print(script)
-   rv = subprocess.call(['bash', script_f.name])
-   if rv != 0: raise Exception("Failed to run 'mkoutput' bash script.")
-   fastas = glob.glob( os.path.join(asm.mkoutput_directory(), '*fasta.gz') )
-   if len(fastas) != 4: raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but only found {}.".format(asm.mkoutput_directory(), len(fastas)))
+    sys.stderr.write("Running mkoutput for {}...\n".format(asm.sample_name))
 
-#-- mkoutput
+    if not asm.is_successful(): raise Exception("Assembly is not complete! Cannot run mkoutput!")
+
+    cmd = ["supernova", "--help"]
+    sys.stderr.write("Checking if supernova is in PATH...\nRUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+
+    mkoutput_d = asm.mkoutput_directory()
+    sys.stderr.write("Entering {}\n".format(mkoutput_d))
+    if not os.path.exists(mkoutput_d):
+        os.makedirs(mkoutput_d)
+    pwd = os.getcwd()
+    os.chdir(mkoutput_d)
+
+    cmd_template = "supernova mkoutput --asmdir={OUTS_ASM_D} --outprefix={SAMPLE_NAME}.{STYLE} --style={STYLE}"
+    for style in ("raw", "megabubbles", "pseudohap2"):
+        cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_directory(), SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        subprocess.check_call(cmd)
+
+    fastas = glob.glob( os.path.join(asm.mkoutput_directory(), '*fasta.gz') )
+    os.chdir(pwd)
+    if len(fastas) != 4:
+        raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but found {}.".format(asm.mkoutput_directory(), len(fastas)))
+
+#-- run_mkoutput
 
 def run_upload(asm):
     sys.stderr.write("Upload {} assembly...\n".format(asm.sample_name))
@@ -87,15 +89,14 @@ def run_upload(asm):
     if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
 
     sys.stderr.write("Entering {} ...\n".format(asm.directory()))
+    pwd = os.getcwd()
     os.chdir(asm.directory())
 
-    # FIXME Not removing ASSEMBLER_CS, skipping it instead with -x. Maybe parameterize? Send to cloud, remove?
-    #if os.path.exists("ASSEMBLER_CS"):
-    #    sys.stderr.write("Removing logging directory ASSEMBLER_CS prior to upload.\n")
-    #    shutil.rmtree("ASSEMBLER_CS")
-
     sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
-    subprocess.call(["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()])
+    cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+    os.chdir(pwd)
 
     sys.stderr.write("Verify upload assembly...\n")
     util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url(), ignore="ASSEMBLER_CS")
