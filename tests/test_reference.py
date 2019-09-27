@@ -9,6 +9,7 @@ class TenxAppTest(unittest.TestCase):
 
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
+        os.chdir(self.tempdir)
         if TenxApp.config is None: TenxApp()
         TenxApp.config['TENX_DATA_PATH'] = self.tempdir
         TenxApp.config['TENX_REMOTE_REFS_URL'] = 'gs://data/references'
