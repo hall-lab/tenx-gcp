@@ -17,6 +17,9 @@
 
 {% set networkName = env["deployment"] + "-slurm-net" %}
 {% set subnetName = env["deployment"] + "-slurm-subnet" %}
+{% set tenxAlnMode = "/apps/longranger/martian-cs/2.3.2/jobmanagers/slurm.template" %}
+{% set tenxAlnCores = 2 %}
+{% set tenxAlnMem = 3.5 * tenxAlnCores %}
 
 resources:
 - name: {{ networkName }}
@@ -136,7 +139,7 @@ resources:
             {{ imports["../scripts/longranger-slurm/startup-script.py"]|indent(12)|replace("@PROJECT@",env["project"])|replace("@ZONE@",properties["zone"])|replace("@INSTANCE_TYPE@","compute")|replace("@MUNGE_KEY@",properties["munge_key"])|replace("@SLURM_VERSION@",properties["slurm_version"])|replace("@STATIC_NODE_COUNT@",properties["static_node_count"])|replace("@MAX_NODE_COUNT@",properties["max_node_count"])|replace("@MACHINE_TYPE@",properties["compute_machine_type"])|replace("@DEF_SLURM_ACCT@",properties["default_account"])|replace("@DEF_SLURM_USERS@",properties["default_users"])|replace("@CLUSTER_NAME@", env["deployment"] )|replace("@EXTERNAL_COMPUTE_IPS@",properties["external_compute_ips"])|replace("@NFS_HOME_SERVER@",properties["nfs_home_server"])|replace("@NFS_APPS_SERVER@",properties["nfs_apps_server"])|replace("@GPU_TYPE@",properties["gpu_type"])|replace("@GPU_COUNT@",properties["gpu_count"])|replace("@REMOTE_DATA_URL@",properties["software_url"]) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.yaml"]|indent(12)|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.longranger.yaml"]|indent(12)|replace("@ALN_MODE@",tenxAlnMode])|replace("@ALN_MEM@",tenxAlnMem])|replace("@ALN_CORES@",tenxAlnCores])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
         - key: slurm_resume
           value: |
             {{ imports["../scripts/longranger-slurm/resume.py"]|indent(12)|replace("@PROJECT@",env["project"])|replace("@ZONE@",properties["zone"])|replace("@REGION@",properties["region"])|replace("@MACHINE_TYPE@",properties["compute_machine_type"])|replace("@PREEMPTIBLE@",properties["preemptible_bursting"])|replace("@EXTERNAL_COMPUTE_IPS@",properties["external_compute_ips"])|replace("@DISK_SIZE_GB@",properties["compute_disk_size_gb"])|replace("@DISK_TYPE@",properties["compute_disk_type"])|replace("@LABELS@",properties["labels"])|replace("@CLUSTER_NAME@", env["deployment"] )|replace("@CPU_PLATFORM@",properties["cpu_platform"])|replace("@GPU_TYPE@",properties["gpu_type"])|replace("@GPU_COUNT@",properties["gpu_count"])|replace("@VPC_SUBNET@",properties["vpc_subnet"])|replace("@SHARED_VPC_HOST_PROJ@",properties["shared_vpc_host_proj"])|replace("@SERVICE_ACCOUNT@",properties["service_account"])  }}
