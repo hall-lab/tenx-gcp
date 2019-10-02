@@ -11,6 +11,17 @@ with open('LICENSE') as f:
 with open('tenx/version.py') as f:
     exec(f.read())
 
+tests_require = [
+    "mock",
+    "nose",
+]
+install_requires=[
+    "click==7.0",
+    "Jinja2>=2.10.1",
+    "pyyaml==5.1",
+    "tabulate",
+]
+
 setup(
     name='tenx',
     version=__version__,
@@ -20,17 +31,14 @@ setup(
     author_email='ebetler@wustl.edu',
     license=license,
     url='https://github.com/hall-lab/tenx-gcp.git',
-    install_requires=[
-        'click==7.0',
-        'pyyaml==5.1',
-        'Jinja2>=2.10.1',
-    ],
+    installs_requires=installs_require,
     entry_points='''
         [console_scripts]
         tenx=tenx.cli:cli
     ''',
     setup_requires=["pytest-runner"],
-    tests_require=["pytest"],
+    test_suite="nose.collector",
+    tests_requires=tests_require,
     packages=find_packages(include=['tenx'], exclude=('tests', 'docs')),
     include_package_data=True,
     package_data={"tenx": ["job-templates/*"]}

@@ -22,7 +22,7 @@ info:
 
 imports:
 - path: ../scripts/longranger/startup-script.local.py
-- path: ../config/tenx.yaml
+- path: ../config/tenx.longranger.yaml
 
 required:
 - disk_size_gb

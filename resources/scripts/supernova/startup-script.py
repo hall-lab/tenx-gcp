@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, re, requests, subprocess, time
+import glob, os, shutil, sys, re, requests, subprocess, time
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
@@ -36,6 +36,7 @@ def install_packages():
         'python-devel',
         'python-pip',
         'python-setuptool',
+        'PyYAML-3.10-11.el7.x86_64',
         'redhat-rpm-config',
 	'sssd-client',
 	'sudo',
@@ -55,6 +56,17 @@ def install_packages():
     subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
     rv = subprocess.call(['pip', 'install', '-U', 'crcmod'])
     if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
+
+    # FROM GCP SLURM
+    # Force re-evaluation of site-packages so that namespace packages (such
+    # as google-auth) are importable. This is needed because we install the
+    # packages while this script is running and do not have the benefit of
+    # restarting the interpreter for it to do it's usual startup sequence to
+    # configure import magic.
+    #import site
+    #for path in [x for x in sys.path if 'site-packages' in x]:
+    #    site.addsitedir(path)
+    #import googleapiclient.discovery, yaml
 
     cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
     rv = subprocess.call(cmd)
@@ -149,14 +161,26 @@ def add_tenx_config_file():
     if os.path.exists(TENX_CONFIG_FILE):
         print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
         return
-
     print "Adding {} ...".format(TENX_CONFIG_FILE)
+    import yaml
+
     url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
     print("GET {}".format(url))
     response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
     if not response.ok: raise Exception("GET failed for {}".format(url))
+    tenx_conf = yaml.safe_load(response.content)
+
+    machine_type = tenx_conf["TENX_MACHINE_TYPE"].split("-")
+    machine_cores = int(machine_type[2])
+    machine_mem = machine_cores * 6.5 # highmem
+    print "Machine cores: {}".format(machine_cores)
+    print "Machine mem: {}".format(machine_mem)
+    # Hold back 2 cores and 13 GB
+    tenx_conf["TENX_ASM_CORES"] = machine_cores - 2
+    tenx_conf["TENX_ASM_MEM"] = machine_mem - (2 * 6.5)
+
     with open(TENX_CONFIG_FILE, "w") as f:
-        f.write(response.content)
+        f.write( yaml.dump(tenx_conf) )
 
 #-- add_tenx_config_file
 
@@ -177,9 +201,9 @@ if __name__ == '__main__':
     print "Startup script...STARTING"
     start_motd()
     create_data_directory_structures()
+    install_packages()
     add_supernova_profile()
     add_tenx_config_file()
-    install_packages()
     install_supernova()
     install_tenx_cli()
     end_motd()
