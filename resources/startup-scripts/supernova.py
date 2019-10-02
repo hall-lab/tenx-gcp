@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import glob, os, shutil, re, requests, subprocess, time
+import glob, os, shutil, re, requests, subprocess, time, yaml
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
@@ -151,14 +151,70 @@ def add_tenx_config_file():
         return
 
     print "Adding {} ...".format(TENX_CONFIG_FILE)
+
+    print "Getting VM specs ..."
+    machine = expand_machine_type()
+    print "Machine cores: {}".format(machine["cores"])
+    print "Machine mem: {}".format(machine["memory"])
+
     url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
     print("GET {}".format(url))
     response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
     if not response.ok: raise Exception("GET failed for {}".format(url))
+
+    tenx_conf = yaml.safe_load(response.content)
+    # Hold back 4 cores and 16 GB
+    tenx_conf["TENX_ASM_CORES"] = ( machine["cores"] * machine["threads"] ) - 4
+    tenx_conf["TENX_ASM_MEM"] = round( (machine["mem"] / 1024) - 16)
+
     with open(TENX_CONFIG_FILE, "w") as f:
-        f.write(response.content)
+        f.write( yaml.dump(tenx_conf) )
 
 #-- add_tenx_config_file
+
+def expand_machine_type():
+
+    # FROM GCP SLURM
+    # Force re-evaluation of site-packages so that namespace packages (such
+    # as google-auth) are importable. This is needed because we install the
+    # packages while this script is running and do not have the benefit of
+    # restarting the interpreter for it to do it's usual startup sequence to
+    # configure import magic.
+    import sys
+    import site
+    for path in [x for x in sys.path if 'site-packages' in x]:
+        site.addsitedir(path)
+
+    import googleapiclient.discovery
+
+    # Assume sockets is 1. Currently, no instances with multiple sockets
+    # Assume hyper-threading is on and 2 threads per core
+    machine = {'sockets': 1, 'cores': 1, 'threads': 1, 'memory': 1}
+
+    try:
+        compute = googleapiclient.discovery.build('compute', 'v1',
+                                                  cache_discovery=False)
+        type_resp = compute.machineTypes().get(project=PROJECT, zone=ZONE,
+                machineType=MACHINE_TYPE).execute()
+        if type_resp:
+            tot_cpus = type_resp['guestCpus']
+            if tot_cpus > 1:
+                machine['cores']   = tot_cpus / 2
+                machine['threads'] = 2
+
+            # Because the actual memory on the host will be different than what
+            # is configured (e.g. kernel will take it). From experiments, about
+            # 16 MB per GB are used (plus about 400 MB buffer for the first
+            # couple of GB's. Using 30 MB to be safe.
+            gb = type_resp['memoryMb'] / 1024;
+            machine['memory'] = type_resp['memoryMb'] - (400 + (gb * 30))
+
+    except Exception, e:
+        print "Failed to get MachineType '%s' from google api (%s)" % (MACHINE_TYPE, str(e))
+
+    return machine
+
+#-- expand_machine_type
 
 def end_motd():
     f = open('/etc/motd', 'w')

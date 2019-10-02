@@ -13,9 +13,6 @@
 # limitations under the License.
 
 {% set networkName = env["deployment"] + "-network" %}
-# FIXME write to tenx config in startup grabbing the machine info
-{% set tenxAsmCores = 58 %} # 90% of cores
-{% set tenxAsmMem = 6.5 * tenxAsmCores %} # for highmem machines
 
 resources:
 - name: {{ networkName }}
@@ -96,5 +93,5 @@ resources:
             {{ imports["../startup-scripts/supernova.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"]) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.supernova.yaml"]|indent(12)|replace("@ASM_MEM@",tenxAsmMem])|replace("@ASM_CORES@",tenxAsmCores])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.supernova.yaml"]|indent(12)|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}
