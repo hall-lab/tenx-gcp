@@ -90,8 +90,8 @@ resources:
       items:
         - key: startup-script
           value: |
-            {{ imports["../startup-scripts/supernova.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"]) }}
+            {{ imports["../scripts/supernova/startup-script.py"]|indent(12)|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"]) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.supernova.yaml"]|indent(12)|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.supernova.yaml"]|indent(12)|replace("@SUPERNOVA_SOFTWARE_URL@",properties["supernova_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@MACHINE_TYPE@",properties["machine_type"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}

@@ -17,8 +17,9 @@ tests_require = [
 ]
 install_requires=[
     "click==7.0",
-    "pyyaml==5.1",
     "Jinja2>=2.10.1",
+    "pyyaml==5.1",
+    "tabulate",
 ]
 
 setup(
