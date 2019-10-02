@@ -35,8 +35,6 @@ def install_packages():
 	'openssl-devel',
         'python-devel',
         'python-pip',
-        'python-setuptool',
-        'PyYAML-3.10-11.el7.x86_64',
         'redhat-rpm-config',
 	'sssd-client',
 	'sudo',
@@ -44,34 +42,30 @@ def install_packages():
 	'unzip',
 	'vim',
         ]
+    cmd = ['yum', 'install', '-y'] + packages
+    print "RUNNING: {}".format(cmd)
+    subprocess.call(cmd)
 
-    while subprocess.call(['yum', 'install', '-y'] + packages):
-        print "Failed to install packages with yum. Trying again in 5 seconds"
-        time.sleep(5)
+    # Python deps
+    cmd = ["pip", "install", "--upgrade", "setuptools", "pyyaml"]
+    print "RUNNING: {}".format(cmd)
+    rv = subprocess.check_call(cmd)
 
-    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client','setuptools']
-    rv = subprocess.call(cmd)
-    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
+    # CRC
+    cmd = ["pip", "uninstall", "--yes", "crcmod"]
+    print "RUNNING: {}".format(cmd)
+    subprocess.call(cmd)
 
-    subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
-    rv = subprocess.call(['pip', 'install', '-U', 'crcmod'])
-    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
+    cmd = ["pip", "install", "-U", "crcmod"]
+    print "RUNNING: {}".format(cmd)
+    rv = subprocess.check_call(cmd)
 
-    # FROM GCP SLURM
-    # Force re-evaluation of site-packages so that namespace packages (such
-    # as google-auth) are importable. This is needed because we install the
-    # packages while this script is running and do not have the benefit of
-    # restarting the interpreter for it to do it's usual startup sequence to
-    # configure import magic.
-    #import site
-    #for path in [x for x in sys.path if 'site-packages' in x]:
-    #    site.addsitedir(path)
-    #import googleapiclient.discovery, yaml
-
+    # Timezone
     cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
-    rv = subprocess.call(cmd)
-    if rv != 0: raise Exception("Failed run: {}".format(' '.join(cmd)))
+    print "RUNNING: {}".format(cmd)
+    rv = subprocess.check_call(cmd)
 
+    # BOTO CFG - cannot have plugin defined
     subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
     subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/', '/etc/boto.cfg'])
 
