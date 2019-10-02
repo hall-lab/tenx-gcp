@@ -20,7 +20,7 @@ info:
 
 imports:
 - path: ../startup-scripts/supernova.py
-- path: ../config/tenx.yaml
+- path: ../config/tenx.supernova.yaml
 
 required:
 - disk_size_gb
