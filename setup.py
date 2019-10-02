@@ -31,7 +31,7 @@ setup(
     author_email='ebetler@wustl.edu',
     license=license,
     url='https://github.com/hall-lab/tenx-gcp.git',
-    installs_requires=installs_require,
+    install_requires=install_requires,
     entry_points='''
         [console_scripts]
         tenx=tenx.cli:cli
