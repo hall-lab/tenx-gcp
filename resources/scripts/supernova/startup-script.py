@@ -44,7 +44,9 @@ def install_packages():
         ]
     cmd = ['yum', 'install', '-y'] + packages
     print "RUNNING: {}".format(cmd)
-    subprocess.call(cmd)
+    while subprocess.call(cmd):
+        print "yum failed to install packages. Trying again in 5 seconds"
+        time.sleep(5)
 
     # Python deps
     cmd = ["pip", "install", "--upgrade", "setuptools", "pyyaml"]
