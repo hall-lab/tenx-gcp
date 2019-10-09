@@ -168,7 +168,7 @@ def add_tenx_config_file():
 
     machine_type = tenx_conf["TENX_MACHINE_TYPE"].split("-")
     machine_cores = int(machine_type[2])
-    machine_mem = machine_cores * 6.5 # highmem
+    machine_mem = int(machine_cores * 6.5) # highmem
     print "Machine cores: {}".format(machine_cores)
     print "Machine mem: {}".format(machine_mem)
     # Hold back 2 cores and 13 GB

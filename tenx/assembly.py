@@ -44,7 +44,7 @@ def run_assemble(asm):
 
     cmd = [
         "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.reads_directory()), "--uiport=18080", "--nodebugmem",
-        "--localcores={}".format(TenxApp.config['TENX_ASM_LOCALCORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_LOCALMEM']),
+        "--localcores={}".format(TenxApp.config['TENX_ASM_CORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_MEM']),
     ]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
