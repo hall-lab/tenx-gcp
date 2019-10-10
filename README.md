@@ -75,7 +75,7 @@ $ gcloud compute ssh supernova01-1
 ```
 Then, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
 ```
-[you@soupernova01-1 ~]$ tenx assembly pipeline ${SAMPLE_NAME} &> log &
+[you@soupernova01-1 ~]$ tenx asm pipeline ${SAMPLE_NAME} &> log &
 ```
 Make sure to logout out of the session, and not let it exit happen because of timeout. Logout, exit or <CNTRL-D> your SSH session.
 ```
