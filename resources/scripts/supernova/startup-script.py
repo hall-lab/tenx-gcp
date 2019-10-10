@@ -173,7 +173,7 @@ def add_tenx_config_file():
     print "Machine mem: {}".format(machine_mem)
     # Hold back 2 cores and 13 GB
     tenx_conf["TENX_ASM_CORES"] = machine_cores - 2
-    tenx_conf["TENX_ASM_MEM"] = machine_mem - (2 * 6.5)
+    tenx_conf["TENX_ASM_MEM"] = int(machine_mem - (2 * 6.5))
 
     with open(TENX_CONFIG_FILE, "w") as f:
         f.write( yaml.dump(tenx_conf) )
