@@ -6,8 +6,7 @@ def calculate_compute_metrics(run_dir):
     if not os.path.exists(run_dir):
         raise Exception("Cannot compute compute metrics! Run directory {} does not exist!".format(run_dir))
     os.chdir(run_dir)
-    paths = []
-    paths = filter(lambda f:"_CS" in f, os.listdir("."))
+    paths = list(filter(lambda f:"_CS" in f, os.listdir(".")))
     if not len(paths) == 1:
         raise Exception("Failed to find log path ending in '_CS'.")
     if not os.path.isdir(paths[0]):

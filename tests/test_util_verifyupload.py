@@ -54,13 +54,13 @@ class VerifyUploadTest(unittest.TestCase):
     @patch('subprocess.check_output')
     def test2_empty(self, test_patch):
         test_patch.return_value = self.gsutil_success_output
-        with self.assertRaisesRegexp(Exception, "Local directory does not contain any files!"):
+        with self.assertRaisesRegex(Exception, "Local directory does not contain any files!"):
             util.verify_upload(ldir=os.path.join("tests", "test_util_verifyupload", "empty"), rurl="gs://data")
 
     @patch('subprocess.check_output')
     def test3_missing(self, test_patch):
         test_patch.return_value = self.gsutil_missing_output
-        with self.assertRaisesRegexp(Exception, "Remote is missing these files:\ndir2/file4"):
+        with self.assertRaisesRegex(Exception, "Remote is missing these files:\ndir2/file4"):
             util.verify_upload(ldir=self.success_dir, rurl="gs://data")
 
     @patch('subprocess.check_output')

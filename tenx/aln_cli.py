@@ -1,12 +1,16 @@
 import click, os, socket, sys
 
-import tenx.app as app
-from tenx.version import __version__
-from tenx import app, alignment, reads, reference, report, util
-from alignment import TenxAlignment
-from reads import TenxReads
-from reference import TenxReference
-import notifications
+from tenx.app import TenxApp
+import tenx.alignment as alignment
+import tenx.notifications as notifications
+import tenx.reads as reads
+import tenx.reference as reference
+import tenx.report as report
+import tenx.util as util
+
+from tenx.alignment import TenxAlignment
+from tenx.reads import TenxReads
+from tenx.reference import TenxReference
 
 # ALIGNMENT
 # - align
@@ -27,7 +31,7 @@ def aln_align(sample_name, ref_name):
     """
     Create alignments with longranger.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReads(sample_name=sample_name), TenxReference(name=ref_name))
 tenx_aln_cli.add_command(aln_align, name="align")
 
@@ -40,7 +44,7 @@ def aln_pipeline(sample_name, ref_name):
 
     Process includes: downloading reads & reference, running longranger, and then uploading the alignments to the cloud.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run longranger wgs pipeline for {}".format(sample_name))
     notifications.slack("{} ALN START {}".format(sample_name, socket.gethostname()))
     try:
@@ -71,7 +75,7 @@ def aln_upload(sample_name):
     """
     Upload an assembly from local disk to cloud storage.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
 tenx_aln_cli.add_command(aln_upload, name="upload")
 

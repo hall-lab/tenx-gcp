@@ -1,6 +1,6 @@
 import requests
 
-from app import TenxApp
+from tenx.app import TenxApp
 
 def slack(message):
     url = TenxApp.config.get('TENX_NOTIFICATIONS_SLACK')

@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 import glob, os, subprocess, sys
-from app import TenxApp
+from tenx.app import TenxApp
 
 class TenxReads():
 

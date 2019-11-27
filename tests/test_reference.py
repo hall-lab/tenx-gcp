@@ -1,4 +1,4 @@
-import gzip, os, shutil, StringIO, subprocess, sys, tarfile, tempfile, unittest
+import gzip, io, os, shutil, subprocess, sys, tarfile, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -32,10 +32,10 @@ class TenxAppTest(unittest.TestCase):
         r = reference.TenxReference(name='refdata-GRCh38-2.1.0')
         self.assertIsNotNone(r)
 
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
-        with self.assertRaisesRegexp(Exception, 'Failed to download reference'):
+        with self.assertRaisesRegex(Exception, 'Failed to download reference'):
             reference.download(r)
         self.assertTrue(os.path.exists(r.references_directory()))
         sys.stderr = sys.__stderr__
@@ -51,7 +51,7 @@ class TenxAppTest(unittest.TestCase):
         os.makedirs( os.path.dirname(genome_fasta_fn) )
         with open(genome_fasta_fn, "w") as f: f.write(">SEQ1\nATGC")
 
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         reference.download(r)

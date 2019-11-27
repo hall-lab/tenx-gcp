@@ -1,4 +1,4 @@
-import os, shutil, StringIO, subprocess, sys, tempfile, unittest
+import io, os, shutil, subprocess, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -28,10 +28,10 @@ class TenxAppTest(unittest.TestCase):
         r = reads.TenxReads(sample_name='TESTER')
         self.assertIsNotNone(r)
 
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
-        with self.assertRaisesRegexp(Exception, 'Failed to download read fastqs'):
+        with self.assertRaisesRegex(Exception, 'Failed to download read fastqs'):
             reads.download(r)
         self.assertTrue(os.path.exists(r.directory()))
 
@@ -47,7 +47,7 @@ class TenxAppTest(unittest.TestCase):
         os.makedirs(r.directory())
         with open(os.path.join(r.directory(), 'read1.fastq'), 'w') as f: f.write("FASTQ\n") # a fastq file
 
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         reads.download(r)

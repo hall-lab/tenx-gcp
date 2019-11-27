@@ -1,4 +1,4 @@
-import os, re, StringIO, sys, tempfile, unittest
+import io, os, re, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -12,12 +12,12 @@ class TenxJobTest(unittest.TestCase):
 
     def test2_template(self):
         templates_p = compute.Job.templates_path()
-        self.assertRegexpMatches(templates_p, re.compile("tenx\/job\-templates"))
+        self.assertRegex(templates_p, re.compile("tenx\/job\-templates"))
 
         job = compute.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
         self.assertEqual(job.template_bn(), "aln-pipeline.slurm.sh")
-        self.assertRegexpMatches(job.template_fn(), re.compile("aln-pipeline.slurm.sh$"))
+        self.assertRegex(job.template_fn(), re.compile("aln-pipeline.slurm.sh$"))
 
         template = job.load_template()
         self.assertIsNotNone(template)
@@ -43,13 +43,13 @@ class TenxJobTest(unittest.TestCase):
         script_f.flush()
         script_f.seek(0, 0)
         script = script_f.read()
-        self.assertEqual(script, template)
-
+        self.assertMultiLineEqual(script.decode(), template)
+        
         check_call_patch.return_value = '0'
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
         job.launch_script(params={"SAMPLE_NAME": "__SAMPLE__", "REF_NAME": "__REF__"})
-        self.assertRegexpMatches(err.getvalue(), re.compile("RUNNING: sbatch \/tmp"))
+        self.assertRegex(err.getvalue(), re.compile("RUNNING: sbatch \/tmp"))
         sys.stderr = sys.__stderr__
 
 # -- TenxJobTest
