@@ -19,7 +19,7 @@ install_requires=[
     "click==7.0",
     "Jinja2>=2.10.1",
     "pyyaml==5.1",
-    "requests==2.7.0",
+    "requests>=2.20.0"
     "SQLAlchemy>=1.3.10",
     "tabulate",
     "yoyo-migrations>=6.1.0",

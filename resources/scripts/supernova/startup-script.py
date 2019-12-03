@@ -49,7 +49,7 @@ def install_packages():
         time.sleep(5)
 
     # Python deps
-    pip.main(["install", "--prefix=/usr", "pyyaml", "requests"])
+    pip.main(["install", "--prefix=/usr", "pyyaml", "requests>=2.20.0"])
 
     # CRC
     pip.main(["uninstall", "--yes", "crcmod"])
