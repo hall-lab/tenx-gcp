@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 import glob, os, shutil, stat, sys, re, requests, subprocess, time
 
