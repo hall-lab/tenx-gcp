@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
-import glob, os, shutil, stat, sys, re, requests, subprocess, time
+import glob, importlib, os, pip, shutil, re, stat, sys, subprocess, tempfile, time
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
@@ -33,9 +33,8 @@ def install_packages():
 	'make',
 	'openssl',
 	'openssl-devel',
-        'python-devel',
-        'python-pip',
-        'python3',
+        'python3-devel',
+        'python3-setuptools',
         'redhat-rpm-config',
 	'sssd-client',
 	'sudo',
@@ -50,21 +49,11 @@ def install_packages():
         time.sleep(5)
 
     # Python deps
-    cmd = ["pip", "install", "--upgrade", "pyyaml", "setuptools"]
-    print("RUNNING: {}".format(cmd))
-    subprocess.check_call(cmd)
-    cmd = ["pip3", "install", "--upgrade", "setuptools", "wheel"]
-    print("RUNNING: {}".format(cmd))
-    subprocess.check_call(cmd)
+    pip.main(["install", "--prefix=/usr", "pyyaml", "requests"])
 
     # CRC
-    cmd = ["pip", "uninstall", "--yes", "crcmod"]
-    print("RUNNING: {}".format(cmd))
-    subprocess.call(cmd)
-
-    cmd = ["pip", "install", "-U", "crcmod"]
-    print("RUNNING: {}".format(cmd))
-    rv = subprocess.check_call(cmd)
+    pip.main(["uninstall", "--yes", "crcmod"])
+    pip.main(["install", "--no-cache-dir", "-U", "crcmod"])
 
     # Timezone
     cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
@@ -101,7 +90,8 @@ def install_supernova():
     os.chdir(APPS_DIR)
 
     print("Download supernova from " + SUPERNOVA_SOFTWARE_URL)
-    subprocess.call(['gsutil', 'ls', '-l', SUPERNOVA_SOFTWARE_URL]) # check if exists
+    cloudsdk_env = { "CLOUDSDK_PYTHON": sys.executable, "CLOUDSDK_GSUTIL_PYTHON": sys.executable }
+    subprocess.call(['gsutil', 'ls', '-l', SUPERNOVA_SOFTWARE_URL], env=cloudsdk_env) # check if exists
     while subprocess.call(['gsutil', '-m', 'cp', SUPERNOVA_SOFTWARE_URL, '.']):
         print("Failed to download supernova! Trying again in 5 seconds...")
         time.sleep (5)
@@ -132,8 +122,7 @@ def install_tenx_cli():
     print("Installing tenx cli...")
 
     os.chdir('/tmp')
-    #rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
-    rv = subprocess.call(["git", "clone", "--single-branch", "--branch", "python3", "https://github.com/hall-lab/tenx-gcp.git"])
+    rv = subprocess.call(['git', 'clone', 'https://github.com/hall-lab/tenx-gcp.git'])
     if rv != 0: raise Exception("Failed to git clone the tenx-gcp repo.")
 
     os.chdir('tenx-gcp')
@@ -159,6 +148,8 @@ def add_supernova_profile():
         f.write("source /apps/supernova/sourceme.bash\n")
         f.write("export LANG=en_US.utf-8\n")
         f.write("export LC_ALL=en_US.utf-8\n")
+        f.write("export CLOUDSDK_PYTHON={}".format(sys.executable))
+        f.write("export CLOUDSDK_GSUTIL_PYTHON={}".format(sys.executable))
 
 #-- add_supernova_profile
 
@@ -167,8 +158,8 @@ def add_tenx_config_file():
         print("Already added tenx config at {}...SKIPPING".format(TENX_CONFIG_FILE))
         return
     print("Adding {} ...".format(TENX_CONFIG_FILE))
-    import yaml
 
+    import requests, yaml
     url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
     print("GET {}".format(url))
     response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
