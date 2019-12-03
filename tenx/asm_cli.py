@@ -1,6 +1,7 @@
 import click, os, socket, sys
 
 from tenx.app import TenxApp
+import tenx.assembly as assembly
 from tenx.compute import Job
 import tenx.notifications as notifications
 import tenx.reads as reads
@@ -8,12 +9,9 @@ import tenx.reference as reference
 import tenx.report as report
 import tenx.util as util
 
-from tenx.assembly import TenxAssembly
-from tenx.reads import TenxReads
-import tenx.notifications as notifications
-
 # ASSEMBLY
 # - assemble (run supernova only command)
+# - download (run supernova only command)
 # - mkoutput (runs mkputput on an assembly
 # - pipeline (run-supernova - full pipeline)
 # - upload (sends assembly to object store)
@@ -34,6 +32,10 @@ def asm_assemble(sample_name):
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
 tenx_asm_cli.add_command(asm_assemble, name="assemble")
+
+# [download]
+from tenx.asm_download import asm_download_cmd
+tenx_asm_cli.add_command(asm_download_cmd, name="download")
 
 @click.command(short_help="run mkoutput on an assembly")
 @click.argument('sample-name', type=click.STRING)
@@ -57,7 +59,7 @@ def asm_pipeline(sample_name):
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
     notifications.slack("{} START {}".format(sample_name, socket.gethostname()))
     try:
-        reads.download(TenxReads(sample_name=sample_name))
+        reads.download(reads.TenxReads(sample_name=sample_name))
         asm = assembly.TenxAssembly(sample_name=sample_name)
         assembly.run_assemble(asm)
         assembly.run_mkoutput(asm)

@@ -3,7 +3,7 @@ import subprocess, unittest
 class TenxAsmCliTest(unittest.TestCase):
 
     # ASSEMBLY
-    def test2_tenx_assembly(self):
+    def test1_tenx_assembly(self):
         rv = subprocess.call(['tenx', 'asm'])
         self.assertEqual(rv, 0)
 
@@ -11,6 +11,12 @@ class TenxAsmCliTest(unittest.TestCase):
         rv = subprocess.call(['tenx', 'asm', 'assemble', '--help'])
         self.assertEqual(rv, 0)
         rv = subprocess.call(['tenx', 'asm', 'assemble'])
+        self.assertEqual(rv, 2)
+
+    def test2_tenx_assembly_download(self):
+        rv = subprocess.call(['tenx', 'asm', 'download', '--help'])
+        self.assertEqual(rv, 0)
+        rv = subprocess.call(['tenx', 'asm', 'download'])
         self.assertEqual(rv, 2)
 
     def test2_tenx_assembly_pipeline(self):
