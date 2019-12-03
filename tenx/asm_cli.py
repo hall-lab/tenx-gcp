@@ -1,11 +1,16 @@
 import click, os, socket, sys
 
-import tenx.app as app
-from tenx import app, assembly, reads, report, util
-from .assembly import TenxAssembly
-from .reads import TenxReads
-import notifications
-from compute import Job
+from tenx.app import TenxApp
+from tenx.compute import Job
+import tenx.notifications as notifications
+import tenx.reads as reads
+import tenx.reference as reference
+import tenx.report as report
+import tenx.util as util
+
+from tenx.assembly import TenxAssembly
+from tenx.reads import TenxReads
+import tenx.notifications as notifications
 
 # ASSEMBLY
 # - assemble (run supernova only command)
@@ -26,7 +31,7 @@ def asm_assemble(sample_name):
     """
     Create an assembly with supernova.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
 tenx_asm_cli.add_command(asm_assemble, name="assemble")
 
@@ -36,7 +41,7 @@ def asm_mkoutput(sample_name):
     """
     Run mkoutput on a supernova assembly.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
 tenx_asm_cli.add_command(asm_mkoutput, name="mkoutput")
 
@@ -48,7 +53,7 @@ def asm_pipeline(sample_name):
 
     Process includes: downloading reads, running supernova, mkoutput, and then uploading the assembly.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
     notifications.slack("{} START {}".format(sample_name, socket.gethostname()))
     try:
@@ -77,7 +82,7 @@ def asm_upload(sample_name):
     """
     Upload an assembly from local disk to cloud storage.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     assembly.run_upload(assembly.TenxAssembly(sample_name=sample_name))
 tenx_asm_cli.add_command(asm_upload, name="upload")
 

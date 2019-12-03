@@ -1,7 +1,7 @@
 import click
 
-from tenx import app, reads
-from reads import TenxReads
+from tenx.app import TenxApp
+from tenx.reads import TenxReads
 
 # READS
 # - download (fetch reads from the cloud)
@@ -19,8 +19,8 @@ def reads_download(sample_name):
     """
     Download reads from cloud storage to local disk.
     """
-    assert bool(app.TenxApp.config) is True, "Must provide tenx yaml config file!"
-    reads.download(TenxReads(sample_name=sample_name))
+    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
+    tenx.reads.download(TenxReads(sample_name=sample_name))
 tenx_reads_cli.add_command(reads_download, name="download")
 
 #-- READS

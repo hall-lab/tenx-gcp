@@ -1,7 +1,7 @@
 import glob, os, shutil, subprocess, sys, tempfile
 
-from app import TenxApp
-import util
+from tenx.app import TenxApp
+import tenx.util as util
 
 class TenxAssembly():
 

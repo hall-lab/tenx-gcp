@@ -19,7 +19,7 @@ class NotificationsTest(unittest.TestCase):
         TenxApp.config['TENX_NOTIFICATIONS_SLACK'] = "https://slack.com"
         notok_response = NotificationsTest.Response(ok=False)
         test_patch.return_value = notok_response
-        with self.assertRaisesRegexp(Exception, 'Slack POST failed for {}'.format(TenxApp.config['TENX_NOTIFICATIONS_SLACK'])):
+        with self.assertRaisesRegex(Exception, 'Slack POST failed for {}'.format(TenxApp.config['TENX_NOTIFICATIONS_SLACK'])):
             notifications.slack(message="Hello World!")
 
         ok_response = NotificationsTest.Response(ok=True)

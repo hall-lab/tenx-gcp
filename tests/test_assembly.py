@@ -1,23 +1,23 @@
-import os, shutil, StringIO, subprocess, sys, tempfile, unittest
+import io, os, subprocess, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
 from tenx.app import TenxApp
-from tenx import assembly
+import tenx.assembly as assembly
 
 class TenxAssemblyTest(unittest.TestCase):
 
     def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
-        os.chdir(self.tempdir)
+        self.temp_d = tempfile.TemporaryDirectory()
+        os.chdir(self.temp_d.name)
         if TenxApp.config is None: TenxApp()
-        TenxApp.config['TENX_DATA_PATH'] = self.tempdir
+        TenxApp.config['TENX_DATA_PATH'] = self.temp_d.name
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
-        TenxApp.config['TENX_ASM_LOCALCORES'] = "2"
-        TenxApp.config['TENX_ASM_LOCALMEM'] = "2"
+        TenxApp.config['TENX_ASM_CORES'] = "2"
+        TenxApp.config['TENX_ASM_MEM'] = "2"
 
     def tearDown(self):
-        shutil.rmtree(self.tempdir)
+        self.temp_d.cleanup()
         TenxApp.config = None
 
     def test10_assembly(self):
@@ -37,11 +37,11 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertTrue(asm.is_successful())
 
     def test21_run_assemble_fails_without_supernova(self):
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with self.assertRaisesRegexp(Exception, "No such file or directory"):
+        with self.assertRaisesRegex(Exception, "No such file or directory"):
             assembly.run_assemble(asm)
         self.assertFalse(os.path.exists(asm.sample_directory()))
 
@@ -52,11 +52,11 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test22_run_assemble_fails_when_no_outs_assembly_dir(self, check_call_patch):
         check_call_patch.return_value = '0'
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with self.assertRaisesRegexp(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_directory())):
+        with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_directory())):
             assembly.run_assemble(asm)
         self.assertTrue(os.path.exists(asm.sample_directory()))
 
@@ -67,7 +67,7 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test23_run_assemble_success(self, check_call_patch):
         check_call_patch.return_value = '0'
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
@@ -82,11 +82,11 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test31_run_mkoutput_fails_with_incomplete_assembly(self, check_call_patch):
         check_call_patch.return_value = '0'
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with self.assertRaisesRegexp(Exception, "Assembly is not complete! Cannot run mkoutput!"):
+        with self.assertRaisesRegex(Exception, "Assembly is not complete! Cannot run mkoutput!"):
             assembly.run_mkoutput(asm)
         expected_err = "Running mkoutput for TESTER...\n"
         self.assertEqual(err.getvalue(), expected_err)
@@ -95,13 +95,13 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test32_run_mkoutput_fails_without_all_fasta_files(self, check_call_patch):
         check_call_patch.return_value = '0'
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
         outs_asm_d = asm.outs_assembly_directory()
         os.makedirs(outs_asm_d)
-        with self.assertRaisesRegexp(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_directory() + " after running mkoutput, but found 0"):
+        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_directory() + " after running mkoutput, but found 0"):
             assembly.run_mkoutput(asm)
         expected_err = "Running mkoutput for TESTER...\nChecking if supernova is in PATH...\nRUNNING: supernova --help\nEntering {ASM_D}/mkoutput\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.raw --style=raw\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.megabubbles --style=megabubbles\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.pseudohap2 --style=pseudohap2\n".format(ASM_D=asm.directory())
         self.assertEqual(err.getvalue(), expected_err)
@@ -110,7 +110,7 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test33_run_mkoutput_success(self, check_call_patch):
         check_call_patch.return_value = '0'
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
@@ -135,10 +135,10 @@ class TenxAssemblyTest(unittest.TestCase):
         pwd = os.getcwd()
         asm = assembly.TenxAssembly(sample_name='TESTER')
 
-        with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful assembly"):
+        with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful assembly"):
             assembly.run_upload(asm)
 
-	err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
         outs_asm_d = asm.outs_assembly_directory()
         os.makedirs(outs_asm_d)

@@ -1,4 +1,4 @@
-import os, shutil, sys, tempfile, unittest, yaml
+import os, sys, tempfile, unittest, yaml
 from mock import patch
 
 from .context import tenx
@@ -15,9 +15,8 @@ class TenxAppTest1(unittest.TestCase):
     def test1_init_fails(self):
         if TenxApp.config is None: TenxApp()
         TenxApp.config = None
-        with self.assertRaises(IOError) as cm:
+        with self.assertRaisesRegex(IOError, "No such file or directory"):
             TenxApp("/tenx.yaml")
-        self.assertTrue("No such file or directory" in cm.exception)
 
     def test2_init(self):
         # init w/o config
@@ -34,7 +33,7 @@ class TenxAppTest1(unittest.TestCase):
                 "TENX_SCRIPTS_PATH": "tests/test_app",
                 "TENX_NOTIFICATIONS_SLACK": "https://slack.com",
                 }
-        conf_f.write( yaml.dump(config) )
+        conf_f.write( yaml.dump(config).encode() )
         conf_f.flush()
 
         tenxapp = TenxApp(conf_f.name)
@@ -45,20 +44,20 @@ class TenxAppTest2(unittest.TestCase):
 
     def setUp(self):
         TenxApp()
-        self.scripts_path = tempfile.mkdtemp()
-        with open(os.path.join(self.scripts_path, "foo.jinja"), "w") as f:
+        self.scripts_path = tempfile.TemporaryDirectory()
+        with open(os.path.join(self.scripts_path.name, "foo.jinja"), "w") as f:
             f.write("FOO JINJA TEMPLATE")
 
     def tearDown(self):
+        self.scripts_path.cleanup()
         TenxApp.config = None
-        shutil.rmtree(self.scripts_path)
 
     def test1_script_template(self):
-        with self.assertRaisesRegexp(Exception, "Scripts directory \(TENX_SCRIPTS_PATH\) is not set in tenx config\!"):
+        with self.assertRaisesRegex(Exception, "Scripts directory \(TENX_SCRIPTS_PATH\) is not set in tenx config\!"):
             TenxApp.load_script_template('blah')
 
-        TenxApp.config['TENX_SCRIPTS_PATH'] = self.scripts_path
-        with self.assertRaisesRegexp(Exception, "Failed to find script template file: {}". format(os.path.join(TenxApp.config['TENX_SCRIPTS_PATH'], 'blah.jinja'))):
+        TenxApp.config['TENX_SCRIPTS_PATH'] = self.scripts_path.name
+        with self.assertRaisesRegex(Exception, "Failed to find script template file: {}". format(os.path.join(TenxApp.config['TENX_SCRIPTS_PATH'], 'blah.jinja'))):
             TenxApp.load_script_template('blah')
 
         script_template = TenxApp.load_script_template('foo')

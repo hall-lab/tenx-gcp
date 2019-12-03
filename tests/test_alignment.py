@@ -1,4 +1,4 @@
-import os, StringIO, shutil, subprocess, sys, tempfile, unittest
+import io, os, shutil, subprocess, sys, tempfile, unittest
 from mock import patch
 
 from .context import tenx
@@ -11,9 +11,9 @@ from tenx.reference import TenxReference
 class TenxAlignmentTest(unittest.TestCase):
 
     def setUp(self):
-        self.tempdir = tempfile.mkdtemp()
+        self.temp_d = tempfile.TemporaryDirectory()
         if TenxApp.config is None: TenxApp()
-        TenxApp.config['TENX_DATA_PATH'] = self.tempdir
+        TenxApp.config['TENX_DATA_PATH'] = self.temp_d.name
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
         TenxApp.config['TENX_REMOTE_REFS_URL'] = 'gs://data/references'
         TenxApp.config['TENX_ALN_MODE'] = 'local'
@@ -22,7 +22,7 @@ class TenxAlignmentTest(unittest.TestCase):
         TenxApp.config['TENX_ALN_VCMODE'] = 'freebayes'
  
     def tearDown(self):
-        shutil.rmtree(self.tempdir)
+        self.temp_d.cleanup()
         TenxApp.config = None
 
     def test10_alignment(self):
@@ -45,7 +45,7 @@ class TenxAlignmentTest(unittest.TestCase):
     @patch('subprocess.check_call')
     def test2_run_align(self, test_patch):
         test_patch.return_value = '0'
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         aln = TenxAlignment(sample_name='TEST_SUCCESS')
@@ -62,10 +62,10 @@ class TenxAlignmentTest(unittest.TestCase):
     @patch('subprocess.check_call')
     @patch('tenx.util.verify_upload')
     def test4_run_upload(self, upload_patch, verify_patch):
-        sys.stderr = StringIO.StringIO()
+        sys.stderr = io.StringIO()
         aln = TenxAlignment(sample_name='TEST_FAIL')
         os.makedirs( os.path.join(aln.directory(), "outs") )
-        with self.assertRaisesRegexp(Exception, "Refusing to upload an unsuccessful alignment"):
+        with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful alignment"):
             alignment.run_upload(aln)
 
         upload_patch.return_value = "0"
@@ -75,7 +75,7 @@ class TenxAlignmentTest(unittest.TestCase):
         os.makedirs( os.path.join(aln.directory(), "outs") )
         with open(os.path.join(aln.directory(), "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
 
-        err = StringIO.StringIO()
+        err = io.StringIO()
         sys.stderr = err
 
         alignment.run_upload(aln)
