@@ -14,21 +14,21 @@ class VerifyUploadTest(unittest.TestCase):
         "objects,": "TOTAL:",
     }
 
-    gsutil_success_output = """
+    gsutil_success_output = bytes("""
 12  2019-02-19T21:50:30Z  gs://data/file1
 12  2019-01-24T00:20:19Z  gs://data/file2
 12  2019-03-07T20:27:34Z  gs://data/dir1/file3
 12  2018-10-02T22:13:33Z  gs://data/dir2/file4
            TOTAL: 4 objects, 3102799379 bytes (48 B)
 
-    """
+    """, "utf-8")
 
-    gsutil_missing_output = """
+    gsutil_missing_output = bytes("""
 12  2019-02-19T21:50:30Z  gs://data/file1
 12  2019-01-24T00:20:19Z  gs://data/file2
 12  2019-03-07T20:27:34Z  gs://data/dir1/file3
            TOTAL: 3 objects, 3102799379 bytes (48 B)
-"""
+""", "utf-8")
 
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()

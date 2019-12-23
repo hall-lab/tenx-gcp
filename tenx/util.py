@@ -66,7 +66,7 @@ def build_remote(rurl):
     regex = re.compile(r"" + rurl + r"")
     remote = {}
     out = subprocess.check_output(['gsutil', 'ls', '-l', rurl + '**'])
-    for l in out.split("\n"):
+    for l in out.decode().split("\n"):
         t = l.split() # no arg splits on spaces
         if len(t) == 0: continue # blank line
         replaced = re.sub(regex, '', t[2])
