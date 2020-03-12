@@ -26,15 +26,15 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertEqual(asm.directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly'))
         self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
         self.assertEqual(asm.mkoutput_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'mkoutput'))
-        self.assertEqual(asm.outs_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs'))
-        self.assertEqual(asm.outs_assembly_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
-        self.assertEqual(asm.outs_assembly_stats_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
+        self.assertEqual(asm.outs_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs'))
+        self.assertEqual(asm.outs_assembly_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
+        self.assertEqual(asm.outs_assembly_stats_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
         self.assertEqual(asm.mkoutput_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
-        self.assertEqual(asm.outs_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
-        self.assertEqual(asm.outs_assembly_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))
-        self.assertEqual(asm.outs_assembly_stats_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
+        self.assertEqual(asm.outs_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
+        self.assertEqual(asm.outs_assembly_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))
+        self.assertEqual(asm.outs_assembly_stats_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
     def test11_is_successful(self):
         asm = assembly.TenxAssembly(sample_name='TESTER')
@@ -64,7 +64,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_directory())):
+        with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_path())):
             assembly.run_assemble(asm)
         self.assertTrue(os.path.exists(asm.sample_directory()))
 
@@ -79,7 +79,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        os.makedirs(asm.outs_assembly_directory())
+        os.makedirs(asm.outs_assembly_path())
         assembly.run_assemble(asm)
         self.assertTrue(os.path.exists(asm.sample_directory()))
 
@@ -107,7 +107,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
         with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_path() + " after running mkoutput, but found 0"):
             assembly.run_mkoutput(asm)
@@ -122,7 +122,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
         mkoutput_d = asm.mkoutput_path()
         os.makedirs(mkoutput_d)
@@ -148,7 +148,7 @@ class TenxAssemblyTest(unittest.TestCase):
 
         err = io.StringIO()
         sys.stderr = err
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
 
         assembly.run_upload(asm)

@@ -20,17 +20,17 @@ class TenxAssembly():
     def reads_directory(self):
         return os.path.join(self.sample_directory(), 'reads')
 
-    def outs_directory(self, remote=False):
+    def outs_path(self, remote=False):
         if not remote:
             return os.path.join(self.directory(), 'outs')
         else:
             return os.path.join(self.remote_url(), 'outs')
 
-    def outs_assembly_directory(self, remote=False):
-        return os.path.join(self.outs_directory(remote=remote), 'assembly')
+    def outs_assembly_path(self, remote=False):
+        return os.path.join(self.outs_path(remote=remote), 'assembly')
 
-    def outs_assembly_stats_directory(self, remote=False):
-        return os.path.join(self.outs_assembly_directory(remote=remote), 'stats')
+    def outs_assembly_stats_path(self, remote=False):
+        return os.path.join(self.outs_assembly_path(remote=remote), 'stats')
 
     def assembler_cs_directory(self, remote=False):
         if not remote:
@@ -45,7 +45,7 @@ class TenxAssembly():
             return os.path.join(self.remote_url(), 'mkoutput')
 
     def is_successful(self): # TODO make more robust
-        return os.path.exists(self.outs_assembly_directory())
+        return os.path.exists(self.outs_assembly_path())
 
 #-- TenxAssembly
 
@@ -68,7 +68,7 @@ def run_assemble(asm):
     subprocess.check_call(cmd)
 
     os.chdir(pwd)
-    if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_directory()))
+    if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_path()))
 
 #-- assemble
 
@@ -90,7 +90,7 @@ def run_mkoutput(asm):
 
     cmd_template = "supernova mkoutput --asmdir={OUTS_ASM_D} --outprefix={SAMPLE_NAME}.{STYLE} --style={STYLE}"
     for style in ("raw", "megabubbles", "pseudohap2"):
-        cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_directory(), SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
+        cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_path(), SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
