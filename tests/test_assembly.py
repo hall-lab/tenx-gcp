@@ -25,13 +25,13 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertEqual(asm.sample_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
         self.assertEqual(asm.directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly'))
         self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
-        self.assertEqual(asm.mkoutput_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'mkoutput'))
+        self.assertEqual(asm.mkoutput_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'mkoutput'))
         self.assertEqual(asm.outs_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs'))
         self.assertEqual(asm.outs_assembly_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.outs_assembly_stats_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
-        self.assertEqual(asm.mkoutput_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
+        self.assertEqual(asm.mkoutput_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
         self.assertEqual(asm.outs_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
         self.assertEqual(asm.outs_assembly_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.outs_assembly_stats_directory(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
@@ -109,7 +109,7 @@ class TenxAssemblyTest(unittest.TestCase):
         asm = assembly.TenxAssembly(sample_name='TESTER')
         outs_asm_d = asm.outs_assembly_directory()
         os.makedirs(outs_asm_d)
-        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_directory() + " after running mkoutput, but found 0"):
+        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_path() + " after running mkoutput, but found 0"):
             assembly.run_mkoutput(asm)
         expected_err = "Running mkoutput for TESTER...\nChecking if supernova is in PATH...\nRUNNING: supernova --help\nEntering {ASM_D}/mkoutput\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.raw --style=raw\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.megabubbles --style=megabubbles\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.pseudohap2 --style=pseudohap2\n".format(ASM_D=asm.directory())
         self.assertEqual(err.getvalue(), expected_err)
@@ -124,7 +124,7 @@ class TenxAssemblyTest(unittest.TestCase):
         asm = assembly.TenxAssembly(sample_name='TESTER')
         outs_asm_d = asm.outs_assembly_directory()
         os.makedirs(outs_asm_d)
-        mkoutput_d = asm.mkoutput_directory()
+        mkoutput_d = asm.mkoutput_path()
         os.makedirs(mkoutput_d)
         for n in range(4):
             with open(os.path.join(mkoutput_d, "{}.fasta.gz".format(n)), "w") as f:

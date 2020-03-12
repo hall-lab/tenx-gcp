@@ -38,7 +38,7 @@ class TenxAssembly():
         else:
             return os.path.join(self.remote_url(), 'ASSEMBLER_CS')
 
-    def mkoutput_directory(self, remote=False):
+    def mkoutput_path(self, remote=False):
         if not remote:
             return os.path.join(self.directory(), 'mkoutput')
         else:
@@ -81,7 +81,7 @@ def run_mkoutput(asm):
     sys.stderr.write("Checking if supernova is in PATH...\nRUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
-    mkoutput_d = asm.mkoutput_directory()
+    mkoutput_d = asm.mkoutput_path()
     sys.stderr.write("Entering {}\n".format(mkoutput_d))
     if not os.path.exists(mkoutput_d):
         os.makedirs(mkoutput_d)
@@ -94,10 +94,10 @@ def run_mkoutput(asm):
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
-    fastas = glob.glob( os.path.join(asm.mkoutput_directory(), '*fasta.gz') )
+    fastas = glob.glob( os.path.join(asm.mkoutput_path(), '*fasta.gz') )
     os.chdir(pwd)
     if len(fastas) != 4:
-        raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but found {}.".format(asm.mkoutput_directory(), len(fastas)))
+        raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but found {}.".format(asm.mkoutput_path(), len(fastas)))
 
 #-- run_mkoutput
 
