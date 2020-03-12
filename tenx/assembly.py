@@ -17,14 +17,32 @@ class TenxAssembly():
     def directory(self):
         return os.path.join(self.sample_directory(), 'assembly')
 
-    def outs_assembly_directory(self):
-        return os.path.join(self.directory(), 'outs', 'assembly')
-
     def reads_directory(self):
         return os.path.join(self.sample_directory(), 'reads')
 
-    def mkoutput_directory(self):
-        return os.path.join(self.directory(), 'mkoutput')
+    def outs_directory(self, remote=False):
+        if not remote:
+            return os.path.join(self.directory(), 'outs')
+        else:
+            return os.path.join(self.remote_url(), 'outs')
+
+    def outs_assembly_directory(self, remote=False):
+        return os.path.join(self.outs_directory(remote=remote), 'assembly')
+
+    def outs_assembly_stats_directory(self, remote=False):
+        return os.path.join(self.outs_assembly_directory(remote=remote), 'stats')
+
+    def assembler_cs_directory(self, remote=False):
+        if not remote:
+            return os.path.join(self.directory(), 'ASSEMBLER_CS')
+        else:
+            return os.path.join(self.remote_url(), 'ASSEMBLER_CS')
+
+    def mkoutput_directory(self, remote=False):
+        if not remote:
+            return os.path.join(self.directory(), 'mkoutput')
+        else:
+            return os.path.join(self.remote_url(), 'mkoutput')
 
     def is_successful(self): # TODO make more robust
         return os.path.exists(self.outs_assembly_directory())
