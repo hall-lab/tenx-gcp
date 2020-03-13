@@ -111,14 +111,19 @@ def run_rm_asm_files(asm):
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
-    # check gcloud
-    #if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
+    sys.stderr.write("Checking mkfastq files exist.\n")
+    cmd = ["gsutil", "ls", os.path.join(asm.mkoutput_path(remote=True), "*fasta.gz")]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+
+    out = subprocess.check_output(cmd)
+    if len(out.decode().split(".fasta.gz\n")) != 5: # 4 files plus blnk after last
+        raise Exception("Failed to find 4 mkoutput fasta files. Refusing to remove post assembly files! {}".format(out.decode().split(".fasta.gz")))
 
     assembler_cs_path = asm.assembler_cs_path(remote=True)
     sys.stderr.write("Removing ASSEMBLER_CS logs path.\n")
     cmd = ["gsutil", "rm", "-r", assembler_cs_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.call(cmd) # ignore return
+    subprocess.call(cmd) # ignore return should be removed
 
     outs_assembly_stats_path = asm.outs_assembly_stats_path(remote=True)
     outs_path = asm.outs_path(remote=True)
@@ -131,7 +136,7 @@ def run_rm_asm_files(asm):
     sys.stderr.write("Removing outs / assembly path\n")
     cmd = ["gsutil", "rm", "-r", outs_assembly_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.call(cmd) # ignore return
+    subprocess.call(cmd) # FIXME ignore return?
 
     sys.stderr.write("Remove post assembly files for ... OK\n")
 
