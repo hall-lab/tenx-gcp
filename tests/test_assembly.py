@@ -158,6 +158,29 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
 
+    @patch('subprocess.check_call')
+    @patch('subprocess.call')
+    def test5_run_rm_asm_files(self, call_patch, check_call_patch):
+        call_patch.return_value = "0"
+        check_call_patch.return_value = "0"
+        pwd = os.getcwd()
+        asm = assembly.TenxAssembly(sample_name='TESTER')
+
+        with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful assembly"):
+            assembly.run_upload(asm)
+
+        err = io.StringIO()
+        sys.stderr = err
+
+        assembly.run_rm_asm_files(asm)
+
+        #gs://data/TESTER/assembly/ASSEMBLER_CS
+        #gs://data/TESTER/assembly/outs/assembly/stats
+        expected_err = "Remove post assembly files for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: gsutil --help\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil rm -r gs://data/TESTER/assembly/outs/assembly\nRemove post assembly files for ... OK\n"
+        self.assertEqual(err.getvalue(), expected_err)
+        sys.stderr = sys.__stderr__
+        self.assertEqual(os.getcwd(), pwd)
+
 # -- TenxAssemblyTest
 
 if __name__ == '__main__':

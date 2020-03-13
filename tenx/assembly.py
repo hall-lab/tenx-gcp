@@ -32,7 +32,7 @@ class TenxAssembly():
     def outs_assembly_stats_path(self, remote=False):
         return os.path.join(self.outs_assembly_path(remote=remote), 'stats')
 
-    def assembler_cs_directory(self, remote=False):
+    def assembler_cs_path(self, remote=False):
         if not remote:
             return os.path.join(self.directory(), 'ASSEMBLER_CS')
         else:
@@ -100,6 +100,42 @@ def run_mkoutput(asm):
         raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but found {}.".format(asm.mkoutput_path(), len(fastas)))
 
 #-- run_mkoutput
+
+def run_rm_asm_files(asm):
+    sys.stderr.write("Remove post assembly files for {} ...\n".format(asm.sample_name))
+    sys.stderr.write("Assembly remote URL: {}\n".format(asm.remote_url()))
+
+    # check gsutil
+    sys.stderr.write("Checking if gsutil is installed...\n")
+    cmd = ["gsutil", "--help"]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+
+    # check gcloud
+    #if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
+
+    assembler_cs_path = asm.assembler_cs_path(remote=True)
+    sys.stderr.write("Removing ASSEMBLER_CS logs path.\n")
+    cmd = ["gsutil", "rm", "-r", assembler_cs_path]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.call(cmd) # ignore return
+
+    outs_assembly_stats_path = asm.outs_assembly_stats_path(remote=True)
+    outs_path = asm.outs_path(remote=True)
+    sys.stderr.write("Moving outs / assembly / stats to outs.\n")
+    cmd = ["gsutil", "mv", outs_assembly_stats_path, outs_path]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
+
+    outs_assembly_path = asm.outs_assembly_path(remote=True)
+    sys.stderr.write("Removing outs / assembly path\n")
+    cmd = ["gsutil", "rm", "-r", outs_assembly_path]
+    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+    subprocess.call(cmd) # ignore return
+
+    sys.stderr.write("Remove post assembly files for ... OK\n")
+
+#-- run_rm_asm_files
 
 def run_upload(asm):
     sys.stderr.write("Upload {} assembly...\n".format(asm.sample_name))
