@@ -107,14 +107,13 @@ def run_rm_asm_files(asm):
 
     # check gsutil
     sys.stderr.write("Checking if gsutil is installed...\n")
-    cmd = ["gsutil", "--help"]
+    cmd = ["which", "gsutil"]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
+    subprocess.check_output(cmd)
 
     sys.stderr.write("Checking mkfastq files exist.\n")
     cmd = ["gsutil", "ls", os.path.join(asm.mkoutput_path(remote=True), "*fasta.gz")]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-
     out = subprocess.check_output(cmd)
     if len(out.decode().split(".fasta.gz\n")) != 5: # 4 files plus blnk after last
         raise Exception("Failed to find 4 mkoutput fasta files. Refusing to remove post assembly files! {}".format(out.decode().split(".fasta.gz")))
@@ -130,11 +129,11 @@ def run_rm_asm_files(asm):
     sys.stderr.write("Moving outs / assembly / stats to outs.\n")
     cmd = ["gsutil", "mv", outs_assembly_stats_path, outs_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
+    subprocess.check_call(cmd) # FIXME check if exists, then move?
 
     outs_assembly_path = asm.outs_assembly_path(remote=True)
     sys.stderr.write("Removing outs / assembly path\n")
-    cmd = ["gsutil", "rm", "-r", outs_assembly_path]
+    cmd = ["gsutil", "-m", "rm", "-r", outs_assembly_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.call(cmd) # FIXME ignore return?
 
