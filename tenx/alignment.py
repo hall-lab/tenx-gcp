@@ -55,18 +55,22 @@ def run_upload(aln):
 
     if not aln.is_successful(): raise Exception("Refusing to upload an unsuccessful alignment!")
 
-    sys.stderr.write("Entering {} ...\n".format(aln.directory()))
-    os.chdir(aln.directory())
-    for cs_subdir in ('ALIGNER_CS', 'PHASER_SVCALLER_CS'):
-        if os.path.exists(cs_subdir):
-            sys.stderr.write("Removing logging directory {} prior to upload.\n".format(cs_subdir))
-            shutil.rmtree(cs_subdir)
+    pwd = os.getcwd()
+    try:
+        sys.stderr.write("Entering {} ...\n".format(aln.directory()))
+        os.chdir(aln.directory())
+        for cs_subdir in ('ALIGNER_CS', 'PHASER_SVCALLER_CS'):
+            if os.path.exists(cs_subdir):
+                sys.stderr.write("Removing logging directory {} prior to upload.\n".format(cs_subdir))
+                shutil.rmtree(cs_subdir)
 
-    sys.stderr.write("Uploading to: {}\n".format(aln.remote_url()))
-    subprocess.check_call(["gsutil", "-m", "rsync", "-r", ".", aln.remote_url()])
+        sys.stderr.write("Uploading to: {}\n".format(aln.remote_url()))
+        subprocess.check_call(["gsutil", "-m", "rsync", "-r", ".", aln.remote_url()])
 
-    sys.stderr.write("Verify upload alignment...\n")
-    util.verify_upload(ldir=aln.directory(), rurl=aln.remote_url())
+        sys.stderr.write("Verify upload alignment...\n")
+        util.verify_upload(ldir=aln.directory(), rurl=aln.remote_url())
+    finally:
+        os.chdir(pwd)
 
     sys.stderr.write("Upload alignment...OK\n")
 

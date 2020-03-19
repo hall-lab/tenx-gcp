@@ -24,9 +24,17 @@ class TenxAssemblyTest(unittest.TestCase):
         asm = assembly.TenxAssembly(sample_name='TESTER')
         self.assertEqual(asm.sample_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
         self.assertEqual(asm.directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly'))
-        self.assertEqual(asm.outs_assembly_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.reads_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'reads'))
+        self.assertEqual(asm.mkoutput_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'mkoutput'))
+        self.assertEqual(asm.outs_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs'))
+        self.assertEqual(asm.outs_assembly_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
+        self.assertEqual(asm.outs_assembly_stats_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
+
         self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
+        self.assertEqual(asm.mkoutput_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
+        self.assertEqual(asm.outs_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
+        self.assertEqual(asm.outs_assembly_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))
+        self.assertEqual(asm.outs_assembly_stats_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
     def test11_is_successful(self):
         asm = assembly.TenxAssembly(sample_name='TESTER')
@@ -56,7 +64,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_directory())):
+        with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_path())):
             assembly.run_assemble(asm)
         self.assertTrue(os.path.exists(asm.sample_directory()))
 
@@ -71,7 +79,7 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        os.makedirs(asm.outs_assembly_directory())
+        os.makedirs(asm.outs_assembly_path())
         assembly.run_assemble(asm)
         self.assertTrue(os.path.exists(asm.sample_directory()))
 
@@ -99,9 +107,9 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
-        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_directory() + " after running mkoutput, but found 0"):
+        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_path() + " after running mkoutput, but found 0"):
             assembly.run_mkoutput(asm)
         expected_err = "Running mkoutput for TESTER...\nChecking if supernova is in PATH...\nRUNNING: supernova --help\nEntering {ASM_D}/mkoutput\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.raw --style=raw\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.megabubbles --style=megabubbles\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.pseudohap2 --style=pseudohap2\n".format(ASM_D=asm.directory())
         self.assertEqual(err.getvalue(), expected_err)
@@ -114,9 +122,9 @@ class TenxAssemblyTest(unittest.TestCase):
         sys.stderr = err
 
         asm = assembly.TenxAssembly(sample_name='TESTER')
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
-        mkoutput_d = asm.mkoutput_directory()
+        mkoutput_d = asm.mkoutput_path()
         os.makedirs(mkoutput_d)
         for n in range(4):
             with open(os.path.join(mkoutput_d, "{}.fasta.gz".format(n)), "w") as f:
@@ -135,17 +143,43 @@ class TenxAssemblyTest(unittest.TestCase):
         pwd = os.getcwd()
         asm = assembly.TenxAssembly(sample_name='TESTER')
 
+        err = io.StringIO()
+        sys.stderr = err
         with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful assembly"):
             assembly.run_upload(asm)
 
-        err = io.StringIO()
-        sys.stderr = err
-        outs_asm_d = asm.outs_assembly_directory()
+        outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
 
+        err.seek(0, 0)
         assembly.run_upload(asm)
 
         expected_err = "Upload TESTER assembly...\nEntering {} ...\nUploading to: gs://data/TESTER/assembly\nRUNNING: gsutil -m rsync -r -x ASSEMBLER_CS/.* . gs://data/TESTER/assembly\nVerify upload assembly...\nUpload assembly...OK\n".format(asm.directory())
+        self.assertEqual(err.getvalue(), expected_err)
+        sys.stderr = sys.__stderr__
+        self.assertEqual(os.getcwd(), pwd)
+
+    @patch('subprocess.check_output')
+    @patch('subprocess.check_call')
+    @patch('subprocess.call')
+    def test5_run_rm_asm_files(self, call_patch, check_call_patch, check_output_patch):
+        call_patch.return_value = "0"
+        check_call_patch.return_value = "0"
+        check_output_patch.return_value = b'0'
+        pwd = os.getcwd()
+        asm = assembly.TenxAssembly(sample_name='TESTER')
+
+        err = io.StringIO()
+        sys.stderr = err
+        with self.assertRaisesRegex(Exception, "Failed to find 4 mkoutput fasta files\. Refusing to remove post assembly files"):
+            assembly.run_rm_asm_files(asm)
+
+        check_output_patch.return_value = b'a.fasta.gz\na.fasta.gz\na.fasta.gz\na.fasta.gz\n'
+        err.seek(0, 0)
+        assembly.run_rm_asm_files(asm)
+
+        self.maxDiff = 10000
+        expected_err = "Remove post assembly files for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nRemove post assembly files for ... OK\n"
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
