@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/hall-lab/tenx-gcp.svg?branch=master)](https://travis-ci.org/hall-lab/tenx-gcp)
+
 # 10X Genomics Deployments and CLI
 
 CLI, config, and resources for running 10X Genomics pipelines
