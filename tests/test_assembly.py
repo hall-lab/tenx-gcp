@@ -178,8 +178,8 @@ class TenxAssemblyTest(unittest.TestCase):
         err.seek(0, 0)
         assembly.run_rm_asm_files(asm)
 
-        #self.maxDiff = 10000
-        expected_err = "Remove post assembly files for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: gsutil --help\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil rm -r gs://data/TESTER/assembly/outs/assembly\nRemove post assembly files for ... OK\n"
+        self.maxDiff = 10000
+        expected_err = "Remove post assembly files for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nRemove post assembly files for ... OK\n"
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
