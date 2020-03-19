@@ -57,17 +57,18 @@ def run_assemble(asm):
     sample_d = asm.sample_directory()
     if not os.path.exists(sample_d):
         os.makedirs(sample_d)
+
     pwd = os.getcwd()
-    os.chdir(sample_d)
-
-    cmd = [
-        "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.reads_directory()), "--uiport=18080", "--nodebugmem",
-        "--localcores={}".format(TenxApp.config['TENX_ASM_CORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_MEM']),
-    ]
-    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
-
-    os.chdir(pwd)
+    try:
+        os.chdir(sample_d)
+        cmd = [
+            "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.reads_directory()), "--uiport=18080", "--nodebugmem",
+            "--localcores={}".format(TenxApp.config['TENX_ASM_CORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_MEM']),
+        ]
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        subprocess.check_call(cmd)
+    finally:
+        os.chdir(pwd)
     if not asm.is_successful(): raise Exception("Ran supernova script, but {} was not found!".format(asm.outs_assembly_path()))
 
 #-- assemble
@@ -85,17 +86,18 @@ def run_mkoutput(asm):
     sys.stderr.write("Entering {}\n".format(mkoutput_d))
     if not os.path.exists(mkoutput_d):
         os.makedirs(mkoutput_d)
+
     pwd = os.getcwd()
-    os.chdir(mkoutput_d)
-
-    cmd_template = "supernova mkoutput --asmdir={OUTS_ASM_D} --outprefix={SAMPLE_NAME}.{STYLE} --style={STYLE}"
-    for style in ("raw", "megabubbles", "pseudohap2"):
-        cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_path(), SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
-        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-        subprocess.check_call(cmd)
-
-    fastas = glob.glob( os.path.join(asm.mkoutput_path(), '*fasta.gz') )
-    os.chdir(pwd)
+    try:
+        os.chdir(mkoutput_d)
+        cmd_template = "supernova mkoutput --asmdir={OUTS_ASM_D} --outprefix={SAMPLE_NAME}.{STYLE} --style={STYLE}"
+        for style in ("raw", "megabubbles", "pseudohap2"):
+            cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_path(), SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
+            sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+            subprocess.check_call(cmd)
+        fastas = glob.glob( os.path.join(asm.mkoutput_path(), '*fasta.gz') )
+    finally:
+        os.chdir(pwd)
     if len(fastas) != 4:
         raise Exception("Expected 4 assembly fasta.gz files in {} after running mkoutput, but found {}.".format(asm.mkoutput_path(), len(fastas)))
 
@@ -120,7 +122,7 @@ def run_rm_asm_files(asm):
 
     assembler_cs_path = asm.assembler_cs_path(remote=True)
     sys.stderr.write("Removing ASSEMBLER_CS logs path.\n")
-    cmd = ["gsutil", "rm", "-r", assembler_cs_path]
+    cmd = ["gsutil", "-m", "rm", "-r", assembler_cs_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.call(cmd) # ignore return should be removed
 
@@ -148,13 +150,14 @@ def run_upload(asm):
 
     sys.stderr.write("Entering {} ...\n".format(asm.directory()))
     pwd = os.getcwd()
-    os.chdir(asm.directory())
-
-    sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
-    cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()]
-    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
-    os.chdir(pwd)
+    try:
+        os.chdir(asm.directory())
+        sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
+        cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()]
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        subprocess.check_call(cmd)
+    finally:
+        os.chdir(pwd)
 
     sys.stderr.write("Verify upload assembly...\n")
     util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url(), ignore="ASSEMBLER_CS")
