@@ -12,7 +12,7 @@ class TenxJobTest(unittest.TestCase):
 
     def test2_template(self):
         templates_p = compute.Job.templates_path()
-        self.assertRegex(templates_p, re.compile("tenx\/job\-templates"))
+        self.assertRegex(templates_p, re.compile("tenx/job-templates"))
 
         job = compute.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
@@ -31,10 +31,10 @@ class TenxJobTest(unittest.TestCase):
             template = template_f.read()
 
         for s in ( "REF_NAME", "SAMPLE_NAME" ):
-            s_re = re.compile("\{\{ " + s + " \}\}")
+            s_re = re.compile("{{ " + s + " }}")
             template = re.sub(s_re, "___" + s + "___", template)
 
-        s_re = re.compile("\{\{ TENX_DATA_PATH \}\}")
+        s_re = re.compile("{{ TENX_DATA_PATH }}")
         template = re.sub(s_re, "", template)
 
         script_f = tempfile.NamedTemporaryFile()
@@ -49,7 +49,7 @@ class TenxJobTest(unittest.TestCase):
         err = io.StringIO()
         sys.stderr = err
         job.launch_script(params={"SAMPLE_NAME": "__SAMPLE__", "REF_NAME": "__REF__"})
-        self.assertRegex(err.getvalue(), re.compile("RUNNING: sbatch \/tmp"))
+        self.assertRegex(err.getvalue(), re.compile("RUNNING: sbatch /tmp"))
         sys.stderr = sys.__stderr__
 
 # -- TenxJobTest
