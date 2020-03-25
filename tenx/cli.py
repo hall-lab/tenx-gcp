@@ -26,6 +26,10 @@ cli.add_command(tenx_asm_cli, name="asm")
 from tenx.compute_cli import tenx_compute_cli
 cli.add_command(tenx_compute_cli, name="compute")
 
+# LIST
+from tenx.list import list_cmd
+cli.add_command(list_cmd, name="list")
+
 # READS
 from tenx.reads_cli import tenx_reads_cli
 cli.add_command(tenx_reads_cli, name="reads")
