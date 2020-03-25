@@ -80,11 +80,11 @@ tenx_asm_cli.add_command(asm_pipeline, name="pipeline")
 
 @click.command(short_help="remove unnecessary post assembly files")
 @click.argument('sample-name', type=click.STRING)
-def asm_rm_asm_files_cmd(sample_name):
+def asm_cleanup_cmd(sample_name):
     """
-    Remove Post Assembly Files
+    Cleanup Assembly
 
-    This command removes the "outs/assembly" and "ASSEMBLER_CS" directories.
+    This command removes unneeded post assembly file including the "outs/assembly" and "ASSEMBLER_CS" directories.
 
     It first ensures the 4 mkoutput files are generated.
 
@@ -92,8 +92,8 @@ def asm_rm_asm_files_cmd(sample_name):
 
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_rm_asm_files(assembly.TenxAssembly(sample_name=sample_name))
-tenx_asm_cli.add_command(asm_rm_asm_files_cmd, name="remove-files")
+    assembly.run_cleanup(assembly.TenxAssembly(sample_name=sample_name))
+tenx_asm_cli.add_command(asm_cleanup_cmd, name="cleanup")
 
 @click.command(short_help="Send the assembly to the cloud")
 @click.argument('sample-name', type=click.STRING)

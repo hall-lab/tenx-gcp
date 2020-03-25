@@ -1,7 +1,7 @@
 import subprocess, unittest
 from click.testing import CliRunner
 
-from tenx.asm_cli import tenx_asm_cli,  asm_assemble,  asm_mkoutput,  asm_pipeline,  asm_rm_asm_files_cmd,  asm_upload
+from tenx.asm_cli import tenx_asm_cli,  asm_assemble,  asm_mkoutput,  asm_pipeline,  asm_cleanup_cmd,  asm_upload
 
 class TenxAsmCliTest(unittest.TestCase):
 
@@ -31,11 +31,11 @@ class TenxAsmCliTest(unittest.TestCase):
         result = runner.invoke(asm_mkoutput, [])
         self.assertEqual(result.exit_code, 2)
 
-    def test2_tenx_assembly_rm_asm_files_cmd(self):
+    def test2_asm_cleanup_cmd(self):
         runner = CliRunner()
-        result = runner.invoke(asm_rm_asm_files_cmd, ["--help"])
+        result = runner.invoke(asm_cleanup_cmd, ["--help"])
         self.assertEqual(result.exit_code, 0)
-        result = runner.invoke(asm_rm_asm_files_cmd, [])
+        result = runner.invoke(asm_cleanup_cmd, [])
         self.assertEqual(result.exit_code, 2)
 
     def test2_tenx_assembly_upload(self):
