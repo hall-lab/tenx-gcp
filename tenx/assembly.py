@@ -103,8 +103,8 @@ def run_mkoutput(asm):
 
 #-- run_mkoutput
 
-def run_rm_asm_files(asm):
-    sys.stderr.write("Remove post assembly files for {} ...\n".format(asm.sample_name))
+def run_cleanup(asm):
+    sys.stderr.write("Cleanup assembly for {} ...\n".format(asm.sample_name))
     sys.stderr.write("Assembly remote URL: {}\n".format(asm.remote_url()))
 
     # check gsutil
@@ -139,9 +139,9 @@ def run_rm_asm_files(asm):
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.call(cmd) # FIXME ignore return?
 
-    sys.stderr.write("Remove post assembly files for ... OK\n")
+    sys.stderr.write("Cleanup assembly ... OK\n")
 
-#-- run_rm_asm_files
+#-- run_cleanup
 
 def run_upload(asm):
     sys.stderr.write("Upload {} assembly...\n".format(asm.sample_name))

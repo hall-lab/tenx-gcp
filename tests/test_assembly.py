@@ -162,7 +162,7 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_output')
     @patch('subprocess.check_call')
     @patch('subprocess.call')
-    def test5_run_rm_asm_files(self, call_patch, check_call_patch, check_output_patch):
+    def test5_run_cleanup(self, call_patch, check_call_patch, check_output_patch):
         call_patch.return_value = "0"
         check_call_patch.return_value = "0"
         check_output_patch.return_value = b'0'
@@ -172,14 +172,14 @@ class TenxAssemblyTest(unittest.TestCase):
         err = io.StringIO()
         sys.stderr = err
         with self.assertRaisesRegex(Exception, "Failed to find 4 mkoutput fasta files\. Refusing to remove post assembly files"):
-            assembly.run_rm_asm_files(asm)
+            assembly.run_cleanup(asm)
 
         check_output_patch.return_value = b'a.fasta.gz\na.fasta.gz\na.fasta.gz\na.fasta.gz\n'
         err.seek(0, 0)
-        assembly.run_rm_asm_files(asm)
+        assembly.run_cleanup(asm)
 
         self.maxDiff = 10000
-        expected_err = "Remove post assembly files for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nRemove post assembly files for ... OK\n"
+        expected_err = "Cleanup assembly for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nCleanup assembly ... OK\n"
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
