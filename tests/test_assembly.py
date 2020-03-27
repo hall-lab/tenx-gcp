@@ -30,7 +30,7 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertEqual(asm.outs_assembly_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.outs_assembly_stats_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
-        self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
+        self.assertEqual(asm.remote_url, os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
         self.assertEqual(asm.mkoutput_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
         self.assertEqual(asm.outs_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
         self.assertEqual(asm.outs_assembly_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))

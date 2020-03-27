@@ -7,6 +7,8 @@ class TenxAssembly():
 
     def __init__(self, sample_name):
         self.sample_name = sample_name
+        if TenxApp.config.get("TENX_REMOTE_URL", None) is not None:
+            self.remote_url = os.path.join(TenxApp.config.get("TENX_REMOTE_URL"), self.sample_name, 'assembly')
 
     def remote_url(self):
         return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample_name, 'assembly')
@@ -24,7 +26,7 @@ class TenxAssembly():
         if not remote:
             return os.path.join(self.directory(), 'outs')
         else:
-            return os.path.join(self.remote_url(), 'outs')
+            return os.path.join(self.remote_url, 'outs')
 
     def outs_assembly_path(self, remote=False):
         return os.path.join(self.outs_path(remote=remote), 'assembly')
@@ -36,13 +38,13 @@ class TenxAssembly():
         if not remote:
             return os.path.join(self.directory(), 'ASSEMBLER_CS')
         else:
-            return os.path.join(self.remote_url(), 'ASSEMBLER_CS')
+            return os.path.join(self.remote_url, 'ASSEMBLER_CS')
 
     def mkoutput_path(self, remote=False):
         if not remote:
             return os.path.join(self.directory(), 'mkoutput')
         else:
-            return os.path.join(self.remote_url(), 'mkoutput')
+            return os.path.join(self.remote_url, 'mkoutput')
 
     def is_successful(self): # TODO make more robust
         return os.path.exists(self.outs_assembly_path())
@@ -105,7 +107,7 @@ def run_mkoutput(asm):
 
 def run_cleanup(asm):
     sys.stderr.write("Cleanup assembly for {} ...\n".format(asm.sample_name))
-    sys.stderr.write("Assembly remote URL: {}\n".format(asm.remote_url()))
+    sys.stderr.write("Assembly remote URL: {}\n".format(asm.remote_url))
 
     # check gsutil
     sys.stderr.write("Checking if gsutil is installed...\n")
@@ -152,15 +154,15 @@ def run_upload(asm):
     pwd = os.getcwd()
     try:
         os.chdir(asm.directory())
-        sys.stderr.write("Uploading to: {}\n".format(asm.remote_url()))
-        cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url()]
+        sys.stderr.write("Uploading to: {}\n".format(asm.remote_url))
+        cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url]
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
     finally:
         os.chdir(pwd)
 
     sys.stderr.write("Verify upload assembly...\n")
-    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url(), ignore="ASSEMBLER_CS")
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url, ignore="ASSEMBLER_CS")
 
     sys.stderr.write("Upload assembly...OK\n")
 
