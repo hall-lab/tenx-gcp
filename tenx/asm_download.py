@@ -26,7 +26,7 @@ def asm_download(asm):
         if not os.path.exists(asm_d):
             os.makedirs(asm_d)
         os.chdir(asm_d)
-        rurl = asm.remote_url()
+        rurl = asm.remote_url
         sys.stdout.write("Assembly remote url: {}\n".format(rurl))
 
         rurls_to_dl = []

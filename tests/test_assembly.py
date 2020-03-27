@@ -30,7 +30,7 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertEqual(asm.outs_assembly_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly'))
         self.assertEqual(asm.outs_assembly_stats_path(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'assembly', 'outs', 'assembly', 'stats'))
 
-        self.assertEqual(asm.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
+        self.assertEqual(asm.remote_url, os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly'))
         self.assertEqual(asm.mkoutput_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'mkoutput'))
         self.assertEqual(asm.outs_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs'))
         self.assertEqual(asm.outs_assembly_path(remote=True), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'assembly', 'outs', 'assembly'))
@@ -163,25 +163,24 @@ class TenxAssemblyTest(unittest.TestCase):
     @patch('subprocess.check_call')
     @patch('subprocess.call')
     def test5_run_cleanup(self, call_patch, check_call_patch, check_output_patch):
-        call_patch.return_value = "0"
-        check_call_patch.return_value = "0"
+        call_patch.return_value = 0
+        check_call_patch.return_value = 0
         check_output_patch.return_value = b'0'
         pwd = os.getcwd()
-        asm = assembly.TenxAssembly(sample_name='TESTER')
-
         err = io.StringIO()
         sys.stderr = err
         with self.assertRaisesRegex(Exception, "Failed to find 4 mkoutput fasta files\. Refusing to remove post assembly files"):
+            asm = assembly.TenxAssembly(sample_name='TESTER')
             assembly.run_cleanup(asm)
 
         check_output_patch.return_value = b'a.fasta.gz\na.fasta.gz\na.fasta.gz\na.fasta.gz\n'
         err.seek(0, 0)
+        asm = assembly.TenxAssembly(sample_name='TESTER')
         assembly.run_cleanup(asm)
 
         self.maxDiff = 10000
-        expected_err = "Cleanup assembly for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nCleanup assembly ... OK\n"
+        expected_err = "Cleanup assembly for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nAssembly is incorrect path, will move after cleanup.\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/TESTER/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/TESTER/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil -m mv gs://data/TESTER/assembly/TESTER/outs/assembly/stats gs://data/TESTER/assembly/TESTER/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/TESTER/outs/assembly\nMoving assembly to correct path...\nCleanup assembly ... OK\n"
         self.assertEqual(err.getvalue(), expected_err)
-        sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
 
 # -- TenxAssemblyTest
