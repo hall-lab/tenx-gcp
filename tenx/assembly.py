@@ -115,10 +115,23 @@ def run_cleanup(asm):
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_output(cmd)
 
+    # check assembly in correct place
+    correct_url = asm.remote_url
+    wrong_url = os.path.join(asm.remote_url, asm.sample_name)
+    cmd = ["gsutil", "ls", wrong_url]
+    rv = subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if rv == 0:
+        sys.stderr.write("Assembly is incorrect path, will move after cleanup.\n")
+        needs_move = True
+        asm.remote_url = wrong_url
+
     sys.stderr.write("Checking mkfastq files exist.\n")
     cmd = ["gsutil", "ls", os.path.join(asm.mkoutput_path(remote=True), "*fasta.gz")]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    out = subprocess.check_output(cmd)
+    try:
+        out = subprocess.check_output(cmd)
+    except:
+        raise Exception("Could not find mkoutput fastas!")
     if len(out.decode().split(".fasta.gz\n")) != 5: # 4 files plus blnk after last
         raise Exception("Failed to find 4 mkoutput fasta files. Refusing to remove post assembly files! {}".format(out.decode().split(".fasta.gz")))
 
@@ -126,20 +139,39 @@ def run_cleanup(asm):
     sys.stderr.write("Removing ASSEMBLER_CS logs path.\n")
     cmd = ["gsutil", "-m", "rm", "-r", assembler_cs_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.call(cmd) # ignore return should be removed
+    try:
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError: # ignore if does not exist
+        pass
 
-    outs_assembly_stats_path = asm.outs_assembly_stats_path(remote=True)
-    outs_path = asm.outs_path(remote=True)
-    sys.stderr.write("Moving outs / assembly / stats to outs.\n")
-    cmd = ["gsutil", "mv", outs_assembly_stats_path, outs_path]
-    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd) # FIXME check if exists, then move?
-
+    # move outs/assembly/stats to outs/
+    try:
+        outs_assembly_stats_path = asm.outs_assembly_stats_path(remote=True)
+        cmd = ["gsutil", "ls", outs_assembly_stats_path]
+        rv = subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        sys.stderr.write("Moving outs / assembly / stats to outs.\n")
+        outs_path = asm.outs_path(remote=True)
+        cmd = ["gsutil", "-m", "mv", outs_assembly_stats_path, outs_path]
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError: # ignore if does not exist
+        pass
     outs_assembly_path = asm.outs_assembly_path(remote=True)
     sys.stderr.write("Removing outs / assembly path\n")
     cmd = ["gsutil", "-m", "rm", "-r", outs_assembly_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.call(cmd) # FIXME ignore return?
+    subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # move assembly to correct place if needed
+    if asm.remote_url == wrong_url:
+        sys.stderr.write("Moving assembly to correct path...\n")
+        asm.remote_url = correct_url
+        sample_url = os.path.join(TenxApp.config['TENX_REMOTE_URL'], asm.sample_name)
+        sample_sample_url = os.path.join(sample_url, asm.sample_name)
+        cmd = ["gsutil", "-m", "mv", wrong_url, sample_url]
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        cmd = ["gsutil", "-m", "mv", sample_sample_url, asm.remote_url]
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     sys.stderr.write("Cleanup assembly ... OK\n")
 
