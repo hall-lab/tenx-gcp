@@ -180,21 +180,29 @@ def run_cleanup(asm):
 def run_upload(asm):
     sys.stderr.write("Upload {} assembly...\n".format(asm.sample_name))
 
+    asm_d = asm.directory()
+    sys.stderr.write("Local path: {}\n".format(asm_d))
+    if not os.path.exists(asm_d):
+        raise Exception("Cannot find local assembly path!")
+
     if not asm.is_successful(): raise Exception("Refusing to upload an unsuccessful assembly!")
 
-    sys.stderr.write("Entering {} ...\n".format(asm.directory()))
     pwd = os.getcwd()
     try:
+        sys.stderr.write("Entering {} ...\n".format(asm_d))
         os.chdir(asm.directory())
+        if os.path.exists(asm.outs_assembly_stats_path()): # may have been moved
+            sys.stderr.write("Moving the outs / assembly / stats to outs...\n")
+            shutil.move(asm.outs_assembly_stats_path(), asm.outs_path())
         sys.stderr.write("Uploading to: {}\n".format(asm.remote_url))
-        cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*", ".", asm.remote_url]
+        cmd = ["gsutil", "-m", "rsync", "-r", "-x", "ASSEMBLER_CS/.*|outs/assembly/.*", ".", asm.remote_url]
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-        subprocess.check_call(cmd)
+        subprocess.check_call(cmd, stdout=subprocess.DEVNULL)
     finally:
         os.chdir(pwd)
 
     sys.stderr.write("Verify upload assembly...\n")
-    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url, ignore="ASSEMBLER_CS")
+    util.verify_upload(ldir=asm.directory(), rurl=asm.remote_url, ignore=["ASSEMBLER_CS", "outs/assembly"])
 
     sys.stderr.write("Upload assembly...OK\n")
 
