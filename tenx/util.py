@@ -37,7 +37,7 @@ def calculate_compute_metrics(run_dir):
 
 #-- calculate_compute_metrics
 
-def verify_upload(ldir, rurl, ignore=None):
+def verify_upload(ldir, rurl, ignore=[]):
     remote = build_remote(rurl)
 
     if not ldir.endswith('/'): ldir += '/'
@@ -48,13 +48,17 @@ def verify_upload(ldir, rurl, ignore=None):
         ldir_file_cnt += len(files)
         for f in files:
             fpath = re.sub(regex, '', os.path.join(root, f))
-            if not fpath in remote: missing[fpath] = True
-            # FIXME check size
+            if not fpath in remote:
+                missing[fpath] = True
 
     if ldir_file_cnt == 0:
         raise Exception("Local directory does not contain any files!")
-    if ignore:
-        missing = { k:v for k,v in missing.items() if not k.startswith(ignore) }
+    if len(ignore) > 0:
+        for k in list(missing.keys()): # convert keys() iter to list
+            for i in ignore:
+                if k.startswith(i):
+                    del(missing[k])
+        # was => missing = { k:v for k,v in missing.items() if not k.startswith(ignore) }
     if missing:
         raise Exception("Remote is missing these files:\n{}".format("\n".join(missing.keys())))
 
