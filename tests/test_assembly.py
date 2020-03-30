@@ -141,7 +141,9 @@ class TenxAssemblyTest(unittest.TestCase):
         check_call_patch.return_value = '0'
         verify_ul_patch.return_value = ""
         pwd = os.getcwd()
+
         asm = assembly.TenxAssembly(sample_name='TESTER')
+        os.makedirs(asm.directory())
 
         err = io.StringIO()
         sys.stderr = err
@@ -154,7 +156,7 @@ class TenxAssemblyTest(unittest.TestCase):
         err.seek(0, 0)
         assembly.run_upload(asm)
 
-        expected_err = "Upload TESTER assembly...\nEntering {} ...\nUploading to: gs://data/TESTER/assembly\nRUNNING: gsutil -m rsync -r -x ASSEMBLER_CS/.* . gs://data/TESTER/assembly\nVerify upload assembly...\nUpload assembly...OK\n".format(asm.directory())
+        expected_err = "Upload TESTER assembly...\nLocal path: {0}\nEntering {0} ...\nUploading to: gs://data/TESTER/assembly\nRUNNING: gsutil -m rsync -r -x ASSEMBLER_CS/.*|outs/assembly/.* . gs://data/TESTER/assembly\nVerify upload assembly...\nUpload assembly...OK\n".format(asm.directory())
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
         self.assertEqual(os.getcwd(), pwd)
