@@ -109,7 +109,7 @@ class TenxAssemblyTest(unittest.TestCase):
         asm = assembly.TenxAssembly(sample_name='TESTER')
         outs_asm_d = asm.outs_assembly_path()
         os.makedirs(outs_asm_d)
-        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta\.gz files in " + asm.mkoutput_path() + " after running mkoutput, but found 0"):
+        with self.assertRaisesRegex(Exception, "Expected 4 assembly fasta.gz files in " + asm.mkoutput_path() + " after running mkoutput, but found 0"):
             assembly.run_mkoutput(asm)
         expected_err = "Running mkoutput for TESTER...\nChecking if supernova is in PATH...\nRUNNING: supernova --help\nEntering {ASM_D}/mkoutput\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.raw --style=raw\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.megabubbles --style=megabubbles\nRUNNING: supernova mkoutput --asmdir={ASM_D}/outs/assembly --outprefix=TESTER.pseudohap2 --style=pseudohap2\n".format(ASM_D=asm.directory())
         self.assertEqual(err.getvalue(), expected_err)
@@ -171,7 +171,7 @@ class TenxAssemblyTest(unittest.TestCase):
         pwd = os.getcwd()
         err = io.StringIO()
         sys.stderr = err
-        with self.assertRaisesRegex(Exception, "Failed to find 4 mkoutput fasta files\. Refusing to remove post assembly files"):
+        with self.assertRaisesRegex(Exception, "Failed to find 4 mkoutput fasta files. Refusing to remove post assembly files"):
             asm = assembly.TenxAssembly(sample_name='TESTER')
             assembly.run_cleanup(asm)
 
