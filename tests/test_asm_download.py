@@ -30,12 +30,9 @@ class TenxAsmDownloadTest(unittest.TestCase):
             self.maxDiff = 10000000000
             expected_output = "\n".join([
                 "Download assembly ... ",
-                "Sample: __TESTER__",
-                "Assembly directory: /tmp/__TESTER__/assembly",
-                "Assembly remote url: gs://data/__TESTER__/assembly",
-                "RUNNING: gsutil -m cp gs://data/__TESTER__/assembly/_perf gs://data/__TESTER__/assembly/_log .",
-                "RUNNING: gsutil -m cp gs://data/__TESTER__/assembly/outs/report.txt gs://data/__TESTER__/assembly/outs/summary.csv .",
-                "RUNNING: gsutil -m rsync -r gs://data/__TESTER__/assembly/mkoutput .",
+                "Remote path: gs://data/__TESTER__/assembly",
+                "Local path: /tmp/__TESTER__/assembly",
+                "RUNNING: gsutil -m rsync -r gs://data/__TESTER__/assembly .",
                 "Download assembly ... DONE",
                 "",
             ])
