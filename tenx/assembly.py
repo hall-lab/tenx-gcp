@@ -86,16 +86,6 @@ def run_cleanup(asm): # remote only
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_output(cmd)
 
-    # check assembly in correct place
-    correct_path = asm.path
-    wrong_path = os.path.join(asm.path, asm.sample_name)
-    cmd = ["gsutil", "ls", wrong_path]
-    rv = subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if rv == 0:
-        sys.stderr.write("Assembly is incorrect path, will move after cleanup.\n")
-        needs_move = True
-        asm.path = wrong_path
-
     sys.stderr.write("Checking mkfastq files exist.\n")
     cmd = ["gsutil", "ls", os.path.join(asm.mkoutput_path, "*fasta.gz")]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
@@ -132,18 +122,6 @@ def run_cleanup(asm): # remote only
     cmd = ["gsutil", "-m", "rm", "-r", outs_assembly_path]
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    # move assembly to correct place if needed
-    if asm.path == wrong_path:
-        sys.stderr.write("Moving assembly to correct path...\n")
-        asm.path = correct_path
-        sample_path = asm.sample_path
-        sample_sample_path = os.path.join(sample_path, asm.sample_name)
-        cmd = ["gsutil", "-m", "mv", wrong_path, sample_path]
-        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        cmd = ["gsutil", "-m", "mv", sample_sample_path, asm.path]
-        subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
     sys.stderr.write("Cleanup assembly ... OK\n")
 
 #-- run_cleanup

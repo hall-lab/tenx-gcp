@@ -179,7 +179,7 @@ class TenxAssemblyTest(unittest.TestCase):
         assembly.run_cleanup(asm)
 
         self.maxDiff = 10000
-        expected_err = "Cleanup assembly for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nAssembly is incorrect path, will move after cleanup.\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/TESTER/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/TESTER/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil -m mv gs://data/TESTER/assembly/TESTER/outs/assembly/stats gs://data/TESTER/assembly/TESTER/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/TESTER/outs/assembly\nMoving assembly to correct path...\nCleanup assembly ... OK\n"
+        expected_err = "Cleanup assembly for TESTER ...\nAssembly remote URL: gs://data/TESTER/assembly\nChecking if gsutil is installed...\nRUNNING: which gsutil\nChecking mkfastq files exist.\nRUNNING: gsutil ls gs://data/TESTER/assembly/mkoutput/*fasta.gz\nRemoving ASSEMBLER_CS logs path.\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/ASSEMBLER_CS\nMoving outs / assembly / stats to outs.\nRUNNING: gsutil -m mv gs://data/TESTER/assembly/outs/assembly/stats gs://data/TESTER/assembly/outs\nRemoving outs / assembly path\nRUNNING: gsutil -m rm -r gs://data/TESTER/assembly/outs/assembly\nCleanup assembly ... OK\n"
         self.assertEqual(err.getvalue(), expected_err)
         self.assertEqual(os.getcwd(), pwd)
 
