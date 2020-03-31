@@ -132,33 +132,6 @@ class TenxAssemblyTest(unittest.TestCase):
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
-    @patch('subprocess.check_call')
-    @patch("tenx.util.verify_upload")
-    def test4_run_upload(self, verify_ul_patch, check_call_patch):
-        check_call_patch.return_value = '0'
-        verify_ul_patch.return_value = ""
-        pwd = os.getcwd()
-
-        asm = assembly.TenxAssembly(sample_name='TESTER', base_path=TenxApp.config["TENX_DATA_PATH"])
-        os.makedirs(asm.path)
-        remote = assembly.TenxAssembly(sample_name='TESTER', base_path=TenxApp.config["TENX_REMOTE_URL"])
-
-        err = io.StringIO()
-        sys.stderr = err
-        with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful assembly"):
-            assembly.run_upload(asm, remote)
-
-        outs_asm_d = asm.outs_assembly_path
-        os.makedirs(outs_asm_d)
-
-        err.seek(0, 0)
-        assembly.run_upload(asm, remote)
-
-        expected_err = "Upload TESTER assembly...\nLocal path: {0}\nEntering {0} ...\nUploading to: gs://data/TESTER/assembly\nRUNNING: gsutil -m rsync -r -x ASSEMBLER_CS/.*|outs/assembly/.* . gs://data/TESTER/assembly\nVerify upload assembly...\nUpload assembly...OK\n".format(asm.path)
-        self.assertEqual(err.getvalue(), expected_err)
-        sys.stderr = sys.__stderr__
-        self.assertEqual(os.getcwd(), pwd)
-
     @patch('subprocess.check_output')
     @patch('subprocess.check_call')
     @patch('subprocess.call')
