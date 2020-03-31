@@ -10,23 +10,22 @@ def asm_download_cmd(sample_name):
     Download an Assembly
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    asm = assembly.TenxAssembly(sample_name=sample_name)
-    asm_download(asm)
+    remote = assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
+    local = assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
+    asm_download(remote, local)
 
 #-- asm_download_cmd
 
-def asm_download(asm):
+def asm_download(remote, local):
     sys.stdout.write("Download assembly ... \n")
-    rurl = asm.remote_url
-    sys.stdout.write("Remote path: {}\n".format(rurl))
-    asm_d = asm.directory()
-    sys.stdout.write("Local path: {}\n".format(asm_d))
+    sys.stdout.write("Remote path: {}\n".format(remote.path))
+    sys.stdout.write("Local path: {}\n".format(local.path))
     old_pwd = os.getcwd()
     try:
-        if not os.path.exists(asm_d):
-            os.makedirs(asm_d)
-        os.chdir(asm_d)
-        cmd = ["gsutil", "-m", "rsync", "-r", rurl, "."]
+        if not os.path.exists(local.path):
+            os.makedirs(local.path)
+        os.chdir(local.path)
+        cmd = ["gsutil", "-m", "rsync", "-r", remote.path, "."]
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
     except:
