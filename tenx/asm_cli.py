@@ -67,7 +67,7 @@ def asm_pipeline(sample_name):
         print( report.compute_metrics_basic(compute_metrics) )
         with open(os.path.join(asm.directory(), "outs", "compute-metrics.txt"), "w") as f:
             f.write( report.compute_metrics_basic(metrics=compute_metrics) )
-        assembly.run_upload(asm)
+        assembly.run_upload(asm, assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"]))
         sys.stderr.write("Run assembly pipeline...OK")
     except BaseException as ex:
         sys.stderr.write("Exception: {}\n".format(ex))
@@ -102,7 +102,9 @@ def asm_upload(sample_name):
     Upload an assembly from local disk to cloud storage.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_upload(assembly.TenxAssembly(sample_name=sample_name))
+    local =assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
+    remote = assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
+    assembly.run_upload(local, remote)
 tenx_asm_cli.add_command(asm_upload, name="upload")
 
 #-- ASSEMBLY
