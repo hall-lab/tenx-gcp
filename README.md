@@ -5,14 +5,44 @@
 
 CLI, config, and resources for running 10X Genomics pipelines
 
-# Pipelines
-
 [supernova](#supernova)
 
 [longranger](#longranger)
 
-<a name="supernova"/>
+# Config and Data Structure
 
+## Config
+
+Configuration is kept in the environment variable "TENX_CONFIG_FILE". These values are filled in from the google deployment YAML, but would need to be provided otherwise. Here are the known config keys. Not all keys are not always necessary. Configs used for deployments are in resources/config.
+
+### General Config
+
+* TENX_DATA_PATH: Base path of the local data, ex: /mnt/disks/data
+* TENX_REMOTE_URL: GCP base URL of the data
+* TENX_NOTIFICATIONS_SLACK: Slack URL for posting notifcations
+
+### Supernova Config
+
+* TENX_SUPERNOVA_SOFTWARE_URL: URL of the supernova tgz to instal
+* TENX_MACHINE_TYPE: GCP machine type for supernova
+
+### Longranger Config
+* TENX_LONGRANGER_SOFTWARE_URL: URL for longerrange tgz to install
+* TENX_REMOTE_REFS_URL: url for the longranger references
+* TENX_ALN_MODE: longranger aligner mode
+* TENX_ALN_CORES: longranger aligner cores to use
+* TENX_ALN_MEM: longranger aligner mem to use
+* TENX_ALN_VCMODE: longranger variant caller [ex: freebayes]
+
+## Data Structure
+The data structure is important for successful runs of alignment nad assembly. The base paths are kept in the above config nad can be local and remote. Local path is needed for assembly and alignemnt. Reads need to be uploaded to the base-path / sample / reads URL.
+
+base-path/
+    sample/
+        assembly/
+        alignemnt/
+        reads/
+      
 # Supernova
 
 The 10X de novo assembler.
