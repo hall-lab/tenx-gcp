@@ -1,7 +1,7 @@
 import os, unittest
 from click.testing import CliRunner
 
-from tenx.asm_stats import asm_stats_cmd, get_contig_lengths, get_scaffold_and_contig_lengths, get_metrics, length_buckets
+from tenx.asm_stats import asm_stats_cmd, get_contig_lengths, get_scaffold_and_contig_lengths, get_stats, length_buckets
 
 class AsmStatsTest(unittest.TestCase):
     def setUp(self):
@@ -20,37 +20,37 @@ class AsmStatsTest(unittest.TestCase):
         self.assertEqual(scaffolds, self.expected_scaffolds)
         self.assertEqual(contigs, self.expected_contigs)
 
-    def test2_get_metrics(self):
-        expected_metrics = {
+    def test2_get_stats(self):
+        expected_stats = {
             "total": sum(self.expected_scaffolds),
             "count": len(self.expected_scaffolds),
         }
-        expected_metrics["genome_n50"] = int(expected_metrics["total"]/2)
-        expected_metrics["n50_length"] = expected_metrics["total"]
+        expected_stats["genome_n50"] = int(expected_stats["total"]/2)
+        expected_stats["n50_length"] = expected_stats["total"]
 
         for b in length_buckets():
-            expected_metrics["_".join([str(b), "count"])] = 0
-            expected_metrics["_".join([str(b), "length"])] = 0
-        expected_metrics["1000000_length"] = self.expected_scaffolds[-1]
-        expected_metrics["1000000_count"] = 1
-        expected_metrics["250000_length"] = self.expected_scaffolds[1]
-        expected_metrics["250000_count"] = 1
-        expected_metrics["10000_length"] = self.expected_scaffolds[0]
-        expected_metrics["10000_count"] = 1
-        metrics = get_metrics(self.expected_scaffolds)
-        self.assertEqual(metrics, expected_metrics)
+            expected_stats["_".join([str(b), "count"])] = 0
+            expected_stats["_".join([str(b), "length"])] = 0
+        expected_stats["1000000_length"] = self.expected_scaffolds[-1]
+        expected_stats["1000000_count"] = 1
+        expected_stats["250000_length"] = self.expected_scaffolds[1]
+        expected_stats["250000_count"] = 1
+        expected_stats["10000_length"] = self.expected_scaffolds[0]
+        expected_stats["10000_count"] = 1
+        stats = get_stats(self.expected_scaffolds)
+        self.assertEqual(stats, expected_stats)
 
-        expected_metrics = {
+        expected_stats = {
             "total": sum(self.expected_contigs),
             "count": len(self.expected_contigs),
         }
-        expected_metrics["genome_n50"] = int(expected_metrics["total"]/2)
-        expected_metrics["n50_length"] = expected_metrics["total"]
+        expected_stats["genome_n50"] = int(expected_stats["total"]/2)
+        expected_stats["n50_length"] = expected_stats["total"]
         for b in length_buckets():
-            expected_metrics["_".join([str(b), "count"])] = 1
-            expected_metrics["_".join([str(b), "length"])] = b + 1
-        metrics = get_metrics(self.expected_contigs)
-        self.assertEqual(metrics, expected_metrics)
+            expected_stats["_".join([str(b), "count"])] = 1
+            expected_stats["_".join([str(b), "length"])] = b + 1
+        stats = get_stats(self.expected_contigs)
+        self.assertEqual(stats, expected_stats)
 
     def test4_asm_stats_cmd(self):
         self.assertEqual(0, 0)
