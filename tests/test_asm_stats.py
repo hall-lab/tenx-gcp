@@ -1,56 +1,63 @@
-#!/usr/bin/env perl
+import os, unittest
+from click.testing import CliRunner
 
-use strict;
-use warnings 'FATAL';
+from tenx.asm_stats import asm_stats_cmd, get_contig_lengths, get_scaffold_and_contig_lengths, get_metrics, length_buckets
 
-use TestEnv;
+class AsmStatsTest(unittest.TestCase):
+    def setUp(self):
+        self.data_dn = os.path.join(os.path.dirname(__file__), "data", "asm-stats")
+        self.fasta1_fn = os.path.join(self.data_dn, "asm.fasta")
+        self.fasta2_fn = os.path.join(self.data_dn, "asm.scaffolded.fasta")
+        self.expected_scaffolds = [ 17004, 350002, 1000001]
+        self.expected_contigs = [1, 2001, 5001, 10001, 100001, 250001, 1000001]
 
-use File::Compare;
-use File::Temp;
-use File::Slurp 'slurp';
-use Test::Exception;
-use Test::More tests => 4;
+    def test1_get_contig_lengths(self):
+        contigs = get_contig_lengths(self.fasta1_fn)
+        self.assertEqual(contigs, self.expected_contigs)
 
-my %test;
-subtest 'setup' => sub{
-    plan tests => 2;
+    def test1_get_scaffold_and_contig_lengths(self):
+        scaffolds, contigs = get_scaffold_and_contig_lengths(self.fasta2_fn)
+        self.assertEqual(scaffolds, self.expected_scaffolds)
+        self.assertEqual(contigs, self.expected_contigs)
 
-    $test{class} = 'Tenx::Assembly::Command::Stats::Quick';
-    use_ok($test{class}) or die;
-    $test{data_dir} = TestEnv::test_data_directory_for_class($test{class});
-    ok(-d $test{data_dir}, 'data dir exists');
+    def test2_get_metrics(self):
+        expected_metrics = {
+            "total": sum(self.expected_scaffolds),
+            "count": len(self.expected_scaffolds),
+        }
+        expected_metrics["genome_n50"] = int(expected_metrics["total"]/2)
+        expected_metrics["n50_length"] = expected_metrics["total"]
 
+        for b in length_buckets():
+            expected_metrics["_".join([str(b), "count"])] = 0
+            expected_metrics["_".join([str(b), "length"])] = 0
+        expected_metrics["1000000_length"] = self.expected_scaffolds[-1]
+        expected_metrics["1000000_count"] = 1
+        expected_metrics["250000_length"] = self.expected_scaffolds[1]
+        expected_metrics["250000_count"] = 1
+        expected_metrics["10000_length"] = self.expected_scaffolds[0]
+        expected_metrics["10000_count"] = 1
+        metrics = get_metrics(self.expected_scaffolds)
+        self.assertEqual(metrics, expected_metrics)
 
-};
+        expected_metrics = {
+            "total": sum(self.expected_contigs),
+            "count": len(self.expected_contigs),
+        }
+        expected_metrics["genome_n50"] = int(expected_metrics["total"]/2)
+        expected_metrics["n50_length"] = expected_metrics["total"]
+        for b in length_buckets():
+            expected_metrics["_".join([str(b), "count"])] = 1
+            expected_metrics["_".join([str(b), "length"])] = b + 1
+        metrics = get_metrics(self.expected_contigs)
+        self.assertEqual(metrics, expected_metrics)
 
-subtest 'success print to STDOUT' => sub{
-    plan tests => 3;
+    def test4_asm_stats_cmd(self):
+        self.assertEqual(0, 0)
 
-    my $output;
-    open local(*STDOUT), '>', \$output or die $!;
-    lives_ok(sub{ $test{class}->execute(fasta_file => $test{data_dir}->file('fasta')->stringify); }, 'execute'); 
-    
-    my $expected_output = slurp($test{data_dir}->file('fasta.stats')->stringify);
-    ok($expected_output, 'loaded expected output');
-    is($output, $expected_output, 'output matches');
+# -- AsmStatsTest
 
-};
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
 
-subtest 'success zero length scaffold print to stats_file' => sub{
-    plan tests => 2;
-
-    my ($fh, $stats_file) = File::Temp::tempfile();
-    $fh->close;
-    lives_ok(sub{ $test{class}->execute(fasta_file => $test{data_dir}->file('zero-length-scaffold.fasta')->stringify, stats_file => $stats_file); }, 'execute');
-    is(File::Compare::compare($stats_file, $test{data_dir}->file('zero-length-scaffold.fasta.stats')->stringify), 0, 'stats file matches');
-    
-};
-
-subtest 'fails' => sub{
-    plan tests => 1;
-
-    throws_ok(sub{ $test{class}->execute(fasta_file => $test{data_dir}->stringify); }, qr/Fasta file does not exist/, 'execute fails w/ non existing fasta file'); 
-
-};
-
-done_testing();
+#-- __main__
