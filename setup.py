@@ -16,6 +16,7 @@ tests_require = [
     "nose",
 ]
 install_requires=[
+    "biopython>=1.46",
     "click==7.0",
     "Jinja2>=2.10.1",
     "pyyaml==5.1",
