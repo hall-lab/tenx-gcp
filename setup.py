@@ -16,6 +16,7 @@ tests_require = [
     "nose",
 ]
 install_requires=[
+    "biopython>=1.46",
     "click==7.0",
     "Jinja2>=2.10.1",
     "pyyaml==5.1",
@@ -44,6 +45,6 @@ setup(
     tests_requires=tests_require,
     packages=find_packages(include=['tenx'], exclude=('tests', 'docs')),
     include_package_data=True,
-    package_data={"tenx": ["job-templates/*"]}
+    package_data={"tenx": ["templates/*"]}
 )
 # -*- coding: utf-8 -*-

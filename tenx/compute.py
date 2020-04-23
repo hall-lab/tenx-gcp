@@ -16,7 +16,7 @@ class Job():
 
     @staticmethod
     def templates_path():
-       return os.path.join( os.path.dirname(os.path.abspath(__file__)), "job-templates")
+       return os.path.join( os.path.dirname(os.path.abspath(__file__)), "templates")
 
     #-- attrs
 

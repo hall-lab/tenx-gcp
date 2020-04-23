@@ -95,6 +95,10 @@ def asm_cleanup_cmd(sample_name):
     assembly.run_cleanup(assembly.TenxAssembly(sample_name=sample_name))
 tenx_asm_cli.add_command(asm_cleanup_cmd, name="cleanup")
 
+# stats
+from tenx.asm_stats import asm_stats_cmd
+tenx_asm_cli.add_command(asm_stats_cmd, name="stats")
+
 # upload
 from tenx.asm_upload import asm_upload_cmd, run_upload
 tenx_asm_cli.add_command(asm_upload_cmd, name="upload")

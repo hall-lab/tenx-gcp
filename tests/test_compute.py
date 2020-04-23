@@ -12,7 +12,7 @@ class TenxJobTest(unittest.TestCase):
 
     def test2_template(self):
         templates_p = compute.Job.templates_path()
-        self.assertRegex(templates_p, re.compile("tenx/job-templates"))
+        self.assertRegex(templates_p, re.compile("tenx/templates"))
 
         job = compute.Job(name="aln-pipeline", manager="slurm")
         self.assertIsNotNone(job)
