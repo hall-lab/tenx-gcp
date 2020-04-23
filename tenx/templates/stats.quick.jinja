@@ -1,0 +1,16 @@
+{% for type in "scaffolds", "contigs" if stats[type] -%}
+{{ type.capitalize() }}
+{{ "  Count     {}".format(stats[type]["count"]) }}
+{{ "  Length    {}".format(stats[type]["total"]) }}
+{{ "  Average   {}".format(stats[type]["mean"])  }}
+{{ "  N50       {}".format(stats[type]["n50_length"]) }}
+{{ "  Longest   {}".format(stats[type]["max"]) }}
+{{ "  Length Distributions" }}
+{% set ns = namespace(b0=length_buckets[0]) -%}
+{% set line_format = "{:>20} {:>4} {} bp" -%}
+{{ line_format.format(" ".join([">", "{}".format(ns.b0)]), stats[type]["{}_count".format(ns.b0)], stats[type]["{}_length".format(ns.b0)]) }}
+{% for b1 in length_buckets[1:] -%}
+{{     line_format.format("{} - {}".format(b1, ns.b0), stats[type]["{}_count".format(ns.b0)], stats[type]["{}_length".format(ns.b0)]) }}
+{%     set ns.b0 = b1 -%}
+{% endfor -%}
+{% endfor -%}
