@@ -19,7 +19,8 @@ def compute_list_templates():
     """
     rows = []
     for fn in os.listdir( Job.templates_path() ):
-        print("\n\n"+fn+"\n\n")
+        if not fn.endswith(".sh"):
+            continue
         (name, manager, suffix) = fn.split(".")
         info = Job.load_template_yaml(fn)
         rows += [[ name, manager, " ".join(info["PARAMS"].keys()) ]]
