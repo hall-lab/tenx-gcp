@@ -1,4 +1,4 @@
-import subprocess, tempfile, unittest
+import os, subprocess, tempfile, unittest
 from click.testing import CliRunner
 from mock import patch
 
@@ -8,7 +8,8 @@ from tenx.asm_download import asm_download_cmd
 class TenxAsmDownloadTest(unittest.TestCase):
     def setUp(self):
         self.temp_d = tempfile.TemporaryDirectory()
-        TenxApp()
+        os.chdir(self.temp_d.name)
+        TenxApp.config = {}
         TenxApp.config['TENX_DATA_PATH'] = "/tmp"
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
 
@@ -27,19 +28,19 @@ class TenxAsmDownloadTest(unittest.TestCase):
         result = runner.invoke(asm_download_cmd, [sample_name])
         try:
             self.assertEqual(result.exit_code, 0)
-            self.maxDiff = 10000000000
-            expected_output = "\n".join([
-                "Download assembly ... ",
-                "Remote path: gs://data/__TESTER__/assembly",
-                "Local path: /tmp/__TESTER__/assembly",
-                "RUNNING: gsutil -m rsync -r gs://data/__TESTER__/assembly .",
-                "Download assembly ... DONE",
-                "",
-            ])
-            self.assertEqual(result.output, expected_output)
         except:
             print(result.output)
             raise
+        self.maxDiff = 10000000000
+        expected_output = "\n".join([
+            "Download assembly ... ",
+            "Remote path: gs://data/__TESTER__/assembly",
+            "Local path: /tmp/__TESTER__/assembly",
+            "RUNNING: gsutil -m rsync -r gs://data/__TESTER__/assembly .",
+            "Download assembly ... DONE",
+            "",
+        ])
+        self.assertEqual(result.output, expected_output)
 
 # -- TenxAsmCliTest
 
