@@ -73,7 +73,7 @@ from tenx.asm_stats import asm_stats_cmd
 tenx_asm_cli.add_command(asm_stats_cmd, name="stats")
 
 # upload
-from tenx.asm_upload import asm_upload_cmd, run_upload
+from tenx.asm_upload import asm_upload_cmd
 tenx_asm_cli.add_command(asm_upload_cmd, name="upload")
 
 #-- ASSEMBLY
