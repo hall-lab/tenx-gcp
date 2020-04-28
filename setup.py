@@ -45,6 +45,6 @@ setup(
     tests_requires=tests_require,
     packages=find_packages(include=['tenx'], exclude=('tests', 'docs')),
     include_package_data=True,
-    package_data={"tenx": ["templates/*"]}
+    package_data={"tenx": ["templates/*","templates/cromwell/*"]}
 )
 # -*- coding: utf-8 -*-

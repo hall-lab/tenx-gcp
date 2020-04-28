@@ -18,6 +18,13 @@ class TenxApp(object):
     # -- __init
 
     @staticmethod
+    def templates_dn_for(name): # cromwell
+        dn = os.path.join(os.path.dirname(__file__), "templates", name)
+        if not os.path.exists(dn):
+            raise Exception("Failed to find templates directory for {}.".format(name))
+        return dn
+
+    @staticmethod
     def load_script_template(name):
         if not 'TENX_SCRIPTS_PATH' in TenxApp.config.keys(): raise Exception("Scripts directory (TENX_SCRIPTS_PATH) is not set in tenx config!")
         script_fn = os.path.join(TenxApp.config['TENX_SCRIPTS_PATH'], name + '.jinja')

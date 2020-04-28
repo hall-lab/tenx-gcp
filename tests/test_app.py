@@ -40,6 +40,14 @@ class TenxAppTest1(unittest.TestCase):
         self.assertIsNotNone(tenxapp)
         self.assertDictEqual(tenxapp.config, config)
 
+    def test3_templates(self):
+        app = TenxApp()
+        with self.assertRaisesRegex(BaseException, "Failed to find templates directory for blah"):
+            app.templates_dn_for("blah")
+        app.templates_dn_for("cromwell")
+
+#-- TenxAppTest1
+
 class TenxAppTest2(unittest.TestCase):
 
     def setUp(self):
