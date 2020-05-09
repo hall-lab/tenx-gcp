@@ -1,19 +1,21 @@
-import os, tempfile, unittest
+import filecmp, io, json, os, subprocess, sys, tempfile, unittest
 from click.testing import CliRunner
 from mock import call, patch
 import socket
 
-from tenx.asm_pipeline import asm_pipeline_cmd
+from tenx.asm_pipeline import asm_pipeline_cmd, asm_pipeline_old_cmd, run_pipeline
 import tenx.app, tenx.assembly, tenx.asm_upload, tenx.notifications, tenx.reads
 
 class AsmPipelineTest(unittest.TestCase):
     
     def setUp(self):
         self.temp_d = tempfile.TemporaryDirectory()
-        os.makedirs(os.path.join(self.temp_d.name, "__SAMPLE__", "assembly"))
+        self.asm = tenx.assembly.TenxAssembly(base_path=self.temp_d.name, sample_name="__SAMPLE__")
+        os.makedirs(os.path.join(self.asm.path))
         tenx.app.TenxApp.config = {
-            "TENX_DATA_PATH": self.temp_d.name,
+            "TENX_DATA_PATH": os.path.join(self.temp_d.name, "__SAMPLE__", "assembly"),
             "TENX_REMOTE_URL": "gs://data",
+            "TENX_CROMWELL_PATH": os.path.join(os.path.dirname(__file__), "data", "app"),
         }
 
     def tearDown(self):
@@ -22,11 +24,8 @@ class AsmPipelineTest(unittest.TestCase):
 
     @patch("socket.gethostname")
     @patch("tenx.notifications.slack")
-    @patch("tenx.reads.download")
-    @patch("tenx.assembly.run_assemble")
-    @patch("tenx.assembly.run_mkoutput")
-    @patch("tenx.asm_upload.run_upload")
-    def test2_asm_pipeline(self, asm_upload_p, asm_mkoutput_p, asm_assemble_p, reads_dl_p, notifications_p, hostname_p):
+    @patch("subprocess.check_call")
+    def test_asm_pipeline(self, subprocess_check_call_p, notifications_p, hostname_p):
         runner = CliRunner()
         result = runner.invoke(asm_pipeline_cmd, ["--help"])
         self.assertEqual(result.exit_code, 0)
@@ -35,18 +34,53 @@ class AsmPipelineTest(unittest.TestCase):
 
         hostname_p.return_value = "deven"
 
-        result = runner.invoke(asm_pipeline_cmd, ["__SAMPLE__"])
+        result = runner.invoke(asm_pipeline_cmd, [self.asm.sample_name])
         try:
             self.assertEqual(result.exit_code, 0)
         except:
             print(result.output)
             raise
         hostname_p.assert_called_once()
-        notifications_p.assert_has_calls([call("__SAMPLE__ START deven"), call("__SAMPLE__ SUCCESS deven")])
+        notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample_name)), call("{} SUCCESS deven".format(self.asm.sample_name))])
+        subprocess_check_call_p.assert_called_once()
+
+    @patch("socket.gethostname")
+    @patch("tenx.notifications.slack")
+    @patch("tenx.reads.download")
+    @patch("tenx.assembly.run_assemble")
+    @patch("tenx.assembly.run_mkoutput")
+    @patch("tenx.asm_upload.run_upload")
+    def test_asm_pipeline_old_cmd(self, asm_upload_p, asm_mkoutput_p, asm_assemble_p, reads_dl_p, notifications_p, hostname_p):
+        runner = CliRunner()
+        result = runner.invoke(asm_pipeline_old_cmd, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(asm_pipeline_old_cmd, [])
+        self.assertEqual(result.exit_code, 2)
+
+        hostname_p.return_value = "deven"
+
+        result = runner.invoke(asm_pipeline_old_cmd, [self.asm.sample_name])
+        try:
+            self.assertEqual(result.exit_code, 0)
+        except:
+            print(result.output)
+            raise
+        hostname_p.assert_called_once()
+        notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample_name)), call("{} SUCCESS deven".format(self.asm.sample_name))])
         reads_dl_p.assert_called_once()
         asm_assemble_p.assert_called_once()
         asm_mkoutput_p.assert_called_once()
         asm_upload_p.assert_called_once()
+
+    @patch("subprocess.check_call")
+    def test_run_pipeline(self, subprocess_check_call_p):
+        s = io.StringIO()
+        sys.stderr = s
+        asm = tenx.assembly.TenxAssembly(base_path=self.temp_d.name, sample_name="blah")
+        run_pipeline(self.asm)
+        subprocess_check_call_p.assert_called_once()
+        self.assertRegex(s.getvalue(), "RUNNING: java -Dconfig.file")
+        sys.stderr = sys.__stderr__
 
 # -- AsmPipelineTest
 
@@ -54,11 +88,3 @@ if __name__ == '__main__':
     unittest.main(verbosity=2)
 
 #-- __main__
-#notifications.slack("{} START {}".format(sample_name, socket.gethostname()))
-#reads.download(reads.TenxReads(sample_name=sample_name))
-#asm = assembly.TenxAssembly(sample_name=sample_name)
-#assembly.run_assemble(asm)
-#assembly.run_mkoutput(asm)
-#run_upload(asm, assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"]))
-#notifications.slack("{} FAILED {}".format(sample_name, socket.gethostname()))
-#notifications.slack("{} SUCCESS {}".format(sample_name, socket.gethostname()))

@@ -9,6 +9,7 @@ class TenxAssembly():
         self.base_path = base_path
         self.sample_name = sample_name
         self.sample_path = os.path.join(self.base_path, self.sample_name)
+        self.pipeline_path = os.path.join(self.sample_path, 'pipeline')
         self.path = os.path.join(self.sample_path, 'assembly')
         self.reads_path = os.path.join(self.sample_path, 'reads')
         self.outs_path = os.path.join(self.path, 'outs')

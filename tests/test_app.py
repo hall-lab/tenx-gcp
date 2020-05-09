@@ -1,24 +1,27 @@
 import os, sys, tempfile, unittest, yaml
 from mock import patch
 
-from .context import tenx
-from tenx.app import TenxApp
+from tenx.app import TenxApp, TenxCromwell
+import tenx.assembly
 
 class TenxAppTest1(unittest.TestCase):
 
     def setUp(self):
-        if TenxApp.config is not None: TenxApp.config = None
+        self.data_dn = os.path.join(os.path.dirname(__file__), "data", "app")
+        self.temp_d = tempfile.TemporaryDirectory()
+        TenxApp.config = None
 
     def tearDown(self):
         TenxApp.config = None
+        self.temp_d.cleanup()
 
-    def test1_init_fails(self):
+    def test_init_fails(self):
         if TenxApp.config is None: TenxApp()
         TenxApp.config = None
         with self.assertRaisesRegex(IOError, "No such file or directory"):
             TenxApp("/tenx.yaml")
 
-    def test2_init(self):
+    def test_init(self):
         # init w/o config
         tenxapp = TenxApp()
         self.assertIsNotNone(TenxApp.config)
@@ -40,11 +43,43 @@ class TenxAppTest1(unittest.TestCase):
         self.assertIsNotNone(tenxapp)
         self.assertDictEqual(tenxapp.config, config)
 
-    def test3_templates(self):
-        app = TenxApp()
-        with self.assertRaisesRegex(BaseException, "Failed to find templates directory for blah"):
-            app.templates_dn_for("blah")
-        app.templates_dn_for("cromwell")
+    def test_cromwell(self):
+        with self.assertRaisesRegex(Exception, "Tenx config has not been initialized!"):
+            cromwell = TenxCromwell()
+
+        TenxApp.config = { "TENX_CROMWELL_PATH": "/", }
+        with self.assertRaisesRegex(Exception, "Cromwell jar not found at /cromwell.jar!"):
+            cromwell = TenxCromwell()
+
+        TenxApp.config = { "TENX_CROMWELL_PATH": self.data_dn, }
+        cromwell = TenxCromwell()
+        self.assertTrue(cromwell)
+
+        templates_dn = cromwell.templates_dn()
+        self.assertTrue(templates_dn)
+
+        cromwell_dn = cromwell.cromwell_dn
+        self.assertEqual(cromwell_dn, TenxApp.config.get("TENX_CROMWELL_PATH"))
+        self.assertEqual(cromwell.cromwell_jar, os.path.join(cromwell_dn, "cromwell.jar"))
+
+        inputs_bn = ".".join(["supernova", "inputs", "json"])
+        self.assertEqual(cromwell.inputs_bn(), inputs_bn)
+        wdl_bn = ".".join(["supernova", "gcloud", "wdl"])
+        self.assertEqual(cromwell.wdl_bn(), wdl_bn)
+        conf_bn = ".".join(["supernova", "conf"])
+        self.assertEqual(cromwell.conf_bn(), conf_bn)
+
+        asm = tenx.assembly.TenxAssembly(sample_name="__TEST__", base_path=self.temp_d.name)
+        conf_fn = os.path.join(asm.pipeline_path, conf_bn)
+        inputs_fn = os.path.join(asm.pipeline_path, inputs_bn)
+        wdl_fn = os.path.join(asm.pipeline_path, wdl_bn)
+
+        cmd = cromwell.supernova_command(asm)
+        expected_cmd = ["java", "-Dconfig={}".format(conf_fn), "-jar", cromwell.cromwell_jar, wdl_fn, "-i", inputs_fn]
+
+        self.assertTrue(os.path.exists(conf_fn))
+        self.assertTrue(os.path.exists(inputs_fn))
+        self.assertTrue(os.path.exists(wdl_fn))
 
 #-- TenxAppTest1
 
