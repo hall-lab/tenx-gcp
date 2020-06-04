@@ -76,8 +76,8 @@ def create_data_directory_structures():
         os.chmod(DATA_DIR, stat.S_IRWXG)
         os.chmod(DATA_DIR, stat.S_IRWXO)
 
-    if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
-        os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
+    if not os.path.exists(APPS_DIR):
+        os.makedirs(APPS_DIR)
 
     if not os.path.exists(TENX_ETC_DIRECTORY):
         os.makedirs(TENX_ETC_DIRECTORY)
@@ -134,7 +134,7 @@ def install_tenx_cli():
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
-    print("Installing tenx-scripts...OK")
+    print("Installing tenx cli...OK")
 
 #-- install_tenx_cli
 
@@ -147,7 +147,6 @@ def add_supernova_profile():
     print("Adding {} ...".format(fn))
     with open(fn, "w") as f:
         f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
-        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
         f.write("[ -e /apps/supernova/sourceme.bash ] && source /apps/supernova/sourceme.bash\n")
         f.write("export LANG=en_US.utf-8\n")
         f.write("export LC_ALL=en_US.utf-8\n")
@@ -185,6 +184,9 @@ def add_tenx_config_file():
 
 def install_cromwell():
     print("Install cromwell...")
+    import requests, yaml
+    with open(TENX_CONFIG_FILE, "r") as f:
+         tenx_conf = yaml.safe_load(f)
     dn = tenx_conf["TENX_CROMWELL_PATH"]
     jar_fn = os.path.join(dn, ".".join(["cromwell", "jar"]))
     print("Local JAR:  {}".format(jar_fn))
@@ -192,7 +194,6 @@ def install_cromwell():
         print("Already installed at {} ...".format(jar_fn))
         return
 
-    import requests
     if not os.path.exists(dn):
         os.makedirs(dn)
     cromwell_version = tenx_conf["TENX_CROMWELL_VERSION"]
