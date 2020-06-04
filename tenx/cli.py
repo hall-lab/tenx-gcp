@@ -31,8 +31,8 @@ from tenx.list import list_cmd
 cli.add_command(list_cmd, name="list")
 
 # READS
-from tenx.reads_cli import tenx_reads_cli
-cli.add_command(tenx_reads_cli, name="reads")
+from tenx.reads_cli import reads_cli
+cli.add_command(reads_cli, name="reads")
 
 # REFERENCE
 from tenx.ref_cli import tenx_ref_cli
