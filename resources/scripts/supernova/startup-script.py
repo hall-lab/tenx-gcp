@@ -9,6 +9,7 @@ SUPERNOVA_SOFTWARE_URL = '@SUPERNOVA_SOFTWARE_URL@'
 
 TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
 TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
+tenx_conf = None
 
 def start_motd():
     msg = """
@@ -30,6 +31,7 @@ def install_packages():
         'gcc',
         'git',
 	'less',
+        'java',
 	'make',
 	'openssl',
 	'openssl-devel',
@@ -38,6 +40,7 @@ def install_packages():
         'redhat-rpm-config',
 	'sssd-client',
 	'sudo',
+        'tmux',
 	'which',
 	'unzip',
 	'vim',
@@ -145,7 +148,7 @@ def add_supernova_profile():
     with open(fn, "w") as f:
         f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
         f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
-        f.write("source /apps/supernova/sourceme.bash\n")
+        f.write("[ -e /apps/supernova/sourceme.bash ] && source /apps/supernova/sourceme.bash\n")
         f.write("export LANG=en_US.utf-8\n")
         f.write("export LC_ALL=en_US.utf-8\n")
         f.write("export CLOUDSDK_PYTHON={}".format(sys.executable))
@@ -180,6 +183,32 @@ def add_tenx_config_file():
 
 #-- add_tenx_config_file
 
+def install_cromwell():
+    print("Install cromwell...")
+    dn = tenx_conf["TENX_CROMWELL_PATH"]
+    jar_fn = os.path.join(dn, ".".join(["cromwell", "jar"]))
+    print("Local JAR:  {}".format(jar_fn))
+    if os.path.exists(jar_fn):
+        print("Already installed at {} ...".format(jar_fn))
+        return
+
+    import requests
+    if not os.path.exists(dn):
+        os.makedirs(dn)
+    cromwell_version = tenx_conf["TENX_CROMWELL_VERSION"]
+    print("Version: {}".format(cromwell_version))
+    url = "https://github.com/broadinstitute/cromwell/releases/download/{0}/{1}-{0}.jar".format(cromwell_version, "cromwell")
+    print("URL: {}".format(url))
+    response = requests.get(url)
+    if not response.ok: raise Exception("GET failed for {}".format(url))
+    print("Writing content to {}".format(jar_fn))
+    with open(jar_fn, "wb") as f:
+        f.write(response.content)
+
+    print("Install cromwell...DONE")
+
+#-- install_cromwell
+
 def end_motd():
     f = open('/etc/motd', 'w')
     f.write('')
@@ -202,6 +231,8 @@ if __name__ == '__main__':
     add_tenx_config_file()
     install_supernova()
     install_tenx_cli()
+    install_cromwell()
     end_motd()
     print("Startup script...DONE")
+
 #-- __main__
