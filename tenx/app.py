@@ -88,7 +88,7 @@ class TenxCromwell():
         with open(conf_template_fn, "r") as f:
             conf_str = f.read()
         conf_t = jinja2.Template(conf_str)
-        conf_rendered = conf_t.render(TENX_CROMWELL_PATH=self.cromwell_dn)
+        conf_rendered = conf_t.render(CROMWELL_ROOT=pipeline_dn)
         conf_fn = os.path.join(pipeline_dn, conf_bn)
         with open(conf_fn, "w") as f:
             f.write(conf_rendered)
