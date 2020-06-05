@@ -7,8 +7,8 @@ DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_SOFTWARE_URL = '@SUPERNOVA_SOFTWARE_URL@'
 
-TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
-TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
+TENX_ETC_DIR = os.path.join(os.path.sep, "etc", "tenx")
+TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIR, "config.yaml")
 tenx_conf = None
 
 def start_motd():
@@ -70,17 +70,10 @@ def install_packages():
 #-- install_packages
 
 def create_data_directory_structures():
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-        os.chmod(DATA_DIR, stat.S_IRWXU)
-        os.chmod(DATA_DIR, stat.S_IRWXG)
-        os.chmod(DATA_DIR, stat.S_IRWXO)
-
-    if not os.path.exists(APPS_DIR):
-        os.makedirs(APPS_DIR)
-
-    if not os.path.exists(TENX_ETC_DIRECTORY):
-        os.makedirs(TENX_ETC_DIRECTORY)
+    for dn in APPS_DIR, DATA_DIR, TENX_ETC_DIR:
+        if not os.path.exists(dn):
+            os.makedirs(dn)
+    os.chmod(DATA_DIR, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
 #-- create_data_directory_structures
 
