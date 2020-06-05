@@ -25,7 +25,7 @@ class TenxRdsCliTest(unittest.TestCase):
         result = runner.invoke(reads_download_cmd, ["MYSAMPLE"])
         self.assertEqual(result.exit_code, 1)
 
-        TenxApp.config = True
+        TenxApp.config = {}
         result = runner.invoke(reads_download_cmd, ["MYSAMPLE"])
         try:
             self.assertEqual(result.exit_code, 0)
