@@ -15,7 +15,7 @@ def asm_pipeline_cmd(sample_name):
     Process includes: downloading reads, running supernova, mkoutput, and then uploading the assembly.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    sys.stderr.write("Run assembly pipeline for {}".format(sample_name))
+    sys.stderr.write("Run assembly pipeline for {}\n".format(sample_name))
     hostname = socket.gethostname()
     notifications.slack("{} START {}".format(sample_name, hostname))
     asm = assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name)
