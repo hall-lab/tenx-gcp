@@ -30,7 +30,7 @@ def asm_assemble(sample_name):
     Create an assembly with supernova.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_assemble(assembly.TenxAssembly(sample_name=sample_name))
+    assembly.run_assemble(assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name))
 tenx_asm_cli.add_command(asm_assemble, name="assemble")
 
 # [download]
@@ -44,7 +44,7 @@ def asm_mkoutput(sample_name):
     Run mkoutput on a supernova assembly.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_mkoutput(assembly.TenxAssembly(sample_name=sample_name))
+    assembly.run_mkoutput(assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name))
 tenx_asm_cli.add_command(asm_mkoutput, name="mkoutput")
 
 # [pipeline]
