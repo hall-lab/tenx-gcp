@@ -7,8 +7,9 @@ DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
 REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_SOFTWARE_URL = '@SUPERNOVA_SOFTWARE_URL@'
 
-TENX_ETC_DIRECTORY = os.path.join(os.path.sep, "etc", "tenx")
-TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIRECTORY, "config.yaml")
+TENX_ETC_DIR = os.path.join(os.path.sep, "etc", "tenx")
+TENX_CONFIG_FILE = os.path.join(TENX_ETC_DIR, "config.yaml")
+tenx_conf = None
 
 def start_motd():
     msg = """
@@ -30,6 +31,7 @@ def install_packages():
         'gcc',
         'git',
 	'less',
+        'java',
 	'make',
 	'openssl',
 	'openssl-devel',
@@ -38,6 +40,7 @@ def install_packages():
         'redhat-rpm-config',
 	'sssd-client',
 	'sudo',
+        'tmux',
 	'which',
 	'unzip',
 	'vim',
@@ -67,17 +70,10 @@ def install_packages():
 #-- install_packages
 
 def create_data_directory_structures():
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-        os.chmod(DATA_DIR, stat.S_IRWXU)
-        os.chmod(DATA_DIR, stat.S_IRWXG)
-        os.chmod(DATA_DIR, stat.S_IRWXO)
-
-    if not os.path.exists( os.path.join(APPS_DIR, 'tenx-scripts') ):
-        os.makedirs( os.path.join(APPS_DIR, 'tenx-scripts') )
-
-    if not os.path.exists(TENX_ETC_DIRECTORY):
-        os.makedirs(TENX_ETC_DIRECTORY)
+    for dn in APPS_DIR, DATA_DIR, TENX_ETC_DIR:
+        if not os.path.exists(dn):
+            os.makedirs(dn)
+    os.chmod(DATA_DIR, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
 #-- create_data_directory_structures
 
@@ -131,7 +127,7 @@ def install_tenx_cli():
 
     os.chdir('/tmp')
     shutil.rmtree('tenx-gcp')
-    print("Installing tenx-scripts...OK")
+    print("Installing tenx cli...OK")
 
 #-- install_tenx_cli
 
@@ -144,8 +140,7 @@ def add_supernova_profile():
     print("Adding {} ...".format(fn))
     with open(fn, "w") as f:
         f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
-        f.write('export PATH=/apps/tenx-scripts:"${PATH}"' + "\n")
-        f.write("source /apps/supernova/sourceme.bash\n")
+        f.write("[ -e /apps/supernova/sourceme.bash ] && source /apps/supernova/sourceme.bash\n")
         f.write("export LANG=en_US.utf-8\n")
         f.write("export LC_ALL=en_US.utf-8\n")
         f.write("export CLOUDSDK_PYTHON={}".format(sys.executable))
@@ -180,6 +175,34 @@ def add_tenx_config_file():
 
 #-- add_tenx_config_file
 
+def install_cromwell():
+    print("Install cromwell...")
+    import requests, yaml
+    with open(TENX_CONFIG_FILE, "r") as f:
+         tenx_conf = yaml.safe_load(f)
+    dn = tenx_conf["TENX_CROMWELL_PATH"]
+    jar_fn = os.path.join(dn, ".".join(["cromwell", "jar"]))
+    print("Local JAR:  {}".format(jar_fn))
+    if os.path.exists(jar_fn):
+        print("Already installed at {} ...".format(jar_fn))
+        return
+
+    if not os.path.exists(dn):
+        os.makedirs(dn)
+    cromwell_version = tenx_conf["TENX_CROMWELL_VERSION"]
+    print("Version: {}".format(cromwell_version))
+    url = "https://github.com/broadinstitute/cromwell/releases/download/{0}/{1}-{0}.jar".format(cromwell_version, "cromwell")
+    print("URL: {}".format(url))
+    response = requests.get(url)
+    if not response.ok: raise Exception("GET failed for {}".format(url))
+    print("Writing content to {}".format(jar_fn))
+    with open(jar_fn, "wb") as f:
+        f.write(response.content)
+
+    print("Install cromwell...DONE")
+
+#-- install_cromwell
+
 def end_motd():
     f = open('/etc/motd', 'w')
     f.write('')
@@ -202,6 +225,8 @@ if __name__ == '__main__':
     add_tenx_config_file()
     install_supernova()
     install_tenx_cli()
+    install_cromwell()
     end_motd()
     print("Startup script...DONE")
+
 #-- __main__

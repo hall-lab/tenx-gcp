@@ -53,14 +53,13 @@ class AsmUploadTest(unittest.TestCase):
         err = io.StringIO()
         sys.stderr = err
         with self.assertRaisesRegex(Exception, "Refusing to upload an unsuccessful assembly"):
-            assembly.run_upload(asm, remote)
+            run_upload(asm, remote)
 
         outs_asm_d = asm.outs_assembly_path
         os.makedirs(outs_asm_d)
 
         err.seek(0, 0)
-        assembly.run_upload(asm, remote)
-
+        run_upload(asm, remote)
         expected_err = "Upload TESTER assembly...\nLocal path: {0}\nEntering {0} ...\nUploading to: gs://data/TESTER/assembly\nRUNNING: gsutil -m rsync -r -x ASSEMBLER_CS/.*|outs/assembly/.* . gs://data/TESTER/assembly\nVerify upload assembly...\nUpload assembly...OK\n".format(asm.path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
