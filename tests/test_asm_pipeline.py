@@ -3,7 +3,7 @@ from click.testing import CliRunner
 from mock import call, patch
 import socket
 
-from tenx.asm_pipeline import asm_pipeline_cmd, asm_pipeline_old_cmd, run_pipeline
+from tenx.asm_pipeline import asm_pipeline_cmd, run_pipeline
 import tenx.app, tenx.assembly, tenx.asm_upload, tenx.notifications, tenx.reads
 
 class AsmPipelineTest(unittest.TestCase):
@@ -43,34 +43,6 @@ class AsmPipelineTest(unittest.TestCase):
         hostname_p.assert_called_once()
         notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample_name)), call("{} SUCCESS deven".format(self.asm.sample_name))])
         subprocess_check_call_p.assert_called_once()
-
-    @patch("socket.gethostname")
-    @patch("tenx.notifications.slack")
-    @patch("tenx.reads.download")
-    @patch("tenx.assembly.run_assemble")
-    @patch("tenx.assembly.run_mkoutput")
-    @patch("tenx.asm_upload.run_upload")
-    def test_asm_pipeline_old_cmd(self, asm_upload_p, asm_mkoutput_p, asm_assemble_p, reads_dl_p, notifications_p, hostname_p):
-        runner = CliRunner()
-        result = runner.invoke(asm_pipeline_old_cmd, ["--help"])
-        self.assertEqual(result.exit_code, 0)
-        result = runner.invoke(asm_pipeline_old_cmd, [])
-        self.assertEqual(result.exit_code, 2)
-
-        hostname_p.return_value = "deven"
-
-        result = runner.invoke(asm_pipeline_old_cmd, [self.asm.sample_name])
-        try:
-            self.assertEqual(result.exit_code, 0)
-        except:
-            print(result.output)
-            raise
-        hostname_p.assert_called_once()
-        notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample_name)), call("{} SUCCESS deven".format(self.asm.sample_name))])
-        reads_dl_p.assert_called_once()
-        asm_assemble_p.assert_called_once()
-        asm_mkoutput_p.assert_called_once()
-        asm_upload_p.assert_called_once()
 
     @patch("subprocess.check_call")
     def test_run_pipeline(self, subprocess_check_call_p):

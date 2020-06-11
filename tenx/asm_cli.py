@@ -48,9 +48,8 @@ def asm_mkoutput(sample_name):
 tenx_asm_cli.add_command(asm_mkoutput, name="mkoutput")
 
 # [pipeline]
-from tenx.asm_pipeline import asm_pipeline_cmd, asm_pipeline_old_cmd
+from tenx.asm_pipeline import asm_pipeline_cmd
 tenx_asm_cli.add_command(asm_pipeline_cmd, name="pipeline")
-tenx_asm_cli.add_command(asm_pipeline_old_cmd, name="pipeline-old")
 
 @click.command(short_help="remove unnecessary post assembly files")
 @click.argument('sample-name', type=click.STRING)
