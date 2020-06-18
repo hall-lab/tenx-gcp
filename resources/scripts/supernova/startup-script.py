@@ -4,7 +4,6 @@ import glob, importlib, os, pip, shutil, re, stat, sys, subprocess, tempfile, ti
 
 APPS_DIR = '/apps'
 DATA_DIR =  os.path.join(os.path.sep, "mnt", "disks", "data")
-REMOTE_DATA_URL = '@REMOTE_DATA_URL@'
 SUPERNOVA_SOFTWARE_URL = '@SUPERNOVA_SOFTWARE_URL@'
 
 TENX_ETC_DIR = os.path.join(os.path.sep, "etc", "tenx")
@@ -26,11 +25,9 @@ def start_motd():
 def install_packages():
 
     packages = [
-        'bsdtar',
 	'ca-certificates',
         'gcc',
         'git',
-	'less',
         'java',
 	'make',
 	'openssl',
@@ -63,10 +60,6 @@ def install_packages():
     print("RUNNING: {}".format(cmd))
     rv = subprocess.check_call(cmd)
 
-    # BOTO CFG - cannot have plugin defined
-    subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
-    subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/', '/etc/boto.cfg'])
-
 #-- install_packages
 
 def create_data_directory_structures():
@@ -78,29 +71,30 @@ def create_data_directory_structures():
 #-- create_data_directory_structures
 
 def install_supernova():
+    print("Install supernova...")
     if os.path.exists( os.path.join(APPS_DIR, "supernova") ):
         print("Already installed supernova...SKIPPING")
         return
 
-    print("Install supernova...")
-    os.chdir(APPS_DIR)
-
     print("Download supernova from " + SUPERNOVA_SOFTWARE_URL)
     cloudsdk_env = { "CLOUDSDK_PYTHON": sys.executable, "CLOUDSDK_GSUTIL_PYTHON": sys.executable }
-    subprocess.call(['gsutil', 'ls', '-l', SUPERNOVA_SOFTWARE_URL], env=cloudsdk_env) # check if exists
-    while subprocess.call(['gsutil', '-m', 'cp', SUPERNOVA_SOFTWARE_URL, '.']):
-        print("Failed to download supernova! Trying again in 5 seconds...")
-        time.sleep (5)
+    subprocess.check_call(['gsutil', 'ls', '-l', SUPERNOVA_SOFTWARE_URL], env=cloudsdk_env) # check if exists
+    os.chdir(APPS_DIR)
+    subprocess.check_call(['gsutil', '-m', 'cp', SUPERNOVA_SOFTWARE_URL, '.'], env=cloudsdk_env)
 
     supernova_glob = glob.glob("supernova*gz")
-    if not len(supernova_glob): raise Exception("Failed to find DL'd supernova tgz!")
+    if not len(supernova_glob):
+        raise Exception("Failed to find DL'd supernova tgz!")
     supernova_tgz = supernova_glob[0]
     print("Found supernova TGZ: " + supernova_tgz)
 
     print("UNTAR supernova...")
-    while subprocess.call(['bsdtar', 'zxf', supernova_tgz]):
-        print("Failed to untar the supernova tgz! Trying again in 5 seconds...")
-        time.sleep (5)
+    try:
+        #subprocess.check_call(['bsdtar', 'zxf', supernova_tgz]):
+        subprocess.check_call(['tar', 'zxf', supernova_tgz])
+    except:
+        print("Failed to untar the supernova tgz!")
+        raise
 
     supernova_dir = re.sub(r'\.t(ar\.)?gz', "", supernova_tgz)
     if not os.path.exists(supernova_dir): raise Exception("Failed to find untarred supnova directory!")
