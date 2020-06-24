@@ -39,13 +39,27 @@ def remote_sample_details(sample_names):
 #-- remote
         
 @click.command(short_help="list samples and their assests")
-def list_cmd():
+@click.argument("sample-names", nargs=-1, type=click.STRING)
+def list_cmd(sample_names):
     """
-    List Samples and Assests [ALN, ASM, RDS]
+    List REMOTE Samples and Assests [ALN, ASM, RDS]
+
+    Give sample names to see sample assets.  If no sample names given, all samples will be listed. Then use the command again to list specific sample assests.
     """
-    sample_names = remote_sample_names()
-    # filter?
-    samples = remote_sample_details(sample_names)
+    if sample_names:
+        samples = remote_sample_details(sample_names)
+        print_sample_assests(samples)
+    else:
+        sample_names = remote_sample_names()
+        print_sample_names(sample_names)
+
+def print_sample_names(sample_names):
+    rows = []
+    for sample_name in sample_names:
+        rows.append([sample_name])
+    print(tabulate.tabulate(rows, ["SAMPLE_NAME"]))
+
+def print_sample_assests(samples):
     rows = []
     for sample_name in samples.keys():
         row = [sample_name, "REMOTE"]

@@ -35,8 +35,23 @@ class ListTest(unittest.TestCase):
         result = runner.invoke(list_cmd, ["--help"])
         self.assertEqual(result.exit_code, 0)
 
-        details_patch.return_value = {"SAMPLE3": {"alignment": "N", "assembly": "Y", "reads": "Y"}}
+        names_patch.return_value = ["SAMPLE3"]
+        details_patch.return_value = None
         result = runner.invoke(list_cmd, [])
+        try:
+            self.assertEqual(result.exit_code, 0)
+        except:
+            print(result.output)
+            raise
+        expected_output = """SAMPLE_NAME
+-------------
+SAMPLE3
+"""
+        self.assertEqual(result.output, expected_output)
+
+        names_patch.return_value = None
+        details_patch.return_value = {"SAMPLE3": {"alignment": "N", "assembly": "Y", "reads": "Y"}}
+        result = runner.invoke(list_cmd, ["SAMPLE3"])
         try:
             self.assertEqual(result.exit_code, 0)
         except:
