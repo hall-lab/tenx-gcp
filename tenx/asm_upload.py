@@ -2,6 +2,7 @@ import click, os, shutil, subprocess, sys
 
 from tenx.app import TenxApp
 import tenx.assembly, tenx.util
+from tenx.sample import TenxSample
 
 @click.command(short_help="Send the assembly to the cloud")
 @click.argument('sample-name', type=click.STRING)
@@ -10,12 +11,12 @@ def asm_upload_cmd(sample_name):
     Upload an assembly from local disk to cloud storage.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    local = tenx.assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
-    remote = tenx.assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
+    local = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"]).assembly()
+    remote = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"]).assembly()
     run_upload(local, remote)
 
 def run_upload(local, remote):
-    sys.stderr.write("Upload {} assembly...\n".format(local.sample_name))
+    sys.stderr.write("Upload {} assembly...\n".format(local.sample.name))
 
     local_d = local.path
     sys.stderr.write("Local path: {}\n".format(local_d))

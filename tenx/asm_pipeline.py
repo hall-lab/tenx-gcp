@@ -5,6 +5,7 @@ import tenx.assembly as assembly
 import tenx.asm_upload
 import tenx.notifications as notifications
 import tenx.reads as reads
+from tenx.sample import TenxSample
 
 @click.command(short_help="run the full supernova assembly pipeline")
 @click.argument('sample-name', type=click.STRING)
@@ -18,7 +19,8 @@ def asm_pipeline_cmd(sample_name):
     sys.stderr.write("Run assembly pipeline for {}\n".format(sample_name))
     hostname = socket.gethostname()
     notifications.slack("{} START {}".format(sample_name, hostname))
-    asm = assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name)
+    sample = TenxSample(base_path=TenxApp.config["TENX_DATA_PATH"], name=sample_name)
+    asm = sample.assembly()
     try:
         run_pipeline(asm)
     except BaseException as ex:

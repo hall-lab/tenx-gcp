@@ -3,8 +3,8 @@ from click.testing import CliRunner
 from mock import patch
 
 from tenx.app import TenxApp
-import tenx.assembly as assembly
 from tenx.asm_upload import asm_upload_cmd, run_upload
+from tenx.sample import TenxSample
 
 class AsmUploadTest(unittest.TestCase):
 
@@ -12,7 +12,10 @@ class AsmUploadTest(unittest.TestCase):
         self.temp_d = tempfile.TemporaryDirectory()
         self.rurl = "gs://data"
         os.chdir(self.temp_d.name)
-        self.asm = assembly.TenxAssembly(sample_name='TESTER', base_path=self.temp_d.name)
+        sample = TenxSample(name='TESTER', base_path=self.temp_d.name)
+        self.asm = sample.assembly()
+        rsample = TenxSample(name='TESTER', base_path=self.rurl)
+        self.remote_asm = rsample.assembly()
         if TenxApp.config is None: TenxApp()
         TenxApp.config['TENX_DATA_PATH'] = self.temp_d.name
         TenxApp.config['TENX_REMOTE_URL'] = self.rurl
@@ -48,7 +51,7 @@ class AsmUploadTest(unittest.TestCase):
 
         asm = self.asm
         os.makedirs(asm.path)
-        remote = assembly.TenxAssembly(sample_name='TESTER', base_path=TenxApp.config["TENX_REMOTE_URL"])
+        remote = self.remote_asm
 
         err = io.StringIO()
         sys.stderr = err
