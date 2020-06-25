@@ -16,10 +16,11 @@ class TenxSampleTest(unittest.TestCase):
     def test0_sample(self):
         for key in "TENX_DATA_PATH", "TENX_REMOTE_URL":
             base_path = TenxApp.config.get(key)
-            s = TenxSample(base_path=base_path, name="TESTER")
+            s = TenxSample(base_path=base_path, name="TEST-001")
             self.assertEqual(s.base_path, base_path)
-            self.assertEqual(s.name, "TESTER")
-            self.assertEqual(s.path, os.path.join(base_path, "TESTER"))
+            self.assertEqual(s.name, "TEST-001")
+            self.assertEqual(s.path, os.path.join(base_path, "TEST-001"))
+            self.assertEqual(s.reads_path, os.path.join(base_path, "TEST-001", "reads"))
 
 # -- TenxSampleTest
 

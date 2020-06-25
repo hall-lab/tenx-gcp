@@ -1,4 +1,4 @@
-import subprocess, unittest
+import unittest
 from click.testing import CliRunner
 from mock import patch
 
@@ -7,7 +7,15 @@ from tenx.reads_cli import reads_cli, reads_download_cmd
 
 class TenxRdsCliTest(unittest.TestCase):
 
-    def test1_rds_cli(self):
+    def setUp(self):
+        if TenxApp.config is None: TenxApp()
+        TenxApp.config["TENX_DATA_PATH"] = "/mnt/disks/data"
+        TenxApp.config["TENX_REMOTE_URL"] = "gs://data"
+
+    def tearDown(self):
+        TenxApp.config = None
+
+    def test0_reads_cli(self):
         runner = CliRunner()
         result = runner.invoke(reads_cli, ["--help"])
         self.assertEqual(result.exit_code, 0)
@@ -15,17 +23,13 @@ class TenxRdsCliTest(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
 
     @patch("tenx.reads.download")
-    def test2_tenx_reads_download(self, dl_p):
+    def test_reads_download(self, dl_p):
         runner = CliRunner()
         result = runner.invoke(reads_download_cmd, ["--help"])
         self.assertEqual(result.exit_code, 0)
         result = runner.invoke(reads_download_cmd, [])
         self.assertEqual(result.exit_code, 2)
 
-        result = runner.invoke(reads_download_cmd, ["MYSAMPLE"])
-        self.assertEqual(result.exit_code, 1)
-
-        TenxApp.config = {}
         result = runner.invoke(reads_download_cmd, ["MYSAMPLE"])
         try:
             self.assertEqual(result.exit_code, 0)
