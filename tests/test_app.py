@@ -2,7 +2,7 @@ import os, sys, tempfile, unittest, yaml
 from mock import patch
 
 from tenx.app import TenxApp, TenxCromwell
-import tenx.assembly
+from tenx.sample import TenxSample
 
 class TenxAppTest1(unittest.TestCase):
 
@@ -69,7 +69,8 @@ class TenxAppTest1(unittest.TestCase):
         conf_bn = ".".join(["supernova", "conf"])
         self.assertEqual(cromwell.conf_bn(), conf_bn)
 
-        asm = tenx.assembly.TenxAssembly(sample_name="__TEST__", base_path=self.temp_d.name)
+        sample = TenxSample(name="__TEST__", base_path=self.temp_d.name)
+        asm = sample.assembly()
         conf_fn = os.path.join(asm.pipeline_path, conf_bn)
         inputs_fn = os.path.join(asm.pipeline_path, inputs_bn)
         wdl_fn = os.path.join(asm.pipeline_path, wdl_bn)
@@ -96,7 +97,7 @@ class TenxAppTest2(unittest.TestCase):
         TenxApp.config = None
 
     def test1_script_template(self):
-        with self.assertRaisesRegex(Exception, "Scripts directory \(TENX_SCRIPTS_PATH\) is not set in tenx config\!"):
+        with self.assertRaisesRegex(Exception, "Scripts directory \(TENX_SCRIPTS_PATH\) is not set in tenx config!"):
             TenxApp.load_script_template('blah')
 
         TenxApp.config['TENX_SCRIPTS_PATH'] = self.scripts_path.name

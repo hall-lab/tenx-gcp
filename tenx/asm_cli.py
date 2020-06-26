@@ -1,13 +1,8 @@
-import click, os, socket, sys
+import click
 
 from tenx.app import TenxApp
-import tenx.assembly as assembly
-from tenx.compute import Job
-import tenx.notifications as notifications
-import tenx.reads as reads
-import tenx.reference as reference
-import tenx.report as report
-import tenx.util as util
+import tenx.assembly
+from tenx.sample import TenxSample
 
 # ASSEMBLY
 # - assemble (run supernova only command)
@@ -30,7 +25,7 @@ def asm_assemble(sample_name):
     Create an assembly with supernova.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_assemble(assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name))
+    tenx.assembly.run_assemble(TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"]).assembly())
 tenx_asm_cli.add_command(asm_assemble, name="assemble")
 
 # [download]
@@ -44,7 +39,7 @@ def asm_mkoutput(sample_name):
     Run mkoutput on a supernova assembly.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_mkoutput(assembly.TenxAssembly(base_path=TenxApp.config["TENX_DATA_PATH"], sample_name=sample_name))
+    tenx.assembly.run_mkoutput(TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"]).assembly())
 tenx_asm_cli.add_command(asm_mkoutput, name="mkoutput")
 
 # [pipeline]
@@ -65,7 +60,7 @@ def asm_cleanup_cmd(sample_name):
 
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    assembly.run_cleanup(assembly.TenxAssembly(sample_name=sample_name))
+    tenx.assembly.run_cleanup(TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_REMOTE_URL")).assembly())
 tenx_asm_cli.add_command(asm_cleanup_cmd, name="cleanup")
 
 # stats
@@ -75,5 +70,3 @@ tenx_asm_cli.add_command(asm_stats_cmd, name="stats")
 # upload
 from tenx.asm_upload import asm_upload_cmd
 tenx_asm_cli.add_command(asm_upload_cmd, name="upload")
-
-#-- ASSEMBLY

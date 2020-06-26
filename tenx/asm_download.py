@@ -1,7 +1,7 @@
 import click, os, subprocess, sys
 
 from tenx.app import TenxApp
-import tenx.assembly as assembly
+from tenx.sample import TenxSample
 
 @click.command(short_help="download assembly files")
 @click.argument('sample-name', type=click.STRING)
@@ -10,8 +10,8 @@ def asm_download_cmd(sample_name):
     Download an Assembly
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    remote = assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
-    local = assembly.TenxAssembly(sample_name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
+    remote = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"]).assembly()
+    local = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"]).assembly()
     asm_download(remote, local)
 
 #-- asm_download_cmd

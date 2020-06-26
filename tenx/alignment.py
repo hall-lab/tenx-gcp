@@ -1,21 +1,19 @@
 import glob, os, shutil, subprocess, sys, tempfile
 
 from tenx.app import TenxApp
+from tenx.sample import TenxSample
 import tenx.util as util
 
 class TenxAlignment():
 
     def __init__(self, sample_name):
-        self.sample_name = sample_name
+        self.sample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_DATA_PATH"))
 
     def remote_url(self):
-        return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample_name, 'alignment')
-
-    def sample_directory(self):
-        return os.path.join(TenxApp.config['TENX_DATA_PATH'], self.sample_name)
+        return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample.name, 'alignment')
 
     def directory(self):
-        return os.path.join(self.sample_directory(), 'alignment')
+        return os.path.join(self.sample.path, 'alignment')
 
     def outs_directory(self):
         return os.path.join(self.directory(), 'outs')
@@ -25,10 +23,10 @@ class TenxAlignment():
 
 #-- TenxAlignment
 
-def run_align(aln, ref, rds):
-   sys.stderr.write("Creating alignments for {}\n".format(aln.sample_name))
+def run_align(aln, ref):
+   sys.stderr.write("Creating alignments for {}\n".format(aln.sample.name))
 
-   sample_d = aln.sample_directory()
+   sample_d = aln.sample.path
    if not os.path.exists(sample_d): os.makedirs(sample_d)
    sys.stderr.write("Entering {}\n".format(sample_d))
    pwd = os.getcwd()
@@ -36,7 +34,7 @@ def run_align(aln, ref, rds):
 
    try:
        cmd = ["longranger", "wgs", "--id=alignment",
-           "--sample={}".format(aln.sample_name), "--reference={}".format(ref.directory()), "--fastqs={}".format(rds.directory()),
+           "--sample={}".format(aln.sample.name), "--reference={}".format(ref.directory()), "--fastqs={}".format(aln.sample.reads_path),
             "--vcmode={}".format(TenxApp.config['TENX_ALN_VCMODE']), "--disable-ui", "--jobmode={}".format(TenxApp.config['TENX_ALN_MODE']),
             "--localmem={}".format(TenxApp.config['TENX_ALN_MEM']), "--localcores={}".format(TenxApp.config['TENX_ALN_CORES'])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
@@ -51,7 +49,7 @@ def run_align(aln, ref, rds):
 #-- run_align
 
 def run_upload(aln):
-    sys.stderr.write("Upload {} alignment...\n".format(aln.sample_name))
+    sys.stderr.write("Upload {} alignment...\n".format(aln.sample.name))
 
     if not aln.is_successful(): raise Exception("Refusing to upload an unsuccessful alignment!")
 

@@ -1,7 +1,7 @@
 import click
 
 from tenx.app import TenxApp
-import tenx.reads
+import tenx.reads, tenx.sample
 
 # READS
 # - download (fetch reads from the cloud)
@@ -21,7 +21,7 @@ def reads_download_cmd(sample_name):
     """
     if TenxApp.config is None:
         raise Exception("Must provide tenx yaml config file!")
-    tenx.reads.download(tenx.reads.TenxReads(sample_name=sample_name))
+    lsample = tenx.sample.TenxSample(base_path=TenxApp.config.get("TENX_DATA_PATH"), name=sample_name)
+    rsample = tenx.sample.TenxSample(base_path=TenxApp.config.get("TENX_REMOTE_URL"), name=sample_name)
+    tenx.reads.download(lsample, rsample)
 reads_cli.add_command(reads_download_cmd, name="download")
-
-#-- READS

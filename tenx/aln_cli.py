@@ -9,7 +9,6 @@ import tenx.report as report
 import tenx.util as util
 
 from tenx.alignment import TenxAlignment
-from tenx.reads import TenxReads
 from tenx.reference import TenxReference
 
 # ALIGNMENT
@@ -32,7 +31,7 @@ def aln_align(sample_name, ref_name):
     Create alignments with longranger.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReads(sample_name=sample_name), TenxReference(name=ref_name))
+    alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReference(name=ref_name))
 tenx_aln_cli.add_command(aln_align, name="align")
 
 @click.command(short_help="run the full longranger wgs alignment pipeline")
@@ -50,10 +49,11 @@ def aln_pipeline(sample_name, ref_name):
     try:
         ref = TenxReference(name=ref_name)
         reference.download(ref)
-        rds = TenxReads(sample_name=sample_name)
-        reads.download(rds)
+        sample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_DATA_PATH"))
+        rsample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_REMOTE_URL"))
+        reads.download(sample, rsample)
         aln = alignment.TenxAlignment(sample_name=sample_name)
-        alignment.run_align(aln, ref, rds)
+        alignment.run_align(aln, ref)
         compute_metrics = util.calculate_compute_metrics(aln.directory())
         print( report.compute_metrics_basic(compute_metrics) )
         with open(os.path.join(aln.directory(), "outs", "compute-metrics.txt"), "w") as f:
@@ -78,5 +78,3 @@ def aln_upload(sample_name):
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
     alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
 tenx_aln_cli.add_command(aln_upload, name="upload")
-
-#-- ALIGNMENT

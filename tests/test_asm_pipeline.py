@@ -4,13 +4,15 @@ from mock import call, patch
 import socket
 
 from tenx.asm_pipeline import asm_pipeline_cmd, run_pipeline
-import tenx.app, tenx.assembly, tenx.asm_upload, tenx.notifications, tenx.reads
+import tenx.app, tenx.notifications
+from tenx.sample import TenxSample
 
 class AsmPipelineTest(unittest.TestCase):
     
     def setUp(self):
         self.temp_d = tempfile.TemporaryDirectory()
-        self.asm = tenx.assembly.TenxAssembly(base_path=self.temp_d.name, sample_name="__SAMPLE__")
+        sample = TenxSample(name="__SAMPLE__", base_path=self.temp_d.name)
+        self.asm = sample.assembly()
         os.makedirs(os.path.join(self.asm.path))
         tenx.app.TenxApp.config = {
             "TENX_DATA_PATH": os.path.join(self.temp_d.name, "__SAMPLE__", "assembly"),
@@ -34,21 +36,21 @@ class AsmPipelineTest(unittest.TestCase):
 
         hostname_p.return_value = "deven"
 
-        result = runner.invoke(asm_pipeline_cmd, [self.asm.sample_name])
+        result = runner.invoke(asm_pipeline_cmd, [self.asm.sample.name])
         try:
             self.assertEqual(result.exit_code, 0)
         except:
             print(result.output)
             raise
         hostname_p.assert_called_once()
-        notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample_name)), call("{} SUCCESS deven".format(self.asm.sample_name))])
+        notifications_p.assert_has_calls([call("{} START deven".format(self.asm.sample.name)), call("{} SUCCESS deven".format(self.asm.sample.name))])
         subprocess_check_call_p.assert_called_once()
 
     @patch("subprocess.check_call")
     def test_run_pipeline(self, subprocess_check_call_p):
         s = io.StringIO()
         sys.stderr = s
-        asm = tenx.assembly.TenxAssembly(base_path=self.temp_d.name, sample_name="blah")
+        asm = TenxSample(name="blah", base_path=self.temp_d.name).assembly()
         run_pipeline(self.asm)
         subprocess_check_call_p.assert_called_once()
         self.assertRegex(s.getvalue(), "RUNNING: java -Dconfig.file")

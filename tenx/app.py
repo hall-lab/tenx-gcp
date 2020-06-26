@@ -69,7 +69,7 @@ class TenxCromwell():
         with open(inputs_template_fn, "r") as f:
             inputs_str = f.read()
         inputs_t = jinja2.Template(inputs_str)
-        inputs_rendered = inputs_t.render(SAMPLE_NAME=asm.sample_name)
+        inputs_rendered = inputs_t.render(SAMPLE_NAME=asm.sample.name)
         inputs = json.loads(inputs_rendered)
         inputs_fn = os.path.join(pipeline_dn, inputs_bn)
         with open(inputs_fn, "w") as f:

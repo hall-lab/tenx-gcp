@@ -5,13 +5,10 @@ import tenx.util as util
 
 class TenxAssembly():
 
-    def __init__(self, base_path, sample_name):
-        self.base_path = base_path
-        self.sample_name = sample_name
-        self.sample_path = os.path.join(self.base_path, self.sample_name)
-        self.pipeline_path = os.path.join(self.sample_path, 'pipeline')
-        self.path = os.path.join(self.sample_path, 'assembly')
-        self.reads_path = os.path.join(self.sample_path, 'reads')
+    def __init__(self, sample, path):
+        self.sample = sample
+        self.pipeline_path = os.path.join(sample.path, 'pipeline')
+        self.path = os.path.join(sample.path, 'assembly')
         self.outs_path = os.path.join(self.path, 'outs')
         self.outs_assembly_path = os.path.join(self.outs_path, 'assembly')
         self.outs_assembly_stats_path = os.path.join(self.outs_assembly_path, 'stats')
@@ -28,7 +25,7 @@ def run_assemble(asm):
     sys.stderr.write("Checking if supernova is in PATH...\nRUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
-    sample_d = asm.sample_path
+    sample_d = asm.sample.path
     if not os.path.exists(sample_d):
         os.makedirs(sample_d)
 
@@ -36,7 +33,7 @@ def run_assemble(asm):
     try:
         os.chdir(sample_d)
         cmd = [
-            "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.reads_path), "--uiport=18080", "--nodebugmem",
+            "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.sample.reads_path), "--uiport=18080", "--nodebugmem",
             "--localcores={}".format(TenxApp.config['TENX_ASM_CORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_MEM']),
         ]
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
@@ -48,7 +45,7 @@ def run_assemble(asm):
 #-- assemble
 
 def run_mkoutput(asm):
-    sys.stderr.write("Running mkoutput for {}...\n".format(asm.sample_name))
+    sys.stderr.write("Running mkoutput for {}...\n".format(asm.sample.name))
 
     if not asm.is_successful(): raise Exception("Assembly is not complete! Cannot run mkoutput!")
 
@@ -66,7 +63,7 @@ def run_mkoutput(asm):
         os.chdir(mkoutput_d)
         cmd_template = "supernova mkoutput --asmdir={OUTS_ASM_D} --outprefix={SAMPLE_NAME}.{STYLE} --style={STYLE}"
         for style in ("raw", "megabubbles", "pseudohap2"):
-            cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_path, SAMPLE_NAME=asm.sample_name, STYLE=style).split(" ")
+            cmd = cmd_template.format(OUTS_ASM_D=asm.outs_assembly_path, SAMPLE_NAME=asm.sample.name, STYLE=style).split(" ")
             sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
             subprocess.check_call(cmd)
         fastas = glob.glob( os.path.join(mkoutput_d, '*fasta.gz') )
@@ -78,7 +75,7 @@ def run_mkoutput(asm):
 #-- run_mkoutput
 
 def run_cleanup(asm): # remote only
-    sys.stderr.write("Cleanup assembly for {} ...\n".format(asm.sample_name))
+    sys.stderr.write("Cleanup assembly for {} ...\n".format(asm.sample.name))
     sys.stderr.write("Assembly remote URL: {}\n".format(asm.path))
 
     # check gsutil

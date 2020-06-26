@@ -1,30 +1,39 @@
-import subprocess, unittest
+import unittest
+from click.testing import CliRunner
 
-class TenxAlnCliTest(unittest.TestCase):
+from tenx.aln_cli import tenx_aln_cli, aln_align, aln_pipeline, aln_upload
 
-    def test1_tenx_alignment(self):
-        rv = subprocess.call(['tenx', 'aln'])
-        self.assertEqual(rv, 0)
+class AlnCliTest(unittest.TestCase):
+
+    def test1_tenx_aln(self):
+        runner = CliRunner()
+        result = runner.invoke(tenx_aln_cli, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(tenx_aln_cli, [])
+        self.assertEqual(result.exit_code, 0)
 
     def test2_tenx_aln_align(self):
-        rv = subprocess.call(['tenx', 'aln', 'align', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'aln', 'align'])
-        self.assertEqual(rv, 2)
+        runner = CliRunner()
+        result = runner.invoke(aln_align, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(aln_align, [])
+        self.assertEqual(result.exit_code, 2)
 
     def test2_tenx_aln_pipeline(self):
-        rv = subprocess.call(['tenx', 'aln', 'pipeline', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'aln', 'pipeline'])
-        self.assertEqual(rv, 2)
+        runner = CliRunner()
+        result = runner.invoke(aln_pipeline, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(aln_pipeline, [])
+        self.assertEqual(result.exit_code, 2)
 
     def test2_tenx_aln_upload(self):
-        rv = subprocess.call(['tenx', 'aln', 'upload', '--help'])
-        self.assertEqual(rv, 0)
-        rv = subprocess.call(['tenx', 'aln', 'upload'])
-        self.assertEqual(rv, 2)
+        runner = CliRunner()
+        result = runner.invoke(aln_upload, ["--help"])
+        self.assertEqual(result.exit_code, 0)
+        result = runner.invoke(aln_upload, [])
+        self.assertEqual(result.exit_code, 2)
 
-# -- TenxAlnCliTest
+# -- AlnCliTest
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
