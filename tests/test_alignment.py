@@ -5,7 +5,6 @@ from .context import tenx
 from tenx.app import TenxApp
 from tenx import alignment, reads, reference
 from tenx.alignment import TenxAlignment
-from tenx.reads import TenxReads
 from tenx.reference import TenxReference
 
 class TenxAlignmentTest(unittest.TestCase):
@@ -27,7 +26,7 @@ class TenxAlignmentTest(unittest.TestCase):
 
     def test10_alignment(self):
         aln = TenxAlignment(sample_name='TESTER')
-        self.assertEqual(aln.sample_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
+        self.assertEqual(aln.sample.path, os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER'))
         self.assertEqual(aln.directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'alignment'))
         self.assertEqual(aln.outs_directory(), os.path.join(os.path.sep, TenxApp.config['TENX_DATA_PATH'], 'TESTER', 'alignment', 'outs'))
         self.assertEqual(aln.remote_url(), os.path.join(TenxApp.config['TENX_REMOTE_URL'], 'TESTER', 'alignment'))
@@ -51,11 +50,10 @@ class TenxAlignmentTest(unittest.TestCase):
         aln = TenxAlignment(sample_name='TEST_SUCCESS')
         os.makedirs( os.path.join(aln.directory(), "outs") )
         with open(os.path.join(aln.directory(), "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
-        rds = TenxReads(sample_name='TEST_SUCCESS')
         ref = TenxReference(name="REF")
-        alignment.run_align(aln, ref, rds)
+        alignment.run_align(aln, ref)
 
-        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --vcmode=freebayes --disable-ui --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample_directory(), ref.directory(), rds.directory())
+        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --vcmode=freebayes --disable-ui --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample.path, ref.directory(), aln.sample.reads_path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
