@@ -13,6 +13,7 @@ def reads_cli():
     """
     pass
 
+#- dl
 @click.command(short_help="Download reads from the cloud!")
 @click.argument('sample-name', type=click.STRING)
 def reads_download_cmd(sample_name):
@@ -25,3 +26,7 @@ def reads_download_cmd(sample_name):
     rsample = tenx.sample.TenxSample(base_path=TenxApp.config.get("TENX_REMOTE_URL"), name=sample_name)
     tenx.reads.download(lsample, rsample)
 reads_cli.add_command(reads_download_cmd, name="download")
+
+#- ul
+from tenx.reads_ul import ul_cmd
+reads_cli.add_command(ul_cmd, name="ul")
