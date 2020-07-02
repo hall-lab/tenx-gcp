@@ -1,21 +1,20 @@
-import datetime, os, re, subprocess, unittest
+import datetime, os, unittest
 
-from .context import tenx
 import tenx.util as util
 
 class TenxUtilCalculateComputeMetricsTest(unittest.TestCase):
-    def data_d():
-        return os.path.join(os.path.dirname(__file__), 'test_util_calculate_compute_metrics')
+    def setUp(self):
+        self.data_dn = os.path.join(os.path.dirname(__file__), "data", "test_util_calculate_compute_metrics")
 
     def test_failures(self):
         with self.assertRaisesRegex(Exception, 'Cannot compute compute metrics! Run directory'):
             util.calculate_compute_metrics('/BLAH')
 
         with self.assertRaisesRegex(Exception, "Failed to find log path ending in '_CS'"):
-            util.calculate_compute_metrics(os.path.dirname(__file__))
+            util.calculate_compute_metrics(os.path.dirname(self.data_dn))
 
     def test_success(self):
-        metrics_d = os.path.join(os.path.dirname(__file__), 'test_util_calculate_compute_metrics')
+        metrics_d = self.data_dn
         metrics = util.calculate_compute_metrics(metrics_d)
         expected_metrics = {
             'directory': metrics_d,
@@ -30,6 +29,6 @@ class TenxUtilCalculateComputeMetricsTest(unittest.TestCase):
 #-- TenxUtilTest
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)
 
 #-- main

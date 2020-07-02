@@ -1,7 +1,6 @@
 import gzip, io, os, shutil, subprocess, sys, tarfile, tempfile, unittest
 from mock import patch
 
-from .context import tenx
 from tenx.app import TenxApp
 from tenx import reference
 

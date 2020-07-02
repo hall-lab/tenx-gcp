@@ -1,7 +1,6 @@
 import os, shutil, subprocess, tempfile, unittest
 from mock import patch
 
-from .context import tenx
 from tenx import util
 
 class VerifyUploadTest(unittest.TestCase):

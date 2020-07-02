@@ -1,7 +1,6 @@
 import io, os, subprocess, sys, tempfile, unittest
 from mock import patch
 
-from .context import tenx
 from tenx.app import TenxApp
 import tenx.assembly as assembly
 from tenx.sample import TenxSample
