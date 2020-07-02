@@ -1,7 +1,6 @@
 import io, os, re, sys, tempfile, unittest
 from mock import patch
 
-from .context import tenx
 from tenx import compute
 
 class TenxJobTest(unittest.TestCase):

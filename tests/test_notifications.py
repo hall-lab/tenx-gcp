@@ -1,9 +1,6 @@
-#!/usrbin/env python
-
 import os, requests, unittest
 from mock import patch
 
-from .context import tenx
 from tenx import notifications
 from tenx.app import TenxApp
 

@@ -1,7 +1,6 @@
 import io, os, shutil, subprocess, sys, tempfile, unittest
 from mock import patch
 
-from .context import tenx
 from tenx.app import TenxApp
 from tenx import alignment, reads, reference
 from tenx.alignment import TenxAlignment
