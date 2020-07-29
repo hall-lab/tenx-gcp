@@ -33,7 +33,7 @@ def run_assemble(asm):
     try:
         os.chdir(sample_d)
         cmd = [
-            "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.sample.reads_path), "--uiport=18080", "--nodebugmem",
+            "supernova", "run", "--id=assembly", "--fastqs={}".format(asm.sample.reads_path), "--maxreads=all", "--uiport=18080", "--nodebugmem",
             "--localcores={}".format(TenxApp.config['TENX_ASM_CORES']), "--localmem={}".format(TenxApp.config['TENX_ASM_MEM']),
         ]
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
