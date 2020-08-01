@@ -21,7 +21,7 @@ workflow supernova {
 
   call upload {
     input:
-      sample_name = assemble.output_sample_name
+      sample_name = mkoutput.output_sample_name
   }
 }
 
@@ -57,7 +57,11 @@ task mkoutput {
 
   command {
     tenx asm mkoutput ${sample_name}
-  } 
+  }
+
+  output {
+    String output_sample_name = sample_name
+  }
 }
 
 task upload {
