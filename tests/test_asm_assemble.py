@@ -45,7 +45,7 @@ class TenxAssemblyTest(unittest.TestCase):
             run_assemble(asm)
         self.assertTrue(os.path.exists(sample.path))
 
-        expected_err = "Checking if supernova is in PATH...\nRUNNING: supernova --help\nRUNNING: supernova run --id=assembly --fastqs={} --uiport=18080 --nodebugmem --localcores=2 --localmem=2\n".format(sample.reads_path)
+        expected_err = "Checking if supernova is in PATH...\nRUNNING: supernova --help\nRUNNING: supernova run --id=assembly --fastqs={} --maxreads=all --uiport=18080 --nodebugmem --localcores=2 --localmem=2\n".format(sample.reads_path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
