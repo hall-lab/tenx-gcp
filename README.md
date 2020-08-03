@@ -11,7 +11,7 @@ CLI, config, and resources for running 10X Genomics pipelines
 
 # Config and Data Structure
 
-## Config
+## GCP Config
 
 Configuration is kept in the environment variable "TENX_CONFIG_FILE". These values are filled in from the google deployment YAML, but would need to be provided otherwise. Here are the known config keys. Not all keys are not always necessary. Configs used for deployments are in resources/config.
 
@@ -144,6 +144,24 @@ Cores: 2
 Mem:   8G+
 Disk:  32G+ (loupe files are ~4G each)
 
-# Cellranger
+# Docker Image for Tenx CLI
+There is a docker container (`ebelter/tenx:latest`) to use to interact between the REMOTE and LOCAL data paths. This image does not have supernova or longrnger installed. This image is to upload/download reads and assemblies, and includes `gcloud` and `gsutil` commands.
 
-Not yet :(
+## Auth from MGI
+In order to use `tenx` CLI and the GCP commands
+
+```
+$ bsub -q docker-interactive -a 'docker(ebelter/tenx:latest)' /bin/bash
+```
+Check the config...
+```
+$ gcloud config list
+```
+If needed, reauth GCP:
+```
+$ gcloud init
+```
+Then use `tenx` CLI and GCP commands. Jobs can also submit to the LSF cluster. This command shows all the remote samples.
+```
+$ bsub -q research-hpc -a 'docker(ebelter/tenx:latest)' tenx list
+```
