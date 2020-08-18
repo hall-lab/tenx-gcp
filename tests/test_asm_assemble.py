@@ -39,13 +39,14 @@ class TenxAssemblyTest(unittest.TestCase):
         err = io.StringIO()
         sys.stderr = err
 
+        TenxApp.config['TENX_ASM_PARAMS'] = "--maxreads='all'"
         sample = TenxSample(name="TESTER", base_path=TenxApp.config.get("TENX_DATA_PATH"))
         asm = sample.assembly()
         with self.assertRaisesRegex(Exception, "Ran supernova script, but {} was not found".format(asm.outs_assembly_path)):
             run_assemble(asm)
         self.assertTrue(os.path.exists(sample.path))
 
-        expected_err = "Checking if supernova is in PATH...\nRUNNING: supernova --help\nRUNNING: supernova run --id=assembly --fastqs={} --uiport=18080 --nodebugmem --localcores=2 --localmem=2\n".format(sample.reads_path)
+        expected_err = "Checking if supernova is in PATH...\nRUNNING: supernova --help\nRUNNING: supernova run --id=assembly --fastqs={} --uiport=18080 --nodebugmem --localcores=2 --localmem=2 --maxreads='all'\n".format(sample.reads_path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
