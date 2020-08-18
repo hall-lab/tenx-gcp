@@ -11,7 +11,7 @@ CLI, config, and resources for running 10X Genomics pipelines
 
 # Config and Data Structure
 
-## Config
+## GCP Config
 
 Configuration is kept in the environment variable "TENX_CONFIG_FILE". These values are filled in from the google deployment YAML, but would need to be provided otherwise. Here are the known config keys. Not all keys are not always necessary. Configs used for deployments are in resources/config.
 
@@ -101,18 +101,24 @@ This is list of assets created in the deployment. All assests are preppended wit
 | supernova01-network-tenx-web-ui         | compute.v1.firewall   | firewall to allow access to the 10X web UI |
 
 ### Start Supernova Pipeline
-
 SSH into the supernova01-1 compute instance.
 ```
 $ gcloud compute ssh supernova01-1
 ```
-Then, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. This command redirects STDERR and STDOUT to a log file, and runs the command in the background. When running, supernova keeps a log in the assembly directory called _\_log_
+Create a `tmux` session. This will allow the pipeline comand to persist after loggin out of the supernova instance. A name can be provided for the session.
 ```
-[you@soupernova01-1 ~]$ tenx asm pipeline ${SAMPLE_NAME} &> log &
+[you@soupernova01-1 ~]$ tmux new ${SAMPLE_NAME}
 ```
-Make sure to logout out of the session, and not let it exit happen because of timeout. Logout, exit or <CNTRL-D> your SSH session.
+Inside the `tmux` session, run the supernova pipeline using the _tenx_ CLI providing a sample name. The pipeline expects reads to be in _${REMOTE_DATA_URL}/${SAMPLE_NAME}/reads_ and will put the resulting assembly and outputs into  _${REMOTE_DATA_URL}/${SAMPLE_NAME}/assembly_. Use `tee` to print STDOUT/ERR while redirecting this output to a file.
 ```
-[you@soupernova01-1 ~]$ logout
+[you@soupernova01-1 ~]$ tenx asm pipeline ${SAMPLE_NAME} | tee ${SAMPLE_NAME}.log
+```
+Logout of the tmux session using <CNTL>D-B to preserve it, then log out of the supernova instance. The tmux session will persist.
+
+To re-attach to the tmux session:
+```
+$ gcloud compute ssh supernova01-1
+[you@soupernova01-1 ~]$ tmux attach -t ${SAMPLE_NAME}
 ```
 
 <a name="longranger"/>
@@ -138,6 +144,24 @@ Cores: 2
 Mem:   8G+
 Disk:  32G+ (loupe files are ~4G each)
 
-# Cellranger
+# Docker Image for Tenx CLI
+There is a docker container (`ebelter/tenx:latest`) to use to interact between the REMOTE and LOCAL data paths. This image does not have supernova or longrnger installed. This image is to upload/download reads and assemblies, and includes `gcloud` and `gsutil` commands.
 
-Not yet :(
+## Auth from MGI
+In order to use `tenx` CLI and the GCP commands
+
+```
+$ bsub -q docker-interactive -a 'docker(ebelter/tenx:latest)' /bin/bash
+```
+Check the config...
+```
+$ gcloud config list
+```
+If needed, reauth GCP:
+```
+$ gcloud init
+```
+Then use `tenx` CLI and GCP commands. Jobs can also submit to the LSF cluster. This command shows all the remote samples.
+```
+$ bsub -q research-hpc -a 'docker(ebelter/tenx:latest)' tenx list
+```
