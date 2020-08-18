@@ -25,4 +25,7 @@ resources:
 
     # TENX CONFIG
     #notification            : <SLACK_URL>
+
+    # ASSEMBLY PARAMETERS [see schema for details]
+    #asm_params              : <ASM_PARAMS>
 #  [END supernova_yaml]

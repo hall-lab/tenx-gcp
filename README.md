@@ -114,7 +114,7 @@ Inside the `tmux` session, run the supernova pipeline using the _tenx_ CLI provi
 [you@soupernova01-1 ~]$ tenx asm pipeline ${SAMPLE_NAME} | tee ${SAMPLE_NAME}.log
 ```
 Logout of the tmux session using <CNTL>D-B to preserve it, then log out of the supernova instance. The tmux session will persist.
-    
+
 To re-attach to the tmux session:
 ```
 $ gcloud compute ssh supernova01-1

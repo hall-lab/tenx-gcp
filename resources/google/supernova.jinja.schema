@@ -32,7 +32,16 @@ required:
 - supernova_software_url
 - zone
 
+optional:
+- asm_params
+
 properties:
+  asm_params:
+    type        : string
+    description : |
+      Parameters to pass directly to the supernova "run" command.|
+        v2.1.0 |
+          requires --maxreads default was 1_200_000_000 new max allowed is 2_140_000_000
   disk_size_gb:
     type        : integer
     default     : 2000
