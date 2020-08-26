@@ -6,7 +6,7 @@ Using Google deployments to run Supernova assemblies at scale using Cromwell wor
 
 # 10X Supernova
 
-Supernova is a software package for de novo assembly from Chromium Linked-Reads. These reads have an additional encoding that helps with creaating diploid assemblies, representing maternal and paternal haplotypes.
+Supernova is a software package for de novo assembly from Chromium Linked-Reads. These reads have an additional encoding that helps with creating diploid assemblies, representing maternal and paternal haplotypes.
 
 ---
 
@@ -16,7 +16,7 @@ Supernova is a software package for de novo assembly from Chromium Linked-Reads.
  * minimum compute resources are 32 cores and 256 GB
  * intermediate storage required is > 1TB
 * scale to many assemblies
- * MGI prodcues 8+ at a time
+ * MGI produces 8+ at a time
 * automate the assembly process
  * in-house code and a workflow system
 
@@ -60,7 +60,7 @@ Create and manage cloud resources with simple templates.
 
 Jinja is a modern and designer-friendly templating language for Python, modelled after Django’s templates.
 
-* Jinja file descrbes cloud resources
+* Jinja file describes cloud resources
 * Schema details the config properties
 
 ---
@@ -71,7 +71,7 @@ Installs
 * supernova
 * cromwell
 * in-house code
-* additional linux tools
+* additional Linux tools
 
 ---
 
