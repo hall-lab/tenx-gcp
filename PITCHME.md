@@ -23,7 +23,7 @@ Supernova is a software package for de novo assembly from Chromium Linked-Reads.
 ---
 # In House Code
 
-Scripts and CLI to manage 10X resources and run the assembly pipeline.
+Scripts and CLI to manage 10X resources and run the assembly pipeline. Also included Slack notification when pipelines start and finish.
 
 ---
 
@@ -74,7 +74,17 @@ Installs
 * additional linux tools
 
 ---
-* 1
-* 2
+
+### Config YAML
+
+Includes the properties necaessrey to fconfigure the deployment
 
 ---
+
+# LIVE DEMO
+
+Fingers crossed :)
+
+---
+
+# FIN
