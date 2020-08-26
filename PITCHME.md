@@ -33,7 +33,7 @@ Cromwell is a Workflow Management System geared towards scientific workflows.
 
 ---
 
-### Cromwell Workflow:
+## Cromwell Workflow:
 
 * download read fastqs
 * assemble
@@ -50,9 +50,9 @@ Create and manage cloud resources with simple templates.
 
 ## Google DM Components
 
-* YAML config
 * Jinja template and schema
 * Startup script
+* YAML config
 
 ---
 
@@ -67,17 +67,17 @@ Jinja is a modern and designer-friendly templating language for Python, modelled
 
 ### Startup Script
 
-Installs
-* supernova
+Installs...
+* supernova (from cloud location)
 * cromwell
-* in-house code
+* in-house code (from github)
 * additional Linux tools
 
 ---
 
 ### Config YAML
 
-Includes the properties necaessrey to fconfigure the deployment
+Includes the necessary properties to configure the deployment. Included are project specific items, plus data and supernova cloud locations.
 
 ---
 
