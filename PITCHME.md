@@ -1,4 +1,4 @@
-# Running De Novo Assemblies on the Cloud
+## Running De Novo Assemblies on the Cloud
 
 Using Google deployments to run Supernova assemblies at scale using Cromwell workflows.
 
@@ -22,18 +22,11 @@ Supernova is a software package for de novo assembly from Chromium Linked-Reads.
 
 ---
 
-# Components
-
-* cromwell
-* google deployments
-
----
-
-## Cromwell
+# Cromwell
 
 Cromwell is a Workflow Management System geared towards scientific workflows.
 
-Workflow:
+### Cromwell Workflow:
 
 * download read fastqs
 * assemble
