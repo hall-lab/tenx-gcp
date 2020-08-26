@@ -21,10 +21,17 @@ Supernova is a software package for de novo assembly from Chromium Linked-Reads.
  * in-house code and a workflow system
 
 ---
+# In House Code
+
+Scripts and CLI to manage 10X resources and run the assembly pipeline.
+
+---
 
 # Cromwell
 
 Cromwell is a Workflow Management System geared towards scientific workflows.
+
+---
 
 ### Cromwell Workflow:
 
@@ -35,13 +42,36 @@ Cromwell is a Workflow Management System geared towards scientific workflows.
 
 ---
 
-## Google Deployment Manager
+# Google Deployment Manager
 
 Create and manage cloud resources with simple templates.
 
 ---
 
-## 
+## Google DM Components
+
+* YAML config
+* Jinja template and schema
+* Startup script
+
+---
+
+### Jinja Template and Schema
+
+Jinja is a modern and designer-friendly templating language for Python, modelled after Django’s templates.
+
+* Jinja file descrbes cloud resources
+* Schema details the config properties
+
+---
+
+### Startup Script
+
+Installs
+* supernova
+* cromwell
+* in-house code
+* additional linux tools
 
 ---
 * 1
