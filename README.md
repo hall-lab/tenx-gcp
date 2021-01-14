@@ -149,7 +149,6 @@ There is a docker container (`ebelter/tenx:latest`) to use to interact between t
 
 ## Auth from MGI
 In order to use `tenx` CLI and the GCP commands
-
 ```
 $ bsub -q docker-interactive -a 'docker(ebelter/tenx:latest)' /bin/bash
 ```
@@ -164,4 +163,39 @@ $ gcloud init
 Then use `tenx` CLI and GCP commands. Jobs can also submit to the LSF cluster. This command shows all the remote samples.
 ```
 $ bsub -q research-hpc -a 'docker(ebelter/tenx:latest)' tenx list
+```
+# Using TenX CLI
+## Tenx Config File
+The TenX CLI use a configuration file to retreive data locations, both local and remote. These are base directories/URLs, and will have sample names as subdirectories. These sample directories then may have subdirectories of alignment, assembly, and reads. There is more deatil about the config file adn data structure above.
+### Creating the File
+Create a config file (YAML format) to hold the local MGI disk location and the remote GCP bucket. Create the file in a mounted disk spot.
+```
+$ cd /mnt/disk/data # where ever...
+$ vim tenx.yaml     # use editor and file name of your liking
+```
+Then add these lines, changing the locations to your values.
+```
+TENX_DATA_PATH:  /mnt/disk/data
+TENX_REMOTE_URL: gs://mgi-rg-linked-reads-ccdg-pilot
+```
+### Setting the TENX_CONFIG_FILE Enviornment Variable
+Set in the environment...
+```
+$ TENX_CONFIG_FILE=/mnt/disk/data/tenx.yaml; export TENX_CONFIG_FILE
+```
+Use in the CLI...
+```
+$ TENX_CONFIG_FILE=/mnt/disk/data/tenx.yaml tenx asm download <SAMPLE_NAME>
+```
+## Upload/Download Assemblies
+There are commands to upload or download and download assemblies. Setup the TenX config file above to use in the following commands.
+### To/From MGI
+Get an interactive session to and setup the environemnt. You should use the _ebelter/temx:latest_ docker image.
+```
+$ LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -Is -q docker-interactive -a 'docker(ebelter/tenx:latest)' /bin/bash
+$ TENX_CONFIG_FILE=/mnt/disk/data/tenx.yaml; export TENX_CONFIG_FILE
+```
+You will also need to auth into GCP. Then run or submit downloads...
+```
+$ tenx asm download <SAMPLE_NAME> 
 ```
