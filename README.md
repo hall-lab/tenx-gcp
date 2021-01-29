@@ -25,6 +25,9 @@ Configuration is kept in the environment variable "TENX_CONFIG_FILE". These valu
 
 * TENX_SUPERNOVA_SOFTWARE_URL: URL of the supernova tgz to instal
 * TENX_MACHINE_TYPE: GCP machine type for supernova
+* TENX_ASM_PARAMS: Additional params for the `supernova run` command
+* TENX_CROMWELL_PATH: Path for cromwell installation, default is /app/cromwell
+* TENX_CROMWELL_VERSION: Cromwell version. Use >= 53
 
 ### Longranger Config
 * TENX_LONGRANGER_SOFTWARE_URL: URL for longerrange tgz to install
