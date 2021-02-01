@@ -37,6 +37,11 @@ required:
 - zone
 
 properties:
+  aln_params:
+    type        : string
+    description : |
+      Parameters to pass directly to the longranger "align" command.|
+
   disk_size_gb:
     type        : integer
     default     : 2000

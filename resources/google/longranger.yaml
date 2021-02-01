@@ -26,4 +26,7 @@ resources:
 
     # TENX CONFIG
     #notification            : <SLACK_URL>
+
+    # ALIGNMENT PARAMETERS [see schema for details]
+    #aln_params              : <ALN_PARAMS>
 #  [END longranger_yaml]

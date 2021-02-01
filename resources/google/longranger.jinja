@@ -105,5 +105,5 @@ resources:
             {{ imports["../scripts/longranger/startup-script.local.py"]|indent(12) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.longranger.yaml"]|indent(12)|replace("@ALN_MODE@",tenxAlnMode])|replace("@ALN_MEM@",tenxAlnMem])|replace("@ALN_CORES@",tenxAlnCores])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.longranger.yaml"]|indent(12)|replace("@ALN_MODE@",tenxAlnMode])|replace("@ALN_MEM@",tenxAlnMem])|replace("@ALN_CORES@",tenxAlnCores])|replace("@ALN_PARAMS@",properties["aln_params"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}
