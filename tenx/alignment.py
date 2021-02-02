@@ -5,22 +5,27 @@ import tenx.util as util
 
 class TenxAlignment():
 
-    def __init__(self, sample, path):
+    def __init__(self, sample, path, ref=None):
         self.sample = sample
         self.path = path
-        self.pipeline_path = os.path.join(sample.path, 'pipeline-aln')
+        if ref is not None:
+            self.ref = ref
+        self.pipeline_path = os.path.join(sample.path, 'pipeline')
         self.outs_path = os.path.join(self.path, 'outs')
 
     def is_successful(self):
         return os.path.exists( os.path.join(self.outs_path, "summary.csv") )
-
 #-- TenxAlignment
 
-def run_align(aln, ref):
+def run_align(aln):
    sys.stderr.write("Creating alignments for {}\n".format(aln.sample.name))
+   ref = aln.ref
+   if ref is None:
+       raise Exception("Need reference set on alignment!")
 
    sample_d = aln.sample.path
-   if not os.path.exists(sample_d): os.makedirs(sample_d)
+   if not os.path.exists(sample_d):
+       os.makedirs(sample_d)
    sys.stderr.write("Entering {}\n".format(sample_d))
    pwd = os.getcwd()
    os.chdir(sample_d)
@@ -38,7 +43,6 @@ def run_align(aln, ref):
        raise
    finally:
        os.chdir(pwd)
-
 #-- run_align
 
 def run_upload(aln, remote_aln):
@@ -64,5 +68,4 @@ def run_upload(aln, remote_aln):
         os.chdir(pwd)
 
     sys.stderr.write("Upload alignment...OK\n")
-
 #-- run_upload

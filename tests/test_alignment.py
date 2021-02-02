@@ -11,6 +11,7 @@ class TenxAlignmentTest(unittest.TestCase):
 
     def setUp(self):
         self.temp_d = tempfile.TemporaryDirectory()
+        self.ref = TenxReference(name='refdata-GRCh38-2.1.0')
         if TenxApp.config is None: TenxApp()
         TenxApp.config['TENX_DATA_PATH'] = self.temp_d.name
         TenxApp.config['TENX_REMOTE_URL'] = 'gs://data'
@@ -26,9 +27,10 @@ class TenxAlignmentTest(unittest.TestCase):
 
     def test10_alignment(self):
         sample = TenxSample(name="TESTER", base_path=TenxApp.config['TENX_DATA_PATH'])
-        aln = sample.alignment()
+        aln = sample.alignment(self.ref)
+        self.assertEqual(aln.ref, self.ref)
         self.assertEqual(os.path.join(sample.path, "alignment"), aln.path)
-        self.assertEqual(os.path.join(aln.path, 'outs'), aln.outs_path)
+        self.assertEqual(os.path.join(aln.path, "outs"), aln.outs_path)
 
     def test11_is_successful(self):
         sample = TenxSample(name="TEST_SUCCESS", base_path=TenxApp.config['TENX_DATA_PATH'])
@@ -49,13 +51,12 @@ class TenxAlignmentTest(unittest.TestCase):
         sys.stderr = err
 
         sample = TenxSample(name="TEST_SUCCESS", base_path=TenxApp.config['TENX_DATA_PATH'])
-        aln = sample.alignment()
+        aln = sample.alignment(self.ref)
         os.makedirs( os.path.join(aln.path, "outs") )
         with open(os.path.join(aln.path, "outs", "summary.csv"), "w") as f: f.write("SUCCESS!")
-        ref = TenxReference(name="REF")
-        alignment.run_align(aln, ref)
+        alignment.run_align(aln)
 
-        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --vcmode=freebayes --disable-ui --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample.path, ref.directory(), aln.sample.reads_path)
+        expected_err = "Creating alignments for TEST_SUCCESS\nEntering {}\nRunning longranger wgs --id=alignment --sample=TEST_SUCCESS --reference={} --fastqs={} --vcmode=freebayes --disable-ui --jobmode=local --localmem=6 --localcores=1 ...\n".format(aln.sample.path, self.ref.directory(), aln.sample.reads_path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 

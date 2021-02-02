@@ -1,6 +1,7 @@
 import os, unittest
 
 from tenx.app import TenxApp
+from tenx.reference import TenxReference
 from tenx.sample import TenxSample
 
 class TenxSampleTest(unittest.TestCase):
@@ -25,16 +26,20 @@ class TenxSampleTest(unittest.TestCase):
     def test1_aln_asm(self):
         base_path = TenxApp.config.get("TENX_DATA_PATH")
         sample = TenxSample(base_path=base_path, name="TEST-001")
-        aln = sample.alignment()
+        ref = TenxReference(name='refdata-GRCh38-2.1.0')
+
+        aln = sample.alignment(ref=ref)
         self.assertTrue(bool(aln))
         self.assertEqual(aln.__class__.__name__, "TenxAlignment")
         self.assertEqual(os.path.join(sample.path, "alignment"), aln.path)
-        self.assertEqual(aln.sample, sample)
+        self.assertEqual(sample, aln.sample)
+        self.assertEqual(ref, aln.ref)
+
         asm = sample.assembly()
         self.assertTrue(bool(asm))
         self.assertEqual(asm.__class__.__name__, "TenxAssembly")
         self.assertEqual(os.path.join(sample.path, "assembly"), asm.path)
-        self.assertEqual(asm.sample, sample)
+        self.assertEqual(sample, asm.sample)
 
 # -- TenxSampleTest
 
