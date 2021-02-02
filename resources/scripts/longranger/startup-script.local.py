@@ -57,6 +57,7 @@ if __name__ == '__main__':
             "add_tenx_config.py",
             "install_packages.py",
             "install_longranger.py",
+            "install_cromwell.py",
             "install_tenx_cli.py",
             "end_msg.py",
             ]
