@@ -25,7 +25,6 @@ class TenxAssemblyTest(unittest.TestCase):
             sample = TenxSample(name="TESTER", base_path=base_path)
             asm = sample.assembly()
             self.assertEqual(asm.path, os.path.join(sample.path, "assembly"))
-            self.assertEqual(asm.pipeline_path, os.path.join(base_path, 'TESTER', "pipeline"))
             self.assertEqual(asm.path, os.path.join(base_path, 'TESTER', 'assembly'))
             self.assertEqual(asm.mkoutput_path, os.path.join(base_path, 'TESTER', 'assembly', 'mkoutput'))
             self.assertEqual(asm.outs_path, os.path.join(base_path, 'TESTER', 'assembly', 'outs'))

@@ -9,6 +9,7 @@ class TenxSample():
         self.name = name
         self.path = os.path.join(self.base_path, name)
         self.reads_path = os.path.join(self.path, 'reads')
+        self.pipeline_path = os.path.join(self.path, "pipeline")
 
     def alignment(self, ref=None):
         return TenxAlignment(sample=self, path=os.path.join(self.path, "alignment"), ref=ref)

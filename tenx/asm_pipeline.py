@@ -33,8 +33,8 @@ def asm_pipeline_cmd(sample_name):
 #-- asm_pipeline_cmd
  
 def run_pipeline(asm):
-    cromwell = TenxCromwell()
-    cmd = cromwell.supernova_command(asm)
+    cromwell = TenxCromwell(entity=asm)
+    cmd = cromwell.command()
     sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 

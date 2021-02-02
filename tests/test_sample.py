@@ -22,6 +22,7 @@ class TenxSampleTest(unittest.TestCase):
             self.assertEqual(s.name, "TEST-001")
             self.assertEqual(s.path, os.path.join(base_path, "TEST-001"))
             self.assertEqual(s.reads_path, os.path.join(base_path, "TEST-001", "reads"))
+            self.assertEqual(s.pipeline_path, os.path.join(base_path, "TEST-001", "pipeline"))
 
     def test1_aln_asm(self):
         base_path = TenxApp.config.get("TENX_DATA_PATH")

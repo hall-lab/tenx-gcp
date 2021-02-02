@@ -10,7 +10,6 @@ class TenxAlignment():
         self.path = path
         if ref is not None:
             self.ref = ref
-        self.pipeline_path = os.path.join(sample.path, 'pipeline')
         self.outs_path = os.path.join(self.path, 'outs')
 
     def is_successful(self):

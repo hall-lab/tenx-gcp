@@ -7,7 +7,6 @@ class TenxAssembly():
 
     def __init__(self, sample, path):
         self.sample = sample
-        self.pipeline_path = os.path.join(sample.path, 'pipeline')
         self.path = os.path.join(sample.path, 'assembly')
         self.outs_path = os.path.join(self.path, 'outs')
         self.outs_assembly_path = os.path.join(self.outs_path, 'assembly')
