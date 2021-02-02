@@ -22,6 +22,20 @@ class TenxSampleTest(unittest.TestCase):
             self.assertEqual(s.path, os.path.join(base_path, "TEST-001"))
             self.assertEqual(s.reads_path, os.path.join(base_path, "TEST-001", "reads"))
 
+    def test1_aln_asm(self):
+        base_path = TenxApp.config.get("TENX_DATA_PATH")
+        sample = TenxSample(base_path=base_path, name="TEST-001")
+        aln = sample.alignment()
+        self.assertTrue(bool(aln))
+        self.assertEqual(aln.__class__.__name__, "TenxAlignment")
+        self.assertEqual(os.path.join(sample.path, "alignment"), aln.path)
+        self.assertEqual(aln.sample, sample)
+        asm = sample.assembly()
+        self.assertTrue(bool(asm))
+        self.assertEqual(asm.__class__.__name__, "TenxAssembly")
+        self.assertEqual(os.path.join(sample.path, "assembly"), asm.path)
+        self.assertEqual(asm.sample, sample)
+
 # -- TenxSampleTest
 
 if __name__ == '__main__':
