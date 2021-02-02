@@ -1,25 +1,18 @@
 import glob, os, shutil, subprocess, sys, tempfile
 
 from tenx.app import TenxApp
-from tenx.sample import TenxSample
 import tenx.util as util
 
 class TenxAlignment():
 
-    def __init__(self, sample_name):
-        self.sample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_DATA_PATH"))
-
-    def remote_url(self):
-        return os.path.join(TenxApp.config['TENX_REMOTE_URL'], self.sample.name, 'alignment')
-
-    def directory(self):
-        return os.path.join(self.sample.path, 'alignment')
-
-    def outs_directory(self):
-        return os.path.join(self.directory(), 'outs')
+    def __init__(self, sample, path):
+        self.sample = sample
+        self.path = path
+        self.pipeline_path = os.path.join(sample.path, 'pipeline-aln')
+        self.outs_path = os.path.join(self.path, 'outs')
 
     def is_successful(self):
-        return os.path.exists( os.path.join(self.outs_directory(), "summary.csv") )
+        return os.path.exists( os.path.join(self.outs_path, "summary.csv") )
 
 #-- TenxAlignment
 
@@ -39,7 +32,7 @@ def run_align(aln, ref):
             "--localmem={}".format(TenxApp.config['TENX_ALN_MEM']), "--localcores={}".format(TenxApp.config['TENX_ALN_CORES'])]
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)
-       if not os.path.exists(aln.outs_directory()): raise Exception("Longranger exited 0, but {} does not exist!".format(aln.outs_directory()))
+       if not os.path.exists(aln.outs_path): raise Exception("Longranger exited 0, but {} does not exist!".format(aln.outs_path))
    except:
        sys.stderr.write("Failed to run longranger!\n")
        raise
@@ -48,25 +41,25 @@ def run_align(aln, ref):
 
 #-- run_align
 
-def run_upload(aln):
+def run_upload(aln, remote_aln):
     sys.stderr.write("Upload {} alignment...\n".format(aln.sample.name))
 
     if not aln.is_successful(): raise Exception("Refusing to upload an unsuccessful alignment!")
 
     pwd = os.getcwd()
     try:
-        sys.stderr.write("Entering {} ...\n".format(aln.directory()))
-        os.chdir(aln.directory())
+        sys.stderr.write("Entering {} ...\n".format(aln.path))
+        os.chdir(aln.path)
         for cs_subdir in ('ALIGNER_CS', 'PHASER_SVCALLER_CS'):
             if os.path.exists(cs_subdir):
                 sys.stderr.write("Removing logging directory {} prior to upload.\n".format(cs_subdir))
                 shutil.rmtree(cs_subdir)
 
-        sys.stderr.write("Uploading to: {}\n".format(aln.remote_url()))
-        subprocess.check_call(["gsutil", "-m", "rsync", "-r", ".", aln.remote_url()])
+        sys.stderr.write("Uploading to: {}\n".format(remote_aln.path))
+        subprocess.check_call(["gsutil", "-m", "rsync", "-r", ".", remote_aln.path])
 
         sys.stderr.write("Verify upload alignment...\n")
-        util.verify_upload(ldir=aln.directory(), rurl=aln.remote_url())
+        util.verify_upload(ldir=aln.path, rurl=remote_aln.path)
     finally:
         os.chdir(pwd)
 

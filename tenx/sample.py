@@ -11,7 +11,7 @@ class TenxSample():
         self.reads_path = os.path.join(self.path, 'reads')
 
     def alignment(self):
-        return TenxAlignment(sample=self, path=os.path.join(self.path, "assembly"))
+        return TenxAlignment(sample=self, path=os.path.join(self.path, "alignment"))
 
     def assembly(self):
         return TenxAssembly(sample=self, path=os.path.join(self.path, "assembly"))
