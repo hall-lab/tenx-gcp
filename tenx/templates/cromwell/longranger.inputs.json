@@ -1,0 +1,4 @@
+{
+    "longranger.sample_name": "{{ SAMPLE_NAME }}",
+    "longranger.ref__name": "{{ REF_NAME }}"
+}
