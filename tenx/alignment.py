@@ -34,6 +34,9 @@ def run_align(aln):
            "--sample={}".format(aln.sample.name), "--reference={}".format(ref.directory()), "--fastqs={}".format(aln.sample.reads_path),
             "--vcmode={}".format(TenxApp.config['TENX_ALN_VCMODE']), "--disable-ui", "--jobmode={}".format(TenxApp.config['TENX_ALN_MODE']),
             "--localmem={}".format(TenxApp.config['TENX_ALN_MEM']), "--localcores={}".format(TenxApp.config['TENX_ALN_CORES'])]
+       aln_params = TenxApp.config.get("TENX_ALN_PARAMS", None)
+       if aln_params:
+           cmd += aln_params.split(" ")
        sys.stderr.write("Running {} ...\n".format(' '.join(cmd)))
        subprocess.check_call(cmd)
        if not os.path.exists(aln.outs_path): raise Exception("Longranger exited 0, but {} does not exist!".format(aln.outs_path))
