@@ -1,7 +1,7 @@
 import unittest
 from click.testing import CliRunner
 
-from tenx.aln_cli import tenx_aln_cli, aln_align, aln_pipeline, aln_upload
+from tenx.aln_cli import tenx_aln_cli, aln_align, aln_upload
 
 class AlnCliTest(unittest.TestCase):
 
@@ -21,9 +21,9 @@ class AlnCliTest(unittest.TestCase):
 
     def test2_tenx_aln_pipeline(self):
         runner = CliRunner()
-        result = runner.invoke(aln_pipeline, ["--help"])
+        result = runner.invoke(tenx_aln_cli, ["pipeline", "--help"])
         self.assertEqual(result.exit_code, 0)
-        result = runner.invoke(aln_pipeline, [])
+        result = runner.invoke(tenx_aln_cli, ["pipeline"])
         self.assertEqual(result.exit_code, 2)
 
     def test2_tenx_aln_upload(self):
