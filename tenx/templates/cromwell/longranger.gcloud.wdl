@@ -1,8 +1,8 @@
 # Longranger Pipeline
 
 workflow longranger {
-
   String sample_name
+  String ref_name
 
   call localize_reads {
     input:
@@ -17,16 +17,16 @@ workflow longranger {
   call align {
     input:
       sample_name = localize_reads.output_sample_name
+      ref_name = localize_ref.output_ref_name
   }
 
   call upload {
     input:
-      sample_name = mkoutput.output_sample_name
+      sample_name = align.output_sample_name
   }
 }
 
 task localize_reads {
-
   String sample_name
 
   command {
@@ -39,11 +39,10 @@ task localize_reads {
 }
 
 task localize_ref {
-
   String ref_name
 
   command {
-    tenx reads download ${sample_name}
+    tenx ref download ${ref_name}
   }
 
   output {
@@ -52,7 +51,6 @@ task localize_ref {
 }
 
 task align {
-
   String sample_name
   String ref_name
 
@@ -66,10 +64,9 @@ task align {
 }
 
 task upload {
-
   String sample_name
 
   command {
-    tenx asm upload ${sample_name}
+    tenx aln upload ${sample_name}
   } 
 }
