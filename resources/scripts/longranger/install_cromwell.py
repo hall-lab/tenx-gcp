@@ -1,30 +1,29 @@
 #!/usr/bin/python3
 
-import requests, yaml
+import requests, sys, yaml
 
 def install_cromwell(tenx_conf):
-    print("Install cromwell...")
+    sys.stderr.write("Install cromwell...")
     dn = tenx_conf["TENX_CROMWELL_PATH"]
     jar_fn = os.path.join(dn, ".".join(["cromwell", "jar"]))
-    print("Local JAR:  {}".format(jar_fn))
+    sys.stderr.write(f"Local JAR:  {jar_fn}")
     if os.path.exists(jar_fn):
-        print("Already installed at {} ...".format(jar_fn))
+        sys.stderr.write(f"Already installed at {jar_fn} ...")
         return
 
     if not os.path.exists(dn):
         os.makedirs(dn)
     cromwell_version = tenx_conf["TENX_CROMWELL_VERSION"]
-    print("Version: {}".format(cromwell_version))
+    sys.stderr.write(f"Version: {cromwell_version}")
     url = "https://github.com/broadinstitute/cromwell/releases/download/{0}/{1}-{0}.jar".format(cromwell_version, "cromwell")
-    print("URL: {}".format(url))
+    sys.stderr.write(f"URL: {}".format(url))
     response = requests.get(url)
-    if not response.ok: raise Exception("GET failed for {}".format(url))
-    print("Writing content to {}".format(jar_fn))
+    if not response.ok:
+        raise Exception("GET failed for {url}")
+    sys.stderr.write(f"Writing content to {jar_fn}")
     with open(jar_fn, "wb") as f:
         f.write(response.content)
-
-    print("Install cromwell...DONE")
-
+    sys.stderr.write("Install cromwell...DONE")
 #-- install_cromwell
 
 if __name__ == '__main__':
