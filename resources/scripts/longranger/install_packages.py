@@ -4,10 +4,10 @@ import subprocess
 
 def install_packages():
 
-    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client', 'setuptools', 'pyyaml']
+    cmd = ['pip', 'install', '--upgrade', 'google-api-python-client', 'requests>=2.20.0', 'setuptools', 'pyyaml']
     rv = subprocess.check_call(cmd)
 
-    subprocess.call(['pip', 'uninstall', '--yes', 'crcmod']) # ignore rv
+    subprocess.call(['pip', 'uninstall', '--yes', 'crcmod'])
     cmd = ['pip', 'install', '-U', 'crcmod']
     rv = subprocess.check_call(cmd)
 
