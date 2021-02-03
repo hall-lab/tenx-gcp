@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, requests, sys
+import os, requests, sys, yaml
 
 def add_tenx_config_file():
     # /apps/tenx/config.yaml
@@ -8,18 +8,20 @@ def add_tenx_config_file():
     if not os.path.exists(tenx_apps_path):
         os.makedirs(tenx_apps_path)
 
-    tenx_config_file = os.path.join(tenx_apps_path, "config.yaml")
-    if os.path.exists(tenx_config_file):
-        sys.stderr.write("Already added tenx config at {}...SKIPPING\n".format(tenx_config_file))
+    TENX_CONFIG_FILE = os.path.join(tenx_apps_path, "config.yaml")
+    if os.path.exists(TENX_CONFIG_FILE):
+        sys.stderr.write("Already added tenx config at {}...SKIPPING\n".format(TENX_CONFIG_FILE))
         return
 
-    sys.stderr.write("Adding {}\n".format(tenx_config_file))
+    sys.stderr.write(f"Adding {TENX_CONFIG_FILE}\n")
     url = "http://metadata.google.internal/computeMetadata/v1/instance/attributes/tenx-config"
-    sys.stderr.write("GET {}\n".format(url))
+    print("GET {}".format(url))
     response = requests.get(url, headers={ "Metadata-Flavor": "Google" })
-    if not response.ok: raise Exception("GET failed for {}".format(url))
-    with open(tenx_config_file, "w") as f:
-        f.write(response.content)
+    if not response.ok:
+        raise Exception(f"GET failed for {url}")
+    tenx_conf = yaml.safe_load(response.content)
+    with open(TENX_CONFIG_FILE, "w") as f:
+        f.write( yaml.dump(tenx_conf) )
 
 #-- add_tenx_config_file
 
