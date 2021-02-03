@@ -36,6 +36,13 @@ def install_packages():
     cmd = ['yum', 'install', '-y'] + packages
     subprocess.check_call(cmd)
 
+    cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
+    print("RUNNING: {}".format(cmd))
+    rv = subprocess.check_call(cmd)
+
+    subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
+    subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/', '/etc/boto.cfg'])
+
 #-- install_packages
 
 if __name__ == '__main__':
@@ -53,7 +60,6 @@ if __name__ == '__main__':
             "configure_data_disk.py",
             "add_profiled.py",
             "add_tenx_config.py",
-            "install_packages.py",
             "install_longranger.py",
             "install_cromwell.py",
             "install_tenx_cli.py",
