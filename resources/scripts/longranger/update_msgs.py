@@ -1,11 +1,8 @@
 #!/usr/bin/python3
 
-import os, shutil
+import subprocess
 
-def start_motd():
-    if os.path.exists("/etc/motd"):
-        shutil.copy("/etc/motd", "/etc/motd.bak") 
-
+def begin_msg():
     msg = """
 ***    LONGRANGER AND TENX IS CURRENTLY BEING INSTALLED/CONFIGURED IN THE BACKGROUND  ***
 ***                 A TERMINAL BROADCAST WILL ANNOUNCE WHEN COMPLETE                  ***
@@ -14,8 +11,16 @@ def start_motd():
     f = open('/etc/motd', 'w')
     f.write(msg)
     f.close()
+#-- begin_msg()
 
-#-- start_motd()
+def end_msg():
+    f = open('/etc/motd', 'w')
+    f.write('')
+    f.close()
 
-if __name__ == '__main__':
-    start_motd()
+    msg = """
+*** LONGRANGER AND TENX INSTALLATION COMPLETE ***
+***        YOU MAY NEED TO LOG OUT/IN        ***
+"""
+    subprocess.call(['wall', '-n', msg])
+#-- end_msg

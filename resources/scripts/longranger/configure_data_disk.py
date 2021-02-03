@@ -2,10 +2,7 @@
 
 import os, subprocess, sys
 
-DATA_DIR = os.path.join( os.path.sep, "mnt", "disks", "data")
-
-def configure_data_disk():
-
+def configure_data_disk(DATA_DIR):
     cmds = []
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
@@ -30,8 +27,4 @@ def configure_data_disk():
     for cmd in cmds:
         sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
-
 #-- configure_data_disk
-
-if __name__ == '__main__':
-    configure_data_disk()

@@ -25,7 +25,3 @@ def install_cromwell(tenx_conf):
         f.write(response.content)
     sys.stderr.write("Install cromwell...DONE\n")
 #-- install_cromwell
-
-if __name__ == '__main__':
-    conf = yaml.safe_load(open( os.path.join(os.path.sep, "apps", "tenx", "config.yaml") ))
-    install_cromwell(conf)

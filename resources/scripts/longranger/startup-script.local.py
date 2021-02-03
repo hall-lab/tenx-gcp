@@ -2,74 +2,48 @@
 
 import os, shutil, subprocess, sys
 
-def chpath(path):
-    sys.stderr.write("Entering {}\n".format(path))
-    os.chdir(path)
+sys.stderr.write("Startup script...\n")
+tmp_dn = os.path.join(os.path.sep, "tmp")
+os.chdir(tmp_dn)
+cmd = ["git", "clone", "-b", "aln-cromwell", "https://github.com/hall-lab/tenx-gcp.git"]
+#cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
+sys.stderr.write(f"RUNNING: {' '.join(cmd)}\n")
+subprocess.check_call(cmd)
+os.chdir( os.path.join(tmp_dn, "tenx-gcp", "resources", "scripts", "longranger") )
 
-#-- chpath
+sys.stderr.write("Running install scripts...\n")
+DATA_DN = os.path.join(os.path.sep, "mnt", "disks", "data")
+APPS_DN = os.path.join(os.path.sep, "apps")
+TENX_CONFIG_FILE = os.path.join(APPS_DN, "tenx", "config.yaml")
 
-def run_cmd(cmd):
-    sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
-    subprocess.check_call(cmd)
+from update_msgs import begin_msg, end_msg
+begin_msg()
 
-#-- run_cmd
+from configure_data_disk import configure_data_disk
+configure_data_disk(DATA_DN)
 
-def install_packages():
-    packages = [
-        'bsdtar',
-        'ca-certificates',
-        'gcc',
-        'git',
-        'less',
-        'make',
-        'openssl',
-        'openssl-devel',
-        'python3-devel',
-        'python3-setuptools',
-        'redhat-rpm-config',
-        'sssd-client',
-        'tmux',
-        'which',
-        'unzip',
-        ]
+from configure_tenx import configure_tenx
+configure_tenx(TENX_CONFIG_FILE)
 
-    cmd = ['yum', 'install', '-y'] + packages
-    subprocess.check_call(cmd)
+from install_packages import install_packages
+install_packages()
 
-    cmd = ['timedatectl', 'set-timezone', 'America/Chicago']
-    print("RUNNING: {}".format(cmd))
-    rv = subprocess.check_call(cmd)
+import yaml
+with open(TENX_CONFIG_FILE, "r") as f:
+    conf = yaml.safe_load(f)
 
-    subprocess.call(['sed', '-i', 's/^\[Plugin/#[Plugin/', '/etc/boto.cfg'])
-    subprocess.call(['sed', '-i', 's/^plugin_/#plugin_/', '/etc/boto.cfg'])
+from install_longranger import install_longranger
+install_longranger(APPS_DIR, conf["TENX_LONGRANGER_SOFTWARE_URL"])
 
-#-- install_packages
+from install_tenx import install_tenx
+install_tenx(APPS_DIR, conf[""])
 
-if __name__ == '__main__':
-    sys.stderr.write("Startup script...\n")
+from install_cromwell import install_cromwell
+install_tenx(conf)
 
-    install_packages()
-    chpath( os.path.join(os.path.sep, "tmp") )
-    run_cmd(["git", "clone", "-b", "aln-cromwell", "https://github.com/hall-lab/tenx-gcp.git"])
-    #run_cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
-    chpath( os.path.join(os.path.sep, "tmp", "tenx-gcp", "resources", "scripts", "longranger") )
+end_msg()
 
-    sys.stderr.write("Running scripts...\n")
-    scripts = [
-            "begin_msg.py",
-            "configure_data_disk.py",
-            "add_profiled.py",
-            "add_tenx_config.py",
-            "install_longranger.py",
-            "install_cromwell.py",
-            "install_tenx_cli.py",
-            "end_msg.py",
-            ]
-    for script in scripts:
-        run_cmd(["python", script])
-
-    chpath( os.path.join(os.path.sep, "tmp") )
-    sys.stderr.write("Removing tenx-gcp git repo...\n")
-    shutil.rmtree("tenx-gcp")
-
-    sys.stderr.write("Startup script...DONE\n")
+sys.stderr.write("Removing tenx-gcp git repo...\n")
+os.chdir(tmp_dn)
+shutil.rmtree("tenx-gcp")
+sys.stderr.write("Startup script...DONE\n")

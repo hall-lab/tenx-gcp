@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 
-import os, shutil, subprocess, sys
+import os, subprocess, sys
 
 def install_tenx_cli():
-
     if os.path.exists( os.path.join(os.path.sep, "usr", "bin", "tenx") ):
         sys.stderr.write("Already installed tenx cli...SKIPPING")
         return
-    sys.stderr.write("Installing tenx cli...\n")
+    sys.stderr.write("Installing tenx...\n")
 
     pwd = os.getcwd()
     os.chdir( os.path.join(os.path.sep, "tmp", "tenx-gcp") )

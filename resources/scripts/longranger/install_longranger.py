@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 
-import glob, os, shutil, re, subprocess, sys, yaml
+import glob, os, shutil, re, subprocess, sys
 
-APPS_DIR = os.path.join(os.path.sep, "apps")
-
-def install_longranger(LONGRANGER_SOFTWARE_URL):
+def install_longranger(APPS_DIR, LONGRANGER_SOFTWARE_URL):
     if os.path.exists( os.path.join(APPS_DIR, "longranger") ):
         sys.stderr.write("Already installed longranger...SKIPPING\n")
         return
@@ -21,7 +19,8 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     subprocess.check_call(['gsutil', '-m', 'cp', LONGRANGER_SOFTWARE_URL, '.'])
 
     longranger_glob = glob.glob("longranger*gz")
-    if not len(longranger_glob): raise Exception("Failed to find DL'd longranger tgz!")
+    if not len(longranger_glob):
+        raise Exception("Failed to find DL'd longranger tgz!")
     longranger_tgz = longranger_glob[0]
     sys.stderr.write("Found longranger TGZ: {}\n".format(longranger_tgz))
 
@@ -29,14 +28,10 @@ def install_longranger(LONGRANGER_SOFTWARE_URL):
     subprocess.check_call(['bsdtar', 'zxf', longranger_tgz])
 
     longranger_dir = re.sub(r'\.t(ar\.)?gz', "", longranger_tgz)
-    if not os.path.exists(longranger_dir): raise Exception("Failed to find untarred supnova directory!")
+    if not os.path.exists(longranger_dir):
+        raise Exception("Failed to find untarred supnova directory!")
     shutil.move(longranger_dir, 'longranger')
     os.remove(longranger_tgz)
     os.chdir(pwd)
     sys.stderr.write("Install longranger...OK\n")
-
 #-- install_longranger
-
-if __name__ == '__main__':
-    conf = yaml.safe_load(open( os.path.join(APPS_DIR, "tenx", "config.yaml") ))
-    install_longranger(conf['TENX_LONGRANGER_SOFTWARE_URL'])
