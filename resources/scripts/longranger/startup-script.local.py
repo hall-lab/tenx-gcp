@@ -17,20 +17,20 @@ def run_cmd(cmd):
 def install_packages():
     packages = [
         'bsdtar',
-	'ca-certificates',
+        'ca-certificates',
         'gcc',
         'git',
-	'less',
-	'make',
-	'openssl',
-	'openssl-devel',
+        'less',
+        'make',
+        'openssl',
+        'openssl-devel',
         'python3-devel',
         'python3-setuptools',
         'redhat-rpm-config',
-	'sssd-client',
+        'sssd-client',
         'tmux',
-	'which',
-	'unzip',
+        'which',
+        'unzip',
         ]
 
     cmd = ['yum', 'install', '-y'] + packages

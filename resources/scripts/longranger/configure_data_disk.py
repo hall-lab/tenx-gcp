@@ -8,10 +8,10 @@ def configure_data_disk():
 
     cmds = []
     if not os.path.exists(DATA_DIR):
-	os.makedirs(DATA_DIR)
+        os.makedirs(DATA_DIR)
         cmds +=[
             ["mkfs.ext4", "-m", "0", "-F", "-E", "lazy_itable_init=0,discard", "/dev/disk/by-id/scsi-0Google_PersistentDisk_secondary"],
-	    ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR],
+            ["mount", "-o", "discard,defaults", "/dev/sdb", DATA_DIR],
         ]
 
     cmds += [
@@ -28,7 +28,7 @@ def configure_data_disk():
         ]
 
     for cmd in cmds:
-	sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
+        sys.stderr.write("RUNNING: {}\n".format(" ".join(cmd)))
         subprocess.check_call(cmd)
 
 #-- configure_data_disk
