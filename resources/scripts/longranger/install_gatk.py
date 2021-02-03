@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 # FIXME need a little work like REMOTE SOFTWARE URL
 # REQUIRES /apps path to be created
 
