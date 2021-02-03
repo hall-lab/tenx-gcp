@@ -7,18 +7,13 @@ def install_packages():
 
     packages = [
         'ca-certificates',
-        #'gcc',
-        #'git',
-        #'less',
-        #'make',
+        'git',
         'openssl',
         'openssl-devel',
         'python3-devel',
         'python3-setuptools',
-        #'redhat-rpm-config',
         'sssd-client',
         'tmux',
-        #'unzip',
         ]
     cmd = ['yum', 'install', '-y'] + packages
     subprocess.check_call(cmd)
