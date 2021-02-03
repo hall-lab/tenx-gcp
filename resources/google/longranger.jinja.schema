@@ -28,13 +28,16 @@ required:
 - disk_size_gb
 - machine_type
 - node_count
-- project
+- project_name
 - region
 - remote_data_url
 - remote_refs_url
 - service_account
 - longranger_software_url
 - zone
+
+optional:
+- aln_params
 
 properties:
   aln_params:
@@ -60,13 +63,13 @@ properties:
     default     : 1
     description : Number of longranger instances to create.
 
-  project:
-    type        : string
-    description : Project name to use in label on instances.
-
   notification:
     type        : string
     description : Slack URL to post to a channel when pipelines have completed.
+
+  project_name:
+    type        : string
+    description : Project name to use in label on instances.
 
   region:
     type        : string

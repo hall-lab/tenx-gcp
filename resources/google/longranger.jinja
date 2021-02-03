@@ -15,8 +15,8 @@
 {% set networkName = env["deployment"] + "-network" %}
 {% set tenxAlnMode = "local" %}
 # FIXME determine cores/mem
-{% set tenxAlnCores = 32 %}
-{% set tenxAlnMem = 3.5 * tenxAlnCores %}
+{% set tenxAlnCores = 16 %}
+{% set tenxAlnMem = 90 %}
 
 resources:
 - name: {{ networkName }}
@@ -69,10 +69,9 @@ resources:
       boot: true
       autoDelete: true
       initializeParams:
-        sourceImage: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/family/centos-7
-        #sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20190813
+        sourceImage: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/family/centos-8
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
-        diskSizeGb: 10
+        #diskSizeGb: 10
     - deviceName: secondary
       type: PERSISTENT
       mode: READ_WRITE
@@ -105,5 +104,5 @@ resources:
             {{ imports["../scripts/longranger/startup-script.local.py"]|indent(12) }}
         - key: tenx-config
           value: |
-            {{ imports["../config/tenx.longranger.yaml"]|indent(12)|replace("@ALN_MODE@",tenxAlnMode])|replace("@ALN_MEM@",tenxAlnMem])|replace("@ALN_CORES@",tenxAlnCores])|replace("@ALN_PARAMS@",properties["aln_params"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
+            {{ imports["../config/tenx.longranger.yaml"]|indent(12)|replace("@ALN_MODE@",tenxAlnMode)|replace("@ALN_MEM@",tenxAlnMem)|replace("@ALN_CORES@",tenxAlnCores)|replace("@ALN_PARAMS@",properties["aln_params"])|replace("@LONGRANGER_SOFTWARE_URL@",properties["longranger_software_url"])|replace("@REMOTE_DATA_URL@",properties["remote_data_url"])|replace("@REMOTE_REFS_URL@",properties["remote_refs_url"])|replace("@NOTIFICATION@",properties["notification"]) }}
 {% endfor %}
