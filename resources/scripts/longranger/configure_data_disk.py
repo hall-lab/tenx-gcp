@@ -21,7 +21,7 @@ def configure_data_disk():
         ["chgrp", "-R", "adm", DATA_DIR],
     ]
 
-    for subdir in ["references", "logs", "scripts"]:
+    for subdir in ["references"]:
         cmds += [
             ["mkdir", "-p", os.path.join(DATA_DIR, subdir)],
             ["chmod", "0777", os.path.join(DATA_DIR, subdir)],

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import requests, sys, yaml
+import os, requests, sys, yaml
 
 def install_cromwell(tenx_conf):
     sys.stderr.write("Install cromwell...\n")
@@ -28,4 +28,4 @@ def install_cromwell(tenx_conf):
 
 if __name__ == '__main__':
     conf = yaml.safe_load(open( os.path.join(os.path.sep, "apps", "tenx", "config.yaml") ))
-    install_longranger(conf)
+    install_cromwell(conf)
