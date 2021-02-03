@@ -8,7 +8,7 @@ def add_profiled():
         sys.stderr.write("Already added {} ... SKIPPING\n".format(fn))
         return
 
-    sys,stderr.write(f"Adding {fn} ...")
+    sys,stderr.write(f"Adding {fn} ...\n")
     with open(fn, "w") as f:
         f.write("export TENX_CONFIG_FILE=/apps/tenx/config.yaml\n")
         f.write("[ -f /apps/longranger/sourceme.bash ] && . /apps/longranger/sourceme.bash\n")
