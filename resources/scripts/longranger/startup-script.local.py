@@ -83,8 +83,12 @@ def configure_tenx():
     fn = os.path.join(os.path.sep, "etc", "profile.d", "longranger.sh")
     sys.stderr.write(f"Adding {fn} ...\n")
     with open(fn, "w") as f:
-        f.write("export TENX_CONFIG_FILE=/apps/tenx/config.yaml\n")
+        f.write("export TENX_CONFIG_FILE=" + TENX_CONFIG_FILE + "\n")
         f.write("[ -f /apps/longranger/sourceme.bash ] && . /apps/longranger/sourceme.bash\n")
+        f.write("export LANG=en_US.utf-8\n")
+        f.write("export LC_ALL=en_US.utf-8\n")
+        f.write("export CLOUDSDK_PYTHON={}\n".format(sys.executable))
+        f.write("export CLOUDSDK_GSUTIL_PYTHON={}\n".format(sys.executable))
     return tenx_conf
 #-- configure_tenx
 
