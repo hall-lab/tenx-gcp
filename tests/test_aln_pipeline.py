@@ -4,7 +4,7 @@ from mock import call, patch
 import socket
 
 #from tenx.cli import cli
-from tenx.aln_cli import tenx_aln_cli as cli
+from tenx.aln_cli import aln_cli as cli
 from tenx.aln_pipeline import aln_pipeline_cmd, run_pipeline
 import tenx.app, tenx.notifications
 from tenx.alignment import TenxAlignment
