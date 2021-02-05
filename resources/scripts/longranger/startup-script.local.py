@@ -97,12 +97,14 @@ def install_packages():
 
     packages = [
         'ca-certificates',
+        'gcc',
         'git',
         'java',
         'openssl',
         'openssl-devel',
         'python3-devel',
         'python3-setuptools',
+        'redhat-rpm-config',
         'sssd-client',
         'tmux',
         ]
@@ -115,7 +117,7 @@ def install_packages():
 
     # CRC
     pip.main(["uninstall", "--yes", "crcmod"])
-    pip.main(["install", "--no-cache-dir", "-U", "crcmod"])
+    pip.main(["install", "--prefix=/usr", "--no-cache-dir", "-U", "crcmod"])
 #-- install_packages
 
 def install_longranger():
