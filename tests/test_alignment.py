@@ -86,7 +86,7 @@ class TenxAlignmentTest(unittest.TestCase):
         sys.stderr = err
 
         alignment.run_upload(aln, raln)
-        expected_err = "Upload TEST_SUCCESS alignment...\nEntering {} ...\nUploading to: {}\nVerify upload alignment...\nUpload alignment...OK\n".format(aln.path, raln.path)
+        expected_err = f"Upload TEST_SUCCESS alignment...\nLocal path: {aln.path}\nEntering {aln.path} ...\nUploading to: {raln.path}\nVerify upload alignment...\nUpload alignment...OK\n".format(aln.path, raln.path)
         self.assertEqual(err.getvalue(), expected_err)
         sys.stderr = sys.__stderr__
 
