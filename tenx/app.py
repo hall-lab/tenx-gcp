@@ -63,7 +63,7 @@ class TenxCromwell():
     def inputs_for_entity(self):
         inputs = {"SAMPLE_NAME": self.entity.sample.name, }
         if self.pipeline_name == "longranger":
-            inputs["ref"] = self.entity.ref.name
+            inputs["REF_NAME"] = self.entity.ref.name
         return inputs
 
     def command(self):

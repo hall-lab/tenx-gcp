@@ -16,7 +16,7 @@ workflow longranger {
 
   call align {
     input:
-      sample_name = localize_reads.output_sample_name
+      sample_name = localize_reads.output_sample_name,
       ref_name = localize_ref.output_ref_name
   }
 
