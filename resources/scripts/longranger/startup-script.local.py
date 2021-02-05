@@ -164,8 +164,7 @@ def install_tenx():
     pwd = os.getcwd()
     tmp_dn = os.path.join(os.path.sep, "tmp")
     os.chdir(tmp_dn)
-    cmd = ["git", "clone", "-b", "aln-cromwell", "https://github.com/hall-lab/tenx-gcp.git"]
-    #cmd(["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"])
+    cmd = ["git", "clone", "https://github.com/hall-lab/tenx-gcp.git"]
     sys.stderr.write(f"RUNNING: {' '.join(cmd)}\n")
     subprocess.check_call(cmd)
 
