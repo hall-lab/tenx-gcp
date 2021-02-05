@@ -50,12 +50,17 @@ def run_align(aln):
 def run_upload(aln, remote_aln):
     sys.stderr.write("Upload {} alignment...\n".format(aln.sample.name))
 
+    local_d = aln.path
+    sys.stderr.write("Local path: {}\n".format(local_d))
+    if not os.path.exists(local_d):
+        raise Exception("Cannot find local assembly path!")
+
     if not aln.is_successful(): raise Exception("Refusing to upload an unsuccessful alignment!")
 
     pwd = os.getcwd()
     try:
-        sys.stderr.write("Entering {} ...\n".format(aln.path))
-        os.chdir(aln.path)
+        sys.stderr.write("Entering {} ...\n".format(local_d))
+        os.chdir(local_d)
         for cs_subdir in ('ALIGNER_CS', 'PHASER_SVCALLER_CS'):
             if os.path.exists(cs_subdir):
                 sys.stderr.write("Removing logging directory {} prior to upload.\n".format(cs_subdir))
@@ -65,7 +70,7 @@ def run_upload(aln, remote_aln):
         subprocess.check_call(["gsutil", "-m", "rsync", "-r", ".", remote_aln.path])
 
         sys.stderr.write("Verify upload alignment...\n")
-        util.verify_upload(ldir=aln.path, rurl=remote_aln.path)
+        util.verify_upload(ldir=local_d, rurl=remote_aln.path, ignore=["ALIGNER_CS", "PHASER_SVCALLER_CS"])
     finally:
         os.chdir(pwd)
 

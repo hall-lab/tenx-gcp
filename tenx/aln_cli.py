@@ -51,6 +51,6 @@ def aln_upload_cmd(sample_name):
     sample = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
     aln = sample.alignment()
     rsample = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
-    raln = sample.alignment()
+    raln = rsample.alignment()
     alignment.run_upload(aln, raln)
 aln_cli.add_command(aln_upload_cmd, name="upload")
