@@ -63,11 +63,21 @@ class TenxAppTest1(unittest.TestCase):
         TenxApp.config = { "TENX_CROMWELL_PATH": self.data_dn, }
 
         ref = TenxReference(name="__REF__")
-        sample_entities = {
-                "supernova": self.asm,
-                "longranger": self.aln,
-        }
-        for pipeline_name, entity in sample_entities.items():
+        test_params = [
+                {
+                    "pipeline": "supernova",
+                    "entity": self.asm,
+                    "inputs": {"SAMPLE_NAME": self.asm.sample.name},
+                },
+                {
+                    "pipeline": "longranger",
+                    "entity": self.aln,
+                    "inputs": {"SAMPLE_NAME": self.aln.sample.name, "REF_NAME": self.aln.ref.name},
+                },
+                ]
+        for p in test_params:
+            pipeline_name = p["pipeline"]
+            entity = p["entity"]
             cromwell = TenxCromwell(entity=entity)
             self.assertTrue(cromwell)
             self.assertEqual(cromwell.entity, entity)
@@ -86,6 +96,8 @@ class TenxAppTest1(unittest.TestCase):
             self.assertEqual(cromwell.wdl_bn, wdl_bn)
             conf_bn = ".".join([pipeline_name, "conf"])
             self.assertEqual(cromwell.conf_bn, conf_bn)
+
+            self.assertDictEqual(cromwell.inputs_for_entity(), p["inputs"])
 
             conf_fn = os.path.join(cromwell.pipeline_dn, conf_bn)
             inputs_fn = os.path.join(cromwell.pipeline_dn, inputs_bn)
