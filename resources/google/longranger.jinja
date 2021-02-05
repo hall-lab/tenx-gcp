@@ -71,7 +71,6 @@ resources:
       initializeParams:
         sourceImage: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/family/centos-8
         diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-standard
-        #diskSizeGb: 10
     - deviceName: secondary
       type: PERSISTENT
       mode: READ_WRITE

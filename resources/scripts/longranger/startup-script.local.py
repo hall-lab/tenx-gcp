@@ -98,6 +98,7 @@ def install_packages():
     packages = [
         'ca-certificates',
         'git',
+        'java',
         'openssl',
         'openssl-devel',
         'python3-devel',
