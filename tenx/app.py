@@ -31,9 +31,18 @@ class TenxApp(object):
 # -- TenxApp
 
 class TenxCromwell():
-    def __init__(self):
+    def __init__(self, entity):
         if not TenxApp.config:
             raise Exception("Tenx config has not been initialized!")
+
+        self.entity = entity
+        eclass = entity.__class__.__name__
+        if eclass == "TenxAlignment":
+            self.pipeline_name = "longranger"
+        elif eclass == "TenxAssembly":
+            self.pipeline_name = "supernova"
+        else:
+            raise Exception(f"Unknown entity: {eclass}")
 
         self.cromwell_dn = TenxApp.config.get("TENX_CROMWELL_PATH", None)
         if not self.cromwell_dn:
@@ -45,45 +54,46 @@ class TenxCromwell():
         if not os.path.exists(self.cromwell_jar):
             raise Exception("Cromwell jar not found at {}!".format(self.cromwell_jar))
 
-    def templates_dn(self):
-        return os.path.join(os.path.dirname(__file__), "templates", "cromwell")
+        self.pipeline_dn = entity.sample.pipeline_path
+        self.templates_dn = os.path.join(os.path.dirname(__file__), "templates", "cromwell")
+        self.inputs_bn = ".".join([self.pipeline_name, "inputs", "json"])
+        self.wdl_bn = ".".join([self.pipeline_name, "gcloud", "wdl"])
+        self.conf_bn = ".".join([self.pipeline_name, "conf"])
 
-    def inputs_bn(self):
-        return ".".join(["supernova", "inputs", "json"])
+    def inputs_for_entity(self):
+        inputs = {"SAMPLE_NAME": self.entity.sample.name, }
+        if self.pipeline_name == "longranger":
+            inputs["REF_NAME"] = self.entity.ref.name
+        return inputs
 
-    def wdl_bn(self):
-        return ".".join(["supernova", "gcloud", "wdl"])
-
-    def conf_bn(self):
-        return ".".join(["supernova", "conf"])
-
-    def supernova_command(self, asm):
-        templates_dn = self.templates_dn()
-        pipeline_dn = asm.pipeline_path
+    def command(self):
+        templates_dn = self.templates_dn
+        pipeline_dn = self.pipeline_dn
         if not os.path.exists(pipeline_dn):
             os.makedirs(pipeline_dn)
 
         # Write Inputs
-        inputs_bn = self.inputs_bn()
+        inputs_bn = self.inputs_bn
         inputs_template_fn = os.path.join(templates_dn, inputs_bn)
         with open(inputs_template_fn, "r") as f:
             inputs_str = f.read()
         inputs_t = jinja2.Template(inputs_str)
-        inputs_rendered = inputs_t.render(SAMPLE_NAME=asm.sample.name)
+        inputs = self.inputs_for_entity()
+        inputs_rendered = inputs_t.render(**inputs)
         inputs = json.loads(inputs_rendered)
         inputs_fn = os.path.join(pipeline_dn, inputs_bn)
         with open(inputs_fn, "w") as f:
             f.write(json.dumps(inputs))
 
         # Write WDL
-        wdl_bn = self.wdl_bn()
+        wdl_bn = self.wdl_bn
         wdl_template_fn = os.path.join(templates_dn, wdl_bn)
         wdl_fn = os.path.join(pipeline_dn, wdl_bn)
         with open(wdl_template_fn, "r") as in_f, open(wdl_fn, "w") as out_f:
             out_f.write(in_f.read())
 
         # Write CONF
-        conf_bn = self.conf_bn()
+        conf_bn = self.conf_bn
         conf_template_fn = os.path.join(templates_dn, conf_bn)
         with open(conf_template_fn, "r") as f:
             conf_str = f.read()

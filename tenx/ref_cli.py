@@ -1,7 +1,7 @@
 import click
 
 from tenx.app import TenxApp
-from tenx.reference import TenxReference
+from tenx.reference import TenxReference, download
 
 # REFERENCE
 @click.group()
@@ -18,7 +18,7 @@ def ref_download(ref_name):
     Download reference sequences from cloud storage to local disk.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    tenx.reference.download(TenxReference(name=ref_name))
+    download(TenxReference(name=ref_name))
 tenx_ref_cli.add_command(ref_download, name="download")
 
 #-- REFERENCE

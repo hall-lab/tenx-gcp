@@ -6,8 +6,7 @@ from tenx.version import __version__
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version=__version__)
-@click.pass_context
-def cli(ctx):
+def cli():
     """
     10X CLI
     """
@@ -15,8 +14,8 @@ def cli(ctx):
     pass
 
 # ALIGNMENT
-from tenx.aln_cli import tenx_aln_cli
-cli.add_command(tenx_aln_cli, name="aln")
+from tenx.aln_cli import aln_cli
+cli.add_command(aln_cli, name="aln")
 
 # ASSEMBLY
 from tenx.asm_cli import tenx_asm_cli

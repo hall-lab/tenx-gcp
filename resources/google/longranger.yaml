@@ -11,7 +11,7 @@ resources:
     service_account         : <SERVICE_ACCOUNT>
     region                  : <REGION>
     zone                    : <ZONE>
-    project                 : <PROJECT>
+    project_name            : <PROJECT>
 
     # MACHINES - 10X GENOMICS RECOMMENDATION
     machine_type            : n1-highmem-16
@@ -26,4 +26,7 @@ resources:
 
     # TENX CONFIG
     #notification            : <SLACK_URL>
+
+    # ALIGNMENT PARAMETERS [see schema for details]
+    #aln_params              : <ALN_PARAMS>
 #  [END longranger_yaml]

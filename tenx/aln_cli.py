@@ -10,6 +10,7 @@ import tenx.util as util
 
 from tenx.alignment import TenxAlignment
 from tenx.reference import TenxReference
+from tenx.sample import TenxSample
 
 # ALIGNMENT
 # - align
@@ -17,7 +18,7 @@ from tenx.reference import TenxReference
 # - upload
 
 @click.group()
-def tenx_aln_cli():
+def aln_cli():
     """
     Commands, Pipeline, and Helpers for Alignments
     """
@@ -26,55 +27,30 @@ def tenx_aln_cli():
 @click.command(short_help="align with longranger")
 @click.argument('sample-name', type=click.STRING)
 @click.argument('ref-name', type=click.STRING)
-def aln_align(sample_name, ref_name):
+def aln_align_cmd(sample_name, ref_name):
     """
     Create alignments with longranger.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    alignment.run_align(TenxAlignment(sample_name=sample_name), TenxReference(name=ref_name))
-tenx_aln_cli.add_command(aln_align, name="align")
+    sample = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
+    ref = TenxReference(name=ref_name)
+    aln = sample.alignment(ref=ref)
+    alignment.run_align(aln)
+aln_cli.add_command(aln_align_cmd, name="align")
 
-@click.command(short_help="run the full longranger wgs alignment pipeline")
-@click.argument('sample-name', type=click.STRING)
-@click.argument('ref-name', type=click.STRING)
-def aln_pipeline(sample_name, ref_name):
-    """
-    Fully automated pipeline to create longranger wgs alignments.
-
-    Process includes: downloading reads & reference, running longranger, and then uploading the alignments to the cloud.
-    """
-    assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    sys.stderr.write("Run longranger wgs pipeline for {}".format(sample_name))
-    notifications.slack("{} ALN START {}".format(sample_name, socket.gethostname()))
-    try:
-        ref = TenxReference(name=ref_name)
-        reference.download(ref)
-        sample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_DATA_PATH"))
-        rsample = TenxSample(name=sample_name, base_path=TenxApp.config.get("TENX_REMOTE_URL"))
-        reads.download(sample, rsample)
-        aln = alignment.TenxAlignment(sample_name=sample_name)
-        alignment.run_align(aln, ref)
-        compute_metrics = util.calculate_compute_metrics(aln.directory())
-        print( report.compute_metrics_basic(compute_metrics) )
-        with open(os.path.join(aln.directory(), "outs", "compute-metrics.txt"), "w") as f:
-            f.write( report.compute_metrics_basic(metrics=compute_metrics) )
-        alignment.run_upload(aln)
-        sys.stderr.write("Run longranger wgs alignment pipeline...OK")
-    except BaseException as ex:
-        sys.stderr.write("Exception: {}\n".format(ex))
-        sys.stderr.write("Exception encountered, sending notifications if configured...\n")
-        notifications.slack("{} ALN FAILED {}".format(sample_name, socket.gethostname()))
-        raise
-    sys.stderr.write("Finished, sending notifications if configured...\n")
-    notifications.slack("{} ALN SUCCESS {}".format(sample_name, socket.gethostname()))
-tenx_aln_cli.add_command(aln_pipeline, name="pipeline")
+from tenx.aln_pipeline import aln_pipeline_cmd
+aln_cli.add_command(aln_pipeline_cmd, name="pipeline")
 
 @click.command(short_help="to the cloud")
 @click.argument('sample-name', type=click.STRING)
-def aln_upload(sample_name):
+def aln_upload_cmd(sample_name):
     """
     Upload an assembly from local disk to cloud storage.
     """
     assert bool(TenxApp.config) is True, "Must provide tenx yaml config file!"
-    alignment.run_upload(alignment.TenxAlignment(sample_name=sample_name))
-tenx_aln_cli.add_command(aln_upload, name="upload")
+    sample = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_DATA_PATH"])
+    aln = sample.alignment()
+    rsample = TenxSample(name=sample_name, base_path=TenxApp.config["TENX_REMOTE_URL"])
+    raln = rsample.alignment()
+    alignment.run_upload(aln, raln)
+aln_cli.add_command(aln_upload_cmd, name="upload")

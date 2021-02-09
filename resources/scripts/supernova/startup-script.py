@@ -53,7 +53,7 @@ def install_packages():
 
     # CRC
     pip.main(["uninstall", "--yes", "crcmod"])
-    pip.main(["install", "--no-cache-dir", "-U", "crcmod"])
+    pip.main(["install", "--prefix=/usr", "--no-cache-dir", "-U", "crcmod"])
 
     # Timezone
     cmd = ['timedatectl', 'set-timezone', 'America/Chicago']

@@ -2,6 +2,7 @@ import os, sys, tempfile, unittest, yaml
 from mock import patch
 
 from tenx.app import TenxApp, TenxCromwell
+from tenx.reference import TenxReference
 from tenx.sample import TenxSample
 
 class TenxAppTest1(unittest.TestCase):
@@ -9,6 +10,10 @@ class TenxAppTest1(unittest.TestCase):
     def setUp(self):
         self.data_dn = os.path.join(os.path.dirname(__file__), "data", "app")
         self.temp_d = tempfile.TemporaryDirectory()
+        self.sample = TenxSample(name="__TEST__", base_path=self.temp_d.name)
+        self.asm = self.sample.assembly()
+        self.ref = TenxReference(name="__REF__")
+        self.aln = self.sample.alignment(ref=self.ref)
         TenxApp.config = None
 
     def tearDown(self):
@@ -43,44 +48,67 @@ class TenxAppTest1(unittest.TestCase):
         self.assertIsNotNone(tenxapp)
         self.assertDictEqual(tenxapp.config, config)
 
-    def test_cromwell(self):
+    def test_cromwell_fails(self):
         with self.assertRaisesRegex(Exception, "Tenx config has not been initialized!"):
-            cromwell = TenxCromwell()
+            cromwell = TenxCromwell(entity=self.asm)
 
         TenxApp.config = { "TENX_CROMWELL_PATH": "/", }
         with self.assertRaisesRegex(Exception, "Cromwell jar not found at /cromwell.jar!"):
-            cromwell = TenxCromwell()
+            cromwell = TenxCromwell(entity=self.asm)
 
+        with self.assertRaisesRegex(Exception, "Unknown entity:"):
+            cromwell = TenxCromwell(entity=self.sample)
+
+    def test_cromwell(self):
         TenxApp.config = { "TENX_CROMWELL_PATH": self.data_dn, }
-        cromwell = TenxCromwell()
-        self.assertTrue(cromwell)
 
-        templates_dn = cromwell.templates_dn()
-        self.assertTrue(templates_dn)
+        ref = TenxReference(name="__REF__")
+        test_params = [
+                {
+                    "pipeline": "supernova",
+                    "entity": self.asm,
+                    "inputs": {"SAMPLE_NAME": self.asm.sample.name},
+                },
+                {
+                    "pipeline": "longranger",
+                    "entity": self.aln,
+                    "inputs": {"SAMPLE_NAME": self.aln.sample.name, "REF_NAME": self.aln.ref.name},
+                },
+                ]
+        for p in test_params:
+            pipeline_name = p["pipeline"]
+            entity = p["entity"]
+            cromwell = TenxCromwell(entity=entity)
+            self.assertTrue(cromwell)
+            self.assertEqual(cromwell.entity, entity)
+            self.assertEqual(cromwell.pipeline_name, pipeline_name)
 
-        cromwell_dn = cromwell.cromwell_dn
-        self.assertEqual(cromwell_dn, TenxApp.config.get("TENX_CROMWELL_PATH"))
-        self.assertEqual(cromwell.cromwell_jar, os.path.join(cromwell_dn, "cromwell.jar"))
+            templates_dn = cromwell.templates_dn
+            self.assertTrue(templates_dn)
 
-        inputs_bn = ".".join(["supernova", "inputs", "json"])
-        self.assertEqual(cromwell.inputs_bn(), inputs_bn)
-        wdl_bn = ".".join(["supernova", "gcloud", "wdl"])
-        self.assertEqual(cromwell.wdl_bn(), wdl_bn)
-        conf_bn = ".".join(["supernova", "conf"])
-        self.assertEqual(cromwell.conf_bn(), conf_bn)
+            cromwell_dn = cromwell.cromwell_dn
+            self.assertEqual(cromwell_dn, TenxApp.config.get("TENX_CROMWELL_PATH"))
+            self.assertEqual(cromwell.cromwell_jar, os.path.join(cromwell_dn, "cromwell.jar"))
 
-        sample = TenxSample(name="__TEST__", base_path=self.temp_d.name)
-        asm = sample.assembly()
-        conf_fn = os.path.join(asm.pipeline_path, conf_bn)
-        inputs_fn = os.path.join(asm.pipeline_path, inputs_bn)
-        wdl_fn = os.path.join(asm.pipeline_path, wdl_bn)
+            inputs_bn = ".".join([pipeline_name, "inputs", "json"])
+            self.assertEqual(cromwell.inputs_bn, inputs_bn)
+            wdl_bn = ".".join([pipeline_name, "gcloud", "wdl"])
+            self.assertEqual(cromwell.wdl_bn, wdl_bn)
+            conf_bn = ".".join([pipeline_name, "conf"])
+            self.assertEqual(cromwell.conf_bn, conf_bn)
 
-        cmd = cromwell.supernova_command(asm)
-        expected_cmd = ["java", "-Dconfig={}".format(conf_fn), "-jar", cromwell.cromwell_jar, wdl_fn, "-i", inputs_fn]
+            self.assertDictEqual(cromwell.inputs_for_entity(), p["inputs"])
 
-        self.assertTrue(os.path.exists(conf_fn))
-        self.assertTrue(os.path.exists(inputs_fn))
-        self.assertTrue(os.path.exists(wdl_fn))
+            conf_fn = os.path.join(cromwell.pipeline_dn, conf_bn)
+            inputs_fn = os.path.join(cromwell.pipeline_dn, inputs_bn)
+            wdl_fn = os.path.join(cromwell.pipeline_dn, wdl_bn)
+
+            cmd = cromwell.command()
+            expected_cmd = ["java", "-Dconfig={}".format(conf_fn), "-jar", cromwell.cromwell_jar, wdl_fn, "-i", inputs_fn]
+
+            self.assertTrue(os.path.exists(conf_fn))
+            self.assertTrue(os.path.exists(inputs_fn))
+            self.assertTrue(os.path.exists(wdl_fn))
 
 #-- TenxAppTest1
 
